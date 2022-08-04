@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/ap_top_layout"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/eightDpMargin"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/ic_back_arrow"
+                    app:tint="@color/black"
+                    android:id="@+id/ap_back_arrow"
+                    />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/add_product_text"
+                    android:layout_marginLeft="@dimen/eightDpMargin"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/xlargeText" />
+
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/ap_quick_product_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quick_mode_text" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:id="@+id/ap_first_layout"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/eightDpMargin"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        >
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/test_data_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dummy_info_text"
+                            android:textColor="@color/primary_positive_color"
+                            android:textSize="@dimen/mediumText" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="end"
+                        >
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/ap_add_description_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primary_positive_color"
+                            android:text="@string/get_title_text"
+                            android:textSize="@dimen/mediumText" />
+                    </LinearLayout>
+
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/eightDpMargin"
+                    android:background="@drawable/border"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/ap_cate_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/defaultDpMargin" />
+                </LinearLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tenDpMargin">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/eightDpMargin"
+                        android:orientation="vertical"
+
+                        >
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/title_text"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/mediumText"
+                            />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:hint="@string/title_text"
+                            android:id="@+id/ap_title_wrapper"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxHeight="300dp"
+                            android:isScrollContainer="true"
+                            android:hint="@string/title_text"
+                            android:textSize="@dimen/largeText"
+                            android:inputType="textMultiLine" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_title_list_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_title_options_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:entries="@array/add_product_options" />
+
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/ap_title_list_with_fields_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/choose_the_list_of_values"
+                            android:visibility="gone"
+                            app:backgroundTint="@color/primary_positive_color" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active List:"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/largeText"
+                            android:id="@+id/ap_title_active_list_name"
+                            android:layout_gravity="center_horizontal"
+                            android:visibility="gone"
+                            />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:hint="@string/set_the_default_value"
+                            android:id="@+id/ap_title_non_changeable_default_text_input_wrapper"
+                            android:visibility="gone"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_title_non_changeable_default_text_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/set_the_default_value"
+                            android:textSize="@dimen/largeText"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                             />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ap_title_sources_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/eightDpMargin"
+                            android:layout_marginTop="@dimen/sixtyDpMargin"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/selected_insales_product_image_view">
+
+                            <LinearLayout
+                                android:id="@+id/ap_title_camera_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:src="@drawable/camera" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_title_images_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/gallery" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_title_voice_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_voice"
+                                    app:tint="@color/primary_positive_color" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
+
+
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tenDpMargin">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/eightDpMargin"
+                        android:orientation="vertical"
+                        >
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/description_text"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/mediumText"
+                            />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:hint="@string/description_text"
+                            android:id="@+id/ap_description_wrapper"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxHeight="300dp"
+                            android:isScrollContainer="true"
+                            android:gravity="start"
+                            android:textSize="@dimen/largeText"
+                            android:hint="@string/description_text"
+                            android:inputType="textMultiLine" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_description_list_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_description_options_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:entries="@array/add_product_options" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/ap_description_list_with_fields_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/choose_the_list_of_values"
+                            android:visibility="gone"
+                            app:backgroundTint="@color/primary_positive_color" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active List:"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/largeText"
+                            android:layout_gravity="center_horizontal"
+                            android:id="@+id/ap_description_active_list_name"
+                            android:visibility="gone"
+                            />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:hint="@string/set_the_default_value"
+                            android:id="@+id/ap_description_non_changeable_default_text_input_wrapper"
+                            android:visibility="gone"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_description_non_changeable_default_text_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/largeText"
+                            android:hint="@string/set_the_default_value"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                             />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:id="@+id/ap_description_sources_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/eightDpMargin"
+                            android:layout_marginTop="@dimen/sixtyDpMargin"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/selected_insales_product_image_view">
+
+                            <LinearLayout
+                                android:id="@+id/ap_description_camera_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:src="@drawable/camera" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_description_images_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/gallery" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_description_voice_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_voice"
+                                    app:tint="@color/primary_positive_color" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tenDpMargin">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/eightDpMargin"
+                        android:orientation="vertical"
+                        >
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/quantity_text"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/mediumText"
+                            />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:hint="@string/quantity_text"
+                            android:id="@+id/ap_quantity_wrapper"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_quantity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/largeText"
+                            android:hint="@string/quantity_text"
+                            android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_quantity_list_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_quantity_options_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:entries="@array/three_add_product_options" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/ap_quantity_list_with_fields_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/choose_the_list_of_values"
+                            android:visibility="gone"
+                            app:backgroundTint="@color/primary_positive_color" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active List:"
+                            android:textColor="@color/black"
+                            android:layout_gravity="center_horizontal"
+                            android:textSize="@dimen/largeText"
+                            android:id="@+id/ap_quantity_active_list_name"
+                            android:visibility="gone"
+                            />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:hint="@string/set_the_default_value"
+                            android:id="@+id/ap_quantity_non_changeable_default_text_input_wrapper"
+                            android:visibility="gone"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_quantity_non_changeable_default_text_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/set_the_default_value"
+                            android:imeOptions="actionDone"
+                            android:textSize="@dimen/largeText"
+                            android:inputType="number"
+                            />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:id="@+id/ap_quantity_sources_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/eightDpMargin"
+                            android:layout_marginTop="@dimen/sixtyDpMargin"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/selected_insales_product_image_view">
+
+                            <LinearLayout
+                                android:id="@+id/ap_quantity_camera_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:src="@drawable/camera" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_quantity_images_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/gallery" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_quantity_voice_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_voice"
+                                    app:tint="@color/primary_positive_color" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/tenDpMargin">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/eightDpMargin"
+                        android:orientation="vertical"
+                        >
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/price_text"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/mediumText"
+                            />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:hint="@string/price_text"
+                            android:id="@+id/ap_price_wrapper"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_price"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/largeText"
+                            android:hint="@string/price_text"
+                            android:inputType="number" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_price_list_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:visibility="gone" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:background="@drawable/border"
+                            android:orientation="vertical">
+
+                            <androidx.appcompat.widget.AppCompatSpinner
+                                android:id="@+id/ap_price_options_spinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:entries="@array/three_add_product_options" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/ap_price_list_with_fields_btn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/choose_the_list_of_values"
+                            android:visibility="gone"
+                            app:backgroundTint="@color/primary_positive_color" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active List:"
+                            android:textColor="@color/black"
+                            android:layout_gravity="center_horizontal"
+                            android:textSize="@dimen/largeText"
+                            android:id="@+id/ap_price_active_list_name"
+                            android:visibility="gone"
+                            />
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            app:hintEnabled="false"
+                            app:endIconMode="clear_text"
+                            android:layout_marginTop="@dimen/eightDpMargin"
+                            android:hint="@string/set_the_default_value"
+                            android:id="@+id/ap_price_non_changeable_default_text_input_wrapper"
+                            android:visibility="gone"
+                            >
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ap_price_non_changeable_default_text_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/set_the_default_value"
+                            android:textSize="@dimen/largeText"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <LinearLayout
+                            android:id="@+id/ap_price_sources_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/eightDpMargin"
+                            android:layout_marginTop="@dimen/sixtyDpMargin"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/selected_insales_product_image_view">
+
+                            <LinearLayout
+                                android:id="@+id/ap_price_camera_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:src="@drawable/camera" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_price_images_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/gallery" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ap_price_voice_layout"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:layout_width="60dp"
+                                    android:layout_height="60dp"
+                                    android:padding="5dp"
+                                    android:src="@drawable/ic_voice"
+                                    app:tint="@color/primary_positive_color" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/selected_insales_add_product_image_view"
+                    android:layout_width="250dp"
+                    android:layout_height="250dp"
+                    android:layout_marginTop="@dimen/defaultDpMargin"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/placeholder"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:id="@+id/image_sources_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/eightDpMargin"
+                    android:layout_marginTop="@dimen/sixtyDpMargin"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/selected_insales_product_image_view">
+
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/camera_image_view"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:src="@drawable/camera" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/images_image_view"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:padding="5dp"
+                            android:src="@drawable/gallery" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <androidx.appcompat.widget.AppCompatImageView
+                            android:id="@+id/internet_image_view"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:padding="5dp"
+                            android:src="@drawable/internet"
+                            app:tint="@color/primary_positive_color" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ap_images_recyclerview"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ap_dialog_submit_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/eightDpMargin"
+                    android:text="@string/submit" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ap_dialog_cancel_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/eightDpMargin"
+                    android:text="@string/cancel_text"
+                    app:backgroundTint="@color/secondary_positive_color" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ap_top_layout"
+            android:layout_margin="@dimen/defaultDpMargin"
+            android:id="@+id/ap_second_layout"
+            android:visibility="gone"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_margin="@dimen/eightDpMargin"
+                >
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/test_data_button1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:text="@string/dummy_info_text"
+                    android:textColor="@color/primary_positive_color"
+                    android:textSize="@dimen/mediumText"
+                     />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:visibility="gone"
+                    android:id="@+id/get_title_text_view"
+                    android:textColor="@color/primary_positive_color"
+                    android:text="@string/get_title_text"
+                    android:textSize="@dimen/mediumText"
+                    />
+            </LinearLayout>
+
+
+            <com.mywebsite.insalesproductinfoapp.utils.MyViewPager
+                android:id="@+id/ap_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/ap_next_previous_buttons"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ap_second_layout"
+            android:visibility="gone"
+            >
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Previous"
+                android:textSize="@dimen/largeText"
+                android:textColor="@color/primary_positive_color"
+                android:id="@+id/ap_previous_btn"
+                android:layout_margin="@dimen/eightDpMargin"
+                android:visibility="invisible"
+                />
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Next"
+                android:gravity="end"
+                android:textSize="@dimen/largeText"
+                android:textColor="@color/primary_positive_color"
+                android:id="@+id/ap_next_btn"
+                android:layout_margin="@dimen/eightDpMargin"
+                />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

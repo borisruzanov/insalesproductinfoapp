@@ -6,4 +6,92 @@
     android:layout_height="match_parent"
     tools:context=".view.activities.LoginActivity">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/insales_login_wrapper_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/sixtyDpMargin"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/sixtyDpMargin"
+            android:orientation="vertical"
+            android:padding="@dimen/small">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/insales_login_text"
+                android:textColor="@color/black"
+                android:textSize="@dimen/xxlargeText" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/eightDpMargin"
+                android:text="@string/shop_name_hint_text"
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/insales_login_shop_name_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/radius_text_input_field"
+                android:inputType="text"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/eightDpMargin"
+                android:text="@string/email_text"
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/insales_login_email_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/radius_text_input_field"
+                android:inputType="textEmailAddress"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/eightDpMargin"
+                android:text="@string/password"
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/insales_login_password_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/radius_text_input_field"
+                android:inputType="textPassword"
+                android:textSize="@dimen/mediumText" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/insales_login_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/sixtyDpMargin"
+                android:text="@string/login"
+                android:textSize="@dimen/largeText"
+                app:backgroundTint="@color/secondary_positive_color" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
