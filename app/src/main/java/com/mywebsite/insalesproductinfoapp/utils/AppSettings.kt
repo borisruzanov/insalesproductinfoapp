@@ -42,7 +42,7 @@ class AppSettings(context:Context) {
 
     }
 
-    fun getUser(key: String): User {
+    fun getUser(key: String): User? {
         val value = appSharedPrefs.getString(key, "")
         return Gson().fromJson(value, User::class.java)
     }

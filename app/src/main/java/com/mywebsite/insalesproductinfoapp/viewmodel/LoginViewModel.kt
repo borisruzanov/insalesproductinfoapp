@@ -6,8 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
+import com.mywebsite.insalesproductinfoapp.model.User
 import com.mywebsite.insalesproductinfoapp.retrofit.ApiRepository
 import com.mywebsite.insalesproductinfoapp.utils.AppSettings
+import com.mywebsite.insalesproductinfoapp.utils.Constants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +32,9 @@ class LoginViewModel(context: Context) : ViewModel() {
 
     private fun checkUserLoginStatus(){
         val insalesStatus = appSettings.getString("INSALES_STATUS")
+        val user = appSettings.getUser(Constants.user)
         _isLoading.value = false
-        isLogged.value = insalesStatus!!.isNotEmpty() && insalesStatus == "logged"
+        isLogged.value = user != null && insalesStatus!!.isNotEmpty() && insalesStatus == "logged"
     }
 
     fun callSalesAccount(context: Context,shopName:String,email:String,password:String){

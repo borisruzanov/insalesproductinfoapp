@@ -19,6 +19,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.VolleyError
 import com.boris.expert.csvmagic.model.ProductImages
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -58,6 +62,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private var productsList = mutableListOf<Product>()
     private var originalProductsList = mutableListOf<Product>()
     private lateinit var viewModel: MainActivityViewModel
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private var dialogStatus = 0
     private var currentPage = 1
     private var currentTotalProducts = 0
@@ -97,6 +102,17 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         auth = Firebase.auth
         firebaseDatabase = FirebaseDatabase.getInstance().reference
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
+
+        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+//            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
+//            .requestScopes(Scope(SheetsScopes.SPREADSHEETS))
+//            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
+
+        val acct: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(context)
 
         shopName = appSettings.getString("INSALES_SHOP_NAME") as String
         email = appSettings.getString("INSALES_EMAIL") as String
@@ -856,13 +872,26 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                     }
                     .setPositiveButton(getString(R.string.logout)) { dialog, which ->
                         dialog.dismiss()
+                        startLoading(context)
                         appSettings.remove("INSALES_STATUS")
                         appSettings.remove("INSALES_SHOP_NAME")
                         appSettings.remove("INSALES_EMAIL")
                         appSettings.remove("INSALES_PASSWORD")
                         Paper.book().destroy()
-                        startActivity(Intent(context, LoginActivity::class.java)).apply {
-                            finish()
+                        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this){
+                            mGoogleSignInClient.signOut().addOnCompleteListener(this){
+                                FirebaseAuth.getInstance().signOut()
+
+                                appSettings.remove(Constants.isLogin)
+                                appSettings.remove(Constants.user)
+                                Constants.userData = null
+                                Toast.makeText(context, getString(R.string.logout_success_text), Toast.LENGTH_SHORT)
+                                    .show()
+                                dismiss()
+                                startActivity(Intent(context, LoginActivity::class.java)).apply {
+                                    finish()
+                                }
+                            }
                         }
                     }
                     .create().show()

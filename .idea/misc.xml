@@ -3,28 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/drawable-anydpi/ic_sync.xml" value="0.24" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/drawable/radius_text_input_field.xml" value="0.24" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/activity_barcode_reader.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/activity_login.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/activity_main.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/activity_user_screen.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/custom_loading.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/extend_usage_dialog_layout.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/get_credits_dialog_layout.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/increase_storage_dialog_layout.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/insales_add_product_dialog.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/insales_product_add_image_design.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/insales_product_search_dialog.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/insales_products_item_row_design.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/insales_products_item_row_minimal_design.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/internet_image_search_dialog_layout.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/layout_dialog_rate_us.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/search_image_item_row_design.xml" value="0.40185185185185185" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/voice_language_setting_layout.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/menu/bottom_menu.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/menu/main_menu.xml" value="0.5546875" />
-        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/xml/network_security_config.xml" value="0.416015625" />
+        <entry key="..\:/BorisProjects/Projects/insalesproductinfoapp/app/src/main/res/layout/activity_login.xml" value="0.36102564102564105" />
       </map>
     </option>
   </component>

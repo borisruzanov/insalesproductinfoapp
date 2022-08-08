@@ -125,4 +125,7 @@ dependencies {
     // LIBRARY FOR SCANNER TO SCAN THE QR/BARCODE IMAGE
     implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
 
+    // GOOGLE AUTHENTICATION LIBRARY
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
 }

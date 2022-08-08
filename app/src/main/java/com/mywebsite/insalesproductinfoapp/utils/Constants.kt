@@ -18,6 +18,7 @@ import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.storage.FirebaseStorage
 import com.mywebsite.insalesproductinfoapp.interfaces.FirebaseStorageCallback
 import com.mywebsite.insalesproductinfoapp.model.Product
+import com.mywebsite.insalesproductinfoapp.model.User
 import com.mywebsite.insalesproductinfoapp.services.ImageUploadService
 import net.expandable.ExpandableTextView
 import java.io.File
@@ -71,7 +72,7 @@ class Constants {
         var expiredAt: String = "expiredAt"
         var userCreditsValue = "user_credits_value"
         var firebaseUserId = ""
-//        var userData: User? = null
+        var userData: User? = null
 //        var mService: Drive? = null
 //        var sheetService: Sheets? = null
         var captureImagePath: String? = null
