@@ -44,6 +44,30 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    packagingOptions {
+        exclude 'META-INF/*'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
+
+    }
+
+    configurations {
+        all {
+            exclude module: 'httpclient'
+            exclude module: 'commons-logging'
+        }
+    }
+    kapt {
+        correctErrorTypes true
+    }
 }
 
 dependencies {
@@ -127,5 +151,20 @@ dependencies {
 
     // GOOGLE AUTHENTICATION LIBRARY
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
+    // Ml Kit Text recognition
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.3.0'
+
+    // cropping image
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
+
+    implementation 'com.github.Lucem-Anb:android-text-scanner:0.1.0'
+
+    implementation "com.github.skydoves:balloon:1.4.7"
+
+    implementation 'com.google.cloud:google-cloud-translate:2.1.10'
+
+    // TOOLTIPS LIBRARY
+    implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'
 
 }
