@@ -2,11 +2,10 @@ package com.mywebsite.insalesproductinfoapp.view.activities
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
-import android.content.DialogInterface
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +13,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.speech.RecognizerIntent
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import android.view.*
@@ -24,6 +24,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -42,6 +43,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
+import com.google.gson.JsonObject
 import com.mywebsite.insalesproductinfoapp.R
 import com.mywebsite.insalesproductinfoapp.adapters.BarcodeImageAdapter
 import com.mywebsite.insalesproductinfoapp.adapters.InSalesProductsAdapter
@@ -51,17 +53,27 @@ import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductImageUpdate
 import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductSearchDialogBinding
 import com.mywebsite.insalesproductinfoapp.databinding.InternetImageSearchDialogLayoutBinding
 import com.mywebsite.insalesproductinfoapp.interfaces.APICallback
+import com.mywebsite.insalesproductinfoapp.interfaces.GrammarCallback
 import com.mywebsite.insalesproductinfoapp.interfaces.ResponseListener
 import com.mywebsite.insalesproductinfoapp.model.Category
 import com.mywebsite.insalesproductinfoapp.model.Product
+import com.mywebsite.insalesproductinfoapp.retrofit.ApiServices
+import com.mywebsite.insalesproductinfoapp.retrofit.RetrofitClientApi
 import com.mywebsite.insalesproductinfoapp.utils.*
 import com.mywebsite.insalesproductinfoapp.view.fragments.AddProductCustomDialog
+import com.mywebsite.insalesproductinfoapp.view.fragments.CustomDialog
 import com.mywebsite.insalesproductinfoapp.view.fragments.FullImageFragment
 import com.mywebsite.insalesproductinfoapp.viewmodel.MainActivityViewModel
 import com.mywebsite.insalesproductinfoapp.viewmodel.SalesCustomersViewModel
 import io.paperdb.Paper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.expandable.ExpandableTextView
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
@@ -75,7 +87,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private lateinit var productAdapter: InSalesProductsAdapter
     private var productViewListType = 0
     private var productsList = mutableListOf<Product>()
-    private var originalProductsList = mutableListOf<Product>()
+
+    //    private var originalProductsList = mutableListOf<Product>()
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private var dialogStatus = 0
@@ -87,16 +100,14 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     var userCurrentCreditsValue: Float = 0F
     private lateinit var auth: FirebaseAuth
     private lateinit var firebaseDatabase: DatabaseReference
-    private var voiceSearchHint = "default"
     private var productImagesChanges = false
     private var selectedImageBase64String: String = ""
     private var voiceLanguageCode = "en"
-    private var barcodeSearchHint = "default"
     var searchedImagesList = mutableListOf<String>()
     private var currentPhotoPath: String? = null
     private lateinit var searchDialog: InsalesProductSearchDialogBinding
     private lateinit var internetSearchBinding: InternetImageSearchDialogLayoutBinding
-    private lateinit var insalesUpdateProductImageLayout:InsalesProductImageUpdateDialogBinding
+    private lateinit var insalesUpdateProductImageLayout: InsalesProductImageUpdateDialogBinding
     private lateinit var internetImageAdapter: InternetImageAdapter
     private var userCurrentCredits = ""
     private var originalCategoriesList = mutableListOf<Category>()
@@ -106,6 +117,14 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private var barcodeImageList = mutableListOf<String>()
     var multiImagesList = mutableListOf<String>()
     private var adapter: BarcodeImageAdapter? = null
+    private var characters = 0
+    private var grammarPrice = 0F
+    private var unitCharacterPrice = 0F
+    private var howMuchChargeCredits = 0F
+
+    companion object {
+        var originalProductsList = mutableListOf<Product>()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -271,8 +290,24 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
 
     override fun onResume() {
         super.onResume()
+        searchDialog = InsalesProductSearchDialogBinding.inflate(LayoutInflater.from(this))
         internetSearchBinding =
             InternetImageSearchDialogLayoutBinding.inflate(LayoutInflater.from(this))
+
+        getSearchImageDetail()
+        checkAndStartTrialPeriod()
+        getPrices()
+        val intentsFilter = IntentFilter()
+        intentsFilter.addAction("update-products")
+        intentsFilter.addAction("update-images")
+        LocalBroadcastManager.getInstance(
+            context
+        ).registerReceiver(broadcastReceiver, intentsFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver)
     }
 
     private fun openSearchDialog() {
@@ -316,7 +351,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         }
 
         searchDialog.voiceSearchFragmentInsales.setOnClickListener {
-            voiceSearchHint = "voice_mode"
+            Constants.voiceSearchHint = "voice_mode"
             voiceLanguageCode = appSettings.getString("VOICE_LANGUAGE_CODE") as String
             val voiceLayout = LayoutInflater.from(context).inflate(
                 R.layout.voice_language_setting_layout,
@@ -386,7 +421,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         }
 
         searchDialog.barcodeImgFragmentInsales.setOnClickListener {
-            barcodeSearchHint = "default"
+            Constants.barcodeSearchHint = "default"
             Constants.listUpdateFlag = 1
             val intent = Intent(context, BarcodeReaderActivity::class.java)
             barcodeImageResultLauncher.launch(intent)
@@ -431,7 +466,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                 if (result.data != null && result.data!!.hasExtra("SCANNED_BARCODE_VALUE")) {
                     val barcodeId = result.data!!.getStringExtra("SCANNED_BARCODE_VALUE") as String
                     if (barcodeId.isNotEmpty()) {
-                        if (barcodeSearchHint == "default") {
+                        if (Constants.barcodeSearchHint == "default") {
                             search(barcodeId, "sku")
                         } else {
                             internetSearchBinding.textInputField.setText(barcodeId)
@@ -600,7 +635,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                             results!![0]
                         }
 
-                if (voiceSearchHint == "default") {
+                if (Constants.voiceSearchHint == "default") {
                     internetSearchBinding.textInputField.setText(spokenText)
                     Constants.hideKeyboar(context)
                     startSearch(
@@ -611,9 +646,9 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                         internetImageAdapter
                     )
                 } else {
-//                            searchBox.setText(spokenText)
-//                            search(spokenText, "default")
-//                            voiceSearchHint = "default"
+                    internetSearchBinding.textInputField.setText(spokenText)
+                    search(spokenText, "default")
+                    Constants.voiceSearchHint = "default"
                 }
             }
         }
@@ -919,14 +954,18 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                         appSettings.remove("INSALES_EMAIL")
                         appSettings.remove("INSALES_PASSWORD")
                         Paper.book().destroy()
-                        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this){
-                            mGoogleSignInClient.signOut().addOnCompleteListener(this){
+                        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this) {
+                            mGoogleSignInClient.signOut().addOnCompleteListener(this) {
                                 FirebaseAuth.getInstance().signOut()
 
                                 appSettings.remove(Constants.isLogin)
                                 appSettings.remove(Constants.user)
                                 Constants.userData = null
-                                Toast.makeText(context, getString(R.string.logout_success_text), Toast.LENGTH_SHORT)
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.logout_success_text),
+                                    Toast.LENGTH_SHORT
+                                )
                                     .show()
                                 dismiss()
                                 startActivity(Intent(context, LoginActivity::class.java)).apply {
@@ -1012,7 +1051,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
 
     override fun onItemEditClick(position: Int, imagePosition: Int) {
         val imageItem = productsList[position].productImages!![imagePosition]
-        insalesUpdateProductImageLayout = InsalesProductImageUpdateDialogBinding.inflate(LayoutInflater.from(context))
+        insalesUpdateProductImageLayout =
+            InsalesProductImageUpdateDialogBinding.inflate(LayoutInflater.from(context))
         insalesUpdateProductImageLayout.cameraImageView.setOnClickListener {
             intentType = 1
             if (RuntimePermissionHelper.checkCameraPermission(
@@ -1059,7 +1099,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
             }
 
             internetSearchBinding.barcodeImgSearchInternetImages.setOnClickListener {
-                barcodeSearchHint = "image"
+                Constants.barcodeSearchHint = "image"
                 val intent = Intent(context, BarcodeReaderActivity::class.java)
                 barcodeImageResultLauncher.launch(intent)
             }
@@ -1296,11 +1336,13 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         val pItem = productsList[position]
         multiImagesList.clear()
         barcodeImageList.clear()
-        insalesUpdateProductImageLayout = InsalesProductImageUpdateDialogBinding.inflate(LayoutInflater.from(context))
-        insalesUpdateProductImageLayout.insalesProductImagesRecyclerview.layoutManager = LinearLayoutManager(
-            context, RecyclerView.HORIZONTAL,
-            false
-        )
+        insalesUpdateProductImageLayout =
+            InsalesProductImageUpdateDialogBinding.inflate(LayoutInflater.from(context))
+        insalesUpdateProductImageLayout.insalesProductImagesRecyclerview.layoutManager =
+            LinearLayoutManager(
+                context, RecyclerView.HORIZONTAL,
+                false
+            )
 
         insalesUpdateProductImageLayout.insalesProductImagesRecyclerview.hasFixedSize()
         adapter = BarcodeImageAdapter(
@@ -1392,7 +1434,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
             }
 
             internetSearchBinding.barcodeImgSearchInternetImages.setOnClickListener {
-                barcodeSearchHint = "image"
+                Constants.barcodeSearchHint = "image"
                 val intent = Intent(context, BarcodeReaderActivity::class.java)
                 barcodeImageResultLauncher.launch(intent)
             }
@@ -1596,13 +1638,18 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                 productsList.removeAt(position)
                 productsList.add(position, tempProduct)
                 productAdapter.notifyDataSetChanged()
-                Constants.startImageUploadService(pItem.id, multiImagesList.joinToString(","), "add_image", true)
+                Constants.startImageUploadService(
+                    pItem.id,
+                    multiImagesList.joinToString(","),
+                    "add_image",
+                    true
+                )
                 Constants.multiImagesSelectedListSize = multiImagesList.size
                 multiImagesList.clear()
                 alert.dismiss()
             } else {
                 Constants.multiImagesSelectedListSize = 0
-                BaseActivity.showAlert(
+                showAlert(
                     context,
                     getString(R.string.image_attach_error)
                 )
@@ -1613,11 +1660,89 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     }
 
     override fun onItemRemoveClick(position: Int, imagePosition: Int) {
+        val imageItem = productsList[position].productImages!![imagePosition]
+        MaterialAlertDialogBuilder(context)
+            .setTitle(getString(R.string.remove_text))
+            .setMessage(getString(R.string.image_remove_warning_message))
+            .setCancelable(false)
+            .setNegativeButton(getString(R.string.cancel_text)) { dialog, which ->
+                dialog.dismiss()
+            }
+            .setPositiveButton(getString(R.string.remove_text)) { dialog, which ->
+                dialog.dismiss()
+                startLoading(context)
+                salesViewModel.callRemoveProductImage(
+                    context,
+                    shopName,
+                    email,
+                    password,
+                    imageItem.productId,
+                    imageItem.id
+                )
+                salesViewModel.getRemoveProductImageResponse().observe(this) { response ->
+                    if (response != null) {
+                        if (response.get("status").asString == "200") {
+//                                                Handler(Looper.myLooper()!!).postDelayed({
+                            dismiss()
+                            productsList[position].productImages!!.removeAt(imagePosition)
+                            productAdapter.notifyDataSetChanged()
+                            updateMainProductList(productsList[position])
+//                                                    dialogStatus = 1
+//                                                    fetchProducts()//showProducts()
+//                                                }, 3000)
+                        } else {
+                            dismiss()
+                            showAlert(
+                                context,
+                                response.get("message").asString
+                            )
+                        }
+                    } else {
+//                                            Handler(Looper.myLooper()!!).postDelayed({
+                        dismiss()
+                        productsList[position].productImages!!.removeAt(imagePosition)
+                        productAdapter.notifyDataSetChanged()
+                        updateMainProductList(productsList[position])
+//                                                dialogStatus = 1
+//                                                fetchProducts()//showProducts()
+//                                            }, 3000)
+                    }
+                }
 
+            }.create().show()
     }
 
     override fun onItemEditImageClick(position: Int) {
+        val pItem = productsList[position]
+        CustomDialog(
+            shopName,
+            email,
+            password,
+            pItem,
+            position,
+            null,
+            productAdapter,
+            salesViewModel,
+            object : ResponseListener {
+                override fun onSuccess(result: String) {
+                    if (result.contains("image_changes")) {
 
+                        if (Constants.productId != 0) {
+                            addLoadingImages(Constants.productId)
+                        } else {
+                            dialogStatus = 0
+                            fetchProducts()
+                        }
+                    } else {
+                        dialogStatus = 1
+                        fetchProducts()
+                    }
+                }
+
+            }).show(
+            supportFragmentManager,
+            "dialog"
+        )
     }
 
     override fun onItemGrammarCheckClick(
@@ -1627,11 +1752,124 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         description: ExpandableTextView,
         grammarStatusView: MaterialTextView
     ) {
+        val item = productsList[position]
+        characters = appSettings.getInt("GRAMMAR_CHARACTERS_LIMIT")
+        grammarPrice = appSettings.getString("GRAMMAR_CHARACTERS_PRICE")!!.toFloat()
+        unitCharacterPrice = grammarPrice / characters
+        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 
+        val totalCharacters = item.title.length + item.fullDesc.length
+        val totalCreditPrice = unitCharacterPrice * totalCharacters
+        howMuchChargeCredits = totalCreditPrice
+
+        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+            startLoading(context)
+            GrammarCheck.check(
+                context,
+                item.title,
+                title,
+                1,
+                grammarStatusView,
+                object : GrammarCallback {
+                    override fun onSuccess(
+                        response: SpannableStringBuilder?,
+                        errors: Boolean
+                    ) {
+                        GrammarCheck.check(
+                            context,
+                            item.fullDesc,
+                            description,
+                            0,
+                            grammarStatusView,
+                            object : GrammarCallback {
+                                override fun onSuccess(
+                                    response: SpannableStringBuilder?,
+                                    errors: Boolean
+                                ) {
+                                    dismiss()
+                                    chargeCreditsPrice()
+                                    if (errors) {
+                                        grammarStatusView.setTextColor(Color.RED)
+                                        grammarStatusView.text =
+                                            getString(
+                                                R.string.error_found_text
+                                            )
+                                        //grammarCheckBtn.setImageResource(R.drawable.red_cross)
+                                        grammarCheckBtn.setColorFilter(
+                                            ContextCompat.getColor(
+                                                context,
+                                                R.color.red
+                                            ),
+                                            android.graphics.PorterDuff.Mode.MULTIPLY
+                                        )
+                                    } else {
+                                        grammarStatusView.setTextColor(Color.GREEN)
+                                        grammarStatusView.text =
+                                            getString(
+                                                R.string.no_erros_text
+                                            )
+                                        // grammarCheckBtn.setImageResource(R.drawable.green_check_48)
+                                        grammarCheckBtn.setColorFilter(
+                                            ContextCompat.getColor(
+                                                context,
+                                                R.color.green
+                                            ),
+                                            android.graphics.PorterDuff.Mode.MULTIPLY
+                                        )
+                                    }
+                                }
+
+                            })
+                    }
+
+                })
+        } else {
+            MaterialAlertDialogBuilder(context)
+                .setMessage(getString(R.string.low_credites_error_message))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                    dialog.dismiss()
+                    startActivity(
+                        Intent(
+                            context,
+                            UserScreenActivity::class.java
+                        )
+                    )
+                }
+                .create().show()
+        }
     }
 
     override fun onItemGetDescriptionClick(position: Int) {
+        val pItem = productsList[position]
+        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 
+        if (userCurrentCredits.toFloat() >= 1.0) {
+            Constants.pItemPosition = position
+            Constants.pItem = pItem
+
+            launchActivity.launch(
+                Intent(
+                    context,
+                    RainForestApiActivity::class.java
+                )
+            )
+        } else {
+            MaterialAlertDialogBuilder(context)
+                .setMessage(getString(R.string.low_credites_error_message2))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                    dialog.dismiss()
+                    startActivity(Intent(context, UserScreenActivity::class.java))
+                }
+                .create().show()
+        }
     }
 
     override fun onItemCameraIconClick(
@@ -1639,7 +1877,19 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         title: ExpandableTextView,
         description: ExpandableTextView
     ) {
-
+        val item = productsList[position]
+        Constants.pItemPosition = position
+        Constants.pItem = item
+        Constants.pTitle = title
+        Constants.pDescription = description
+        //BaseActivity.showAlert(requireActivity(),item.title)
+        if (RuntimePermissionHelper.checkCameraPermission(
+                context, Constants.CAMERA_PERMISSION
+            )
+        ) {
+            // BaseActivity.hideSoftKeyboard(requireActivity())
+//            pickImageFromCamera()
+        }
     }
 
     override fun onItemImageIconClick(
@@ -1647,7 +1897,348 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         title: ExpandableTextView,
         description: ExpandableTextView
     ) {
+        val item = productsList[position]
+        Constants.pItemPosition = position
+        Constants.pItem = item
+        Constants.pTitle = title
+        Constants.pDescription = description
+        //BaseActivity.showAlert(requireActivity(),item.fullDesc)
+        if (RuntimePermissionHelper.checkCameraPermission(
+                context,
+                Constants.READ_STORAGE_PERMISSION
+            )
+        ) {
+            //BaseActivity.hideSoftKeyboard(requireActivity())
+//            pickImageFromGallery()
+        }
+    }
 
+    var launchActivity =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && Constants.pItem != null) {
+                val data: Intent? = result.data
+
+                if (data != null && data.hasExtra("TITLE")) {
+                    val title = data.getStringExtra("TITLE") as String
+                    if (title.isNotEmpty()) {
+                        val currentPItemTitle = Constants.pItem!!.title
+                        val stringBuilder = java.lang.StringBuilder()
+                        stringBuilder.append(currentPItemTitle)
+                        stringBuilder.append(title)
+                        Constants.pItem!!.title = stringBuilder.toString()
+                    }
+                }
+
+                if (data != null && data.hasExtra("DESCRIPTION")) {
+                    val description = data.getStringExtra("DESCRIPTION") as String
+                    if (description.isNotEmpty()) {
+
+                        val currentPItemDescription = Constants.pItem!!.fullDesc
+                        val stringBuilder = java.lang.StringBuilder()
+                        stringBuilder.append(currentPItemDescription)
+                        stringBuilder.append(description)
+                        Constants.pItem!!.fullDesc = stringBuilder.toString()
+
+                    }
+                }
+                val tempImageList = mutableListOf<String>()
+                val images = Constants.selectedRainForestProductImages
+                if (images.isNotEmpty()) {
+
+                    if (images.contains(",")) {
+                        tempImageList.addAll(images.split(","))
+                    } else {
+                        tempImageList.add(images)
+                    }
+                    if (tempImageList.isNotEmpty()) {
+                        for (i in 0 until tempImageList.size) {
+                            Constants.pItem!!.productImages!!.add(
+                                ProductImages(
+                                    0,
+                                    Constants.pItem!!.id,
+                                    "",
+                                    0
+                                )
+                            )
+                        }
+                    }
+                }
+
+                CustomDialog(
+                    shopName,
+                    email,
+                    password,
+                    Constants.pItem!!,
+                    Constants.pItemPosition!!,
+                    tempImageList,
+                    productAdapter,
+                    salesViewModel, object : ResponseListener {
+                        override fun onSuccess(result: String) {
+                            if (result.contains("image_changes")) {
+//                                dialogStatus = 0
+//                                fetchProducts()
+                                if (Constants.productId != 0) {
+                                    addLoadingImages(Constants.productId)
+                                } else {
+                                    dialogStatus = 0
+                                    fetchProducts()
+                                }
+                            } else {
+                                dialogStatus = 1
+                                fetchProducts()
+                            }
+                        }
+
+                    }
+                ).show(supportFragmentManager, "dialog")
+                productAdapter.notifyItemChanged(Constants.pItemPosition!!)
+
+            }
+        }
+
+    private fun chargeCreditsPrice() {
+        val firebaseDatabase = FirebaseDatabase.getInstance().reference
+        val hashMap = HashMap<String, Any>()
+        val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
+        userCurrentCredits = remaining.toString()
+        hashMap["credits"] = userCurrentCredits
+        firebaseDatabase.child(Constants.firebaseUserCredits)
+            .child(Constants.firebaseUserId)
+            .updateChildren(hashMap)
+            .addOnSuccessListener {
+                howMuchChargeCredits = 0F
+                getUserCredits(
+                    context
+                )
+            }
+            .addOnFailureListener {
+
+            }
+    }
+
+    var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != null && intent.action == "update-products") {
+                dialogStatus = 1
+                fetchProducts()
+            } else if (intent.action != null && intent.action == "update-images") {
+                val apiInterface: ApiServices =
+                    RetrofitClientApi.createService(ApiServices::class.java)
+                val productId = intent.getIntExtra("PID", 0)
+
+                apiInterface.salesProduct(email, password, shopName, productId)
+                    .enqueue(object : Callback<JsonObject> {
+                        override fun onResponse(
+                            call: Call<JsonObject>,
+                            response: Response<JsonObject>?
+                        ) {
+                            val result = response!!.body()
+                            if (result != null) {
+                                if (result.get("status").asString == "200") {
+
+                                    val product = result.getAsJsonObject("product")
+                                    val imagesArray = product.getAsJsonArray("images")
+                                    val variants = product.getAsJsonArray("variants")
+                                    val variantsItem = variants[0].asJsonObject
+                                    val imagesList = mutableListOf<ProductImages>()
+
+                                    if (imagesArray.size() > 0) {
+                                        for (j in 0 until imagesArray.size()) {
+                                            val imageItem = imagesArray[j].asJsonObject
+                                            imagesList.add(
+                                                ProductImages(
+                                                    imageItem.get("id").asInt,
+                                                    imageItem.get("product_id").asInt,
+                                                    imageItem.get("url").asString,
+                                                    imageItem.get("position").asInt
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    val updatedProduct = Product(
+                                        product.get("id").asInt,
+                                        product.get("category_id").asInt,
+                                        product.get("title").asString,
+                                        if (product.get("short_description").isJsonNull) {
+                                            ""
+                                        } else {
+                                            product.get("short_description").asString
+                                        },
+                                        if (product.get("description").isJsonNull) {
+                                            ""
+                                        } else {
+                                            product.get("description").asString
+                                        },
+                                        if (variantsItem.get("sku").isJsonNull) {
+                                            ""
+                                        } else {
+                                            variantsItem.get("sku").asString
+                                        },
+                                        imagesList as ArrayList<ProductImages>
+                                    )
+                                    var foundPosition = -1
+                                    val cacheList: ArrayList<Product>? =
+                                        Paper.book().read(Constants.cacheProducts)
+                                    if (cacheList!!.isNotEmpty()) {
+                                        for (i in 0 until cacheList.size) {
+                                            val item = cacheList[i]
+                                            if (item.id == productId) {
+                                                foundPosition = i
+                                                break
+                                            }
+                                        }
+
+                                        if (foundPosition != -1) {
+                                            cacheList.removeAt(foundPosition)
+                                            cacheList.add(foundPosition, updatedProduct)
+                                            Paper.book().destroy()
+                                            Paper.book().write(Constants.cacheProducts, cacheList)
+                                            originalProductsList.clear()
+                                            productsList.clear()
+                                            originalProductsList.addAll(cacheList)
+                                            productsList.addAll(originalProductsList)
+                                            productAdapter.notifyDataSetChanged()
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                        override fun onFailure(call: Call<JsonObject>, t: Throwable) {
+                            Log.d("TEST199", "t!!.localizedMessage")
+                        }
+
+                    })
+            }
+        }
+    }
+
+    fun addLoadingImages(productId: Int) {
+        var foundPosition = -1
+        var foundItem: Product? = null
+        val cacheList: ArrayList<Product>? = Paper.book().read(Constants.cacheProducts)
+        if (cacheList!!.isNotEmpty()) {
+            for (i in 0 until cacheList.size) {
+                val item = cacheList[i]
+                if (item.id == productId) {
+                    foundPosition = i
+                    foundItem = item
+                    break
+                }
+            }
+
+            if (foundPosition != -1 && foundItem != null) {
+
+                for (j in 0 until Constants.multiImagesSelectedListSize) {
+                    foundItem.productImages!!.add(
+                        ProductImages(
+                            0,
+                            productId,
+                            "",
+                            0
+                        )
+                    )
+                }
+
+                cacheList.removeAt(foundPosition)
+                cacheList.add(foundPosition, foundItem)
+                Paper.book().destroy()
+                Paper.book().write(Constants.cacheProducts, cacheList)
+                originalProductsList.clear()
+                productsList.clear()
+                originalProductsList.addAll(cacheList)
+                productsList.addAll(originalProductsList)
+
+                productAdapter.notifyItemChanged(0, productsList.size)
+
+            }
+        }
+    }
+
+    private fun updateMainProductList(changeItem: Product) {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            if (originalProductsList.isNotEmpty()) {
+                var isFound = false
+                var foundPosition = -1
+                for (i in 0 until originalProductsList.size) {
+                    if (originalProductsList[i].id == changeItem.id) {
+                        isFound = true
+                        foundPosition = i
+                        break
+                    } else {
+                        isFound = false
+                    }
+                }
+                if (isFound && foundPosition != -1) {
+                    originalProductsList.removeAt(foundPosition)
+                    originalProductsList.add(foundPosition, changeItem)
+                    Paper.book().destroy()
+                    Paper.book().write(Constants.cacheProducts, originalProductsList)
+                }
+            }
+
+        }
+    }
+
+    private fun getPrices() {
+        firebaseDatabase.child(Constants.firebasePrices).addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val pDetailsPrice: String =
+                    snapshot.child("rainforest").child("p_details_price").getValue(
+                        Float::class.java
+                    ).toString()
+                val pListPrice: String =
+                    snapshot.child("rainforest").child("p_list_price").getValue(
+                        Float::class.java
+                    ).toString()
+                val characters =
+                    snapshot.child("translator").child("characters").getValue(Int::class.java)
+                val translatorPrice: String = snapshot.child("translator").child("price").getValue(
+                    Float::class.java
+                ).toString()
+
+                val grammarCharacters =
+                    snapshot.child("grammar").child("characters").getValue(Int::class.java)
+                val grammarPrice: String = snapshot.child("grammar").child("price").getValue(
+                    Float::class.java
+                ).toString()
+
+                appSettings.putString("P_DETAILS_PRICE", pDetailsPrice)
+                appSettings.putString("P_LIST_PRICE", pListPrice)
+                appSettings.putInt("TRANSLATOR_CHARACTERS_LIMIT", characters!!)
+                appSettings.putString("TRANSLATOR_CHARACTERS_PRICE", translatorPrice)
+                appSettings.putInt("GRAMMAR_CHARACTERS_LIMIT", grammarCharacters!!)
+                appSettings.putString("GRAMMAR_CHARACTERS_PRICE", grammarPrice)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
+    }
+
+    private fun checkAndStartTrialPeriod() {
+        if (auth.currentUser != null) {
+            val id = auth.uid as String
+            Constants.firebaseUserId = id
+//            startLoading(context)
+            activeTrialFeatures(context, Constants.firebaseUserId, object : APICallback {
+                override fun onSuccess(response: JSONObject) {
+//                    dismiss()
+//                    getUserCurrentFeatures()
+                }
+
+                override fun onError(error: VolleyError) {
+//                    dismiss()
+                }
+
+            })
+        }
     }
 
     private fun getImageFromGallery() {

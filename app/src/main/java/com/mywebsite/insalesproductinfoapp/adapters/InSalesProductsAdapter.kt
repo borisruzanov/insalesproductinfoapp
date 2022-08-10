@@ -128,6 +128,36 @@ class InSalesProductsAdapter(
             binding.insalesPItemDescription.isExpanded = false
             binding.insalesPItemDescription.movementMethod = ScrollingMovementMethod.getInstance()
 
+
+            binding.insalesPItemEditImage.setOnClickListener {
+                mListener.onItemEditImageClick(layoutPosition)
+            }
+
+            binding.insalesItemEditTextview.setOnClickListener {
+                mListener.onItemEditImageClick(layoutPosition)
+            }
+
+            binding.grammarCheckIconView.setOnClickListener {
+                mListener.onItemGrammarCheckClick(
+                    layoutPosition,
+                    binding.grammarCheckIconView,
+                    binding.insalesPItemTitle,
+                    binding.insalesPItemDescription,
+                    binding.grammarStatusTextview
+                )
+            }
+
+            binding.getDescriptionTextView.setOnClickListener {
+                mListener.onItemGetDescriptionClick(layoutPosition)
+            }
+
+//            cameraIconView.setOnClickListener {
+//                mListener.onItemCameraIconClick(layoutPosition, productTitle, productDescription)
+//            }
+//            imageIconView.setOnClickListener {
+//                mListener.onItemImageIconClick(layoutPosition, productTitle, productDescription)
+//            }
+
             binding.collapseExpandImg.setOnClickListener {
                 if (binding.insalesPItemTitle.isExpanded) {
                     binding.insalesPItemTitle.isExpanded = false
@@ -327,6 +357,35 @@ class InSalesProductsAdapter(
             } else {
                 adapter.notifyDataSetChanged()
             }
+
+            binding.insalesPItemEditImage.setOnClickListener {
+                mListener.onItemEditImageClick(layoutPosition)
+            }
+
+            binding.insalesItemEditTextview.setOnClickListener {
+                mListener.onItemEditImageClick(layoutPosition)
+            }
+
+            binding.grammarCheckIconView.setOnClickListener {
+                mListener.onItemGrammarCheckClick(
+                    layoutPosition,
+                    binding.grammarCheckIconView,
+                    binding.insalesPItemTitle,
+                    binding.insalesPItemDescription,
+                    binding.grammarStatusTextview
+                )
+            }
+
+            binding.getDescriptionTextView.setOnClickListener {
+                mListener.onItemGetDescriptionClick(layoutPosition)
+            }
+
+//            cameraIconView.setOnClickListener {
+//                mListener.onItemCameraIconClick(layoutPosition, productTitle, productDescription)
+//            }
+//            imageIconView.setOnClickListener {
+//                mListener.onItemImageIconClick(layoutPosition, productTitle, productDescription)
+//            }
 
             binding.collapseExpandImg.setOnClickListener {
                 if (binding.insalesPItemTitle.isExpanded) {
