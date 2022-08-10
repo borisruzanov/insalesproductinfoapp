@@ -125,7 +125,7 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
 
     override fun onResume() {
         super.onResume()
-        getUserCredit()
+//        getUserCredit()
         //getUserSubscriptionDetails()
         //imagesSearchDetailView.text = "${Constants.searchImageCreditPrice} ${getString(R.string.credits_for_text)} ${Constants.searchImagesLimit} ${getString(R.string.images_per_api_request_text)}"
     }

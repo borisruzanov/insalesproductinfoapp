@@ -87,6 +87,10 @@
             android:name=".view.activities.FieldListsActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".view.activities.SettingsActivity"
+            android:exported="true" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

@@ -2,12 +2,11 @@ package com.mywebsite.insalesproductinfoapp.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mywebsite.insalesproductinfoapp.R
+import com.mywebsite.insalesproductinfoapp.databinding.BarcodeImageItemDesignBinding
 
 class BarcodeImageAdapter(private val context: Context, private val imagesList: ArrayList<String>) : RecyclerView.Adapter<BarcodeImageAdapter.ItemViewHolder>() {
 
@@ -23,25 +22,24 @@ class BarcodeImageAdapter(private val context: Context, private val imagesList: 
         this.mListener = listener
     }
 
-    open class ItemViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
-        val barcodeImageView: AppCompatImageView
-        val editImageView: AppCompatImageView
-        val deleteImageView: AppCompatImageView
+    open class ItemViewHolder(private val binding:BarcodeImageItemDesignBinding,private val listener: OnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
 
-        init {
-            barcodeImageView = itemView.findViewById(R.id.barcode_image_item_view)
-            editImageView = itemView.findViewById(R.id.barcode_image_edit_btn)
-            deleteImageView = itemView.findViewById(R.id.barcode_image_delete_btn)
+        fun bindData(item:String,context: Context,position: Int){
+            Glide.with(context)
+                .load(item)
+                .placeholder(R.drawable.placeholder)
+                .centerInside()
+                .into(binding.barcodeImageItemView)
 
-            barcodeImageView.setOnClickListener {
+            binding.barcodeImageItemView.setOnClickListener {
                 listener.onImageClick(layoutPosition)
             }
 
-            editImageView.setOnClickListener {
+            binding.barcodeImageEditBtn.setOnClickListener {
                 listener.onAddItemEditClick(layoutPosition)
             }
 
-            deleteImageView.setOnClickListener {
+            binding.barcodeImageDeleteBtn.setOnClickListener {
                 listener.onItemDeleteClick(layoutPosition)
             }
         }
@@ -50,8 +48,8 @@ class BarcodeImageAdapter(private val context: Context, private val imagesList: 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
 
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.barcode_image_item_design, parent, false)
-        return ItemViewHolder(view, mListener!!)
+        val layoutBinding = BarcodeImageItemDesignBinding.inflate(LayoutInflater.from(parent.context),parent,false)//LayoutInflater.from(parent.context).inflate(R.layout.barcode_image_item_design, parent, false)
+        return ItemViewHolder(layoutBinding, mListener!!)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
@@ -62,11 +60,8 @@ class BarcodeImageAdapter(private val context: Context, private val imagesList: 
         } else {
             image
         }
-        Glide.with(context)
-                .load(tempImg)
-                .placeholder(R.drawable.placeholder)
-                .centerInside()
-                .into(holder.barcodeImageView)
+
+        holder.bindData(tempImg,context,position)
 
     }
 

@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import com.mywebsite.insalesproductinfoapp.R
+import com.mywebsite.insalesproductinfoapp.databinding.RainForestApiItemRowDesignBinding
 import com.mywebsite.insalesproductinfoapp.model.RainForestApiObject
 import java.util.*
 
@@ -17,7 +18,7 @@ import java.util.*
 class RainForestApiAdapter(
     private val context: Context,
     val rainForestApiList: ArrayList<RainForestApiObject>
-) : RecyclerView.Adapter<RainForestApiAdapter.VideoItemViewHolder>() {
+) : RecyclerView.Adapter<RainForestApiAdapter.ItemViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -29,44 +30,13 @@ class RainForestApiAdapter(
         this.mListener = listener
     }
 
-    inner class VideoItemViewHolder(itemView: View, listener: OnItemClickListener) :
+    inner class ItemViewHolder(private val binding:RainForestApiItemRowDesignBinding,private val listener: OnItemClickListener) :
         RecyclerView.ViewHolder(
-            itemView
+            binding.root
         ) {
-        var title: MaterialTextView
-        var image: AppCompatImageView
-        var getDescription:MaterialButton
 
-        init {
-
-            title = itemView.findViewById(R.id.rfa_item_title_view)
-            image = itemView.findViewById(R.id.rfa_item_image_view)
-            getDescription = itemView.findViewById(R.id.rfa_item_get_description_view)
-
-            getDescription.setOnClickListener {
-                mListener!!.onItemClick(layoutPosition)
-            }
-
-        }
-    }
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoItemViewHolder {
-
-            val view = LayoutInflater.from(parent.context).inflate(
-                R.layout.rain_forest_api_item_row_design,
-                parent,
-                false
-            )
-
-            return VideoItemViewHolder(view, mListener!!)
-
-    }
-
-    override fun onBindViewHolder(holder: VideoItemViewHolder, position: Int) {
-        val item = rainForestApiList[position]
-
-        Glide.with(context).load(item.image).into(holder.image)
+        fun bindData(item:RainForestApiObject,context: Context,position: Int){
+            Glide.with(context).load(item.image).into(binding.rfaItemImageView)
 //        GcpTranslator.translateFromEngToRus(context,item.title,object : TranslationCallback {
 //            override fun onTextTranslation(translatedText: String) {
 //                BaseActivity.dismiss()
@@ -74,12 +44,30 @@ class RainForestApiAdapter(
 //                    holder.title.text = translatedText
 //                }
 //                else{
-                    holder.title.text = item.title
+            binding.rfaItemTitleView.text = item.title
 //                }
 //
 //            }
 //        })
 
+            binding.rfaItemGetDescriptionView.setOnClickListener {
+                mListener!!.onItemClick(layoutPosition)
+            }
+        }
+    }
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+
+            val layoutBinding = RainForestApiItemRowDesignBinding.inflate(LayoutInflater.from(parent.context),parent,false)//LayoutInflater.from(parent.context).inflate(R.layout.rain_forest_api_item_row_design, parent, false)
+
+            return ItemViewHolder(layoutBinding, mListener!!)
+
+    }
+
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        val item = rainForestApiList[position]
+        holder.bindData(item,context,position)
     }
 
     override fun getItemCount(): Int {

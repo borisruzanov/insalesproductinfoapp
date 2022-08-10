@@ -20,9 +20,11 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,6 +39,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
@@ -78,7 +81,7 @@ import java.math.RoundingMode
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener {
+class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var context: Context
     private lateinit var binding: ActivityMainBinding
@@ -87,7 +90,6 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private lateinit var productAdapter: InSalesProductsAdapter
     private var productViewListType = 0
     private var productsList = mutableListOf<Product>()
-
     //    private var originalProductsList = mutableListOf<Product>()
     private lateinit var viewModel: MainActivityViewModel
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -110,6 +112,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private lateinit var insalesUpdateProductImageLayout: InsalesProductImageUpdateDialogBinding
     private lateinit var internetImageAdapter: InternetImageAdapter
     private var userCurrentCredits = ""
+    var voiceSearchHint = "default"
+    var barcodeSearchHint = "default"
     private var originalCategoriesList = mutableListOf<Category>()
     private var categoriesList = mutableListOf<Category>()
     private lateinit var salesViewModel: SalesCustomersViewModel
@@ -121,6 +125,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     private var grammarPrice = 0F
     private var unitCharacterPrice = 0F
     private var howMuchChargeCredits = 0F
+    private var selectedInternetImage = ""
 
     companion object {
         var originalProductsList = mutableListOf<Product>()
@@ -147,9 +152,6 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
-//            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
-//            .requestScopes(Scope(SheetsScopes.SPREADSHEETS))
-//            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
 
@@ -286,13 +288,19 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
             addProduct()
         }
 
+        binding.privacyPolicyView.setOnClickListener {
+            binding.drawer.closeDrawer(GravityCompat.START)
+            val browserIntent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://qrmagicapp.com/privacy-policy-CSV/")
+            )
+            startActivity(browserIntent)
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
-        searchDialog = InsalesProductSearchDialogBinding.inflate(LayoutInflater.from(this))
-        internetSearchBinding =
-            InternetImageSearchDialogLayoutBinding.inflate(LayoutInflater.from(this))
 
         getSearchImageDetail()
         checkAndStartTrialPeriod()
@@ -311,8 +319,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     }
 
     private fun openSearchDialog() {
-        val searchDialog =
-            InsalesProductSearchDialogBinding.inflate(LayoutInflater.from(context))//LayoutInflater.from(requireActivity()).inflate(R.layout.insales_product_search_dialog, null)
+        searchDialog = InsalesProductSearchDialogBinding.inflate(layoutInflater)//LayoutInflater.from(requireActivity()).inflate(R.layout.insales_product_search_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
         builder.setView(searchDialog.root)
         builder.setCancelable(false)
@@ -351,7 +358,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         }
 
         searchDialog.voiceSearchFragmentInsales.setOnClickListener {
-            Constants.voiceSearchHint = "voice_mode"
+            voiceSearchHint = "voice_mode"
             voiceLanguageCode = appSettings.getString("VOICE_LANGUAGE_CODE") as String
             val voiceLayout = LayoutInflater.from(context).inflate(
                 R.layout.voice_language_setting_layout,
@@ -416,12 +423,12 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
 
         if (binding.insalesProductsSearch.text.toString().isNotEmpty()) {
             searchDialog.insalesProductsSearchBox.setText(binding.insalesProductsSearch.text.toString())
-            searchDialog.insalesProductsSearchBox.setSelection(binding.insalesProductsSearch.text.toString().length)
+            searchDialog.insalesProductsSearchBox.setSelection(searchDialog.insalesProductsSearchBox.text.toString().length)
             showSoftKeyboard(context, searchDialog.insalesProductsSearchBox)
         }
 
         searchDialog.barcodeImgFragmentInsales.setOnClickListener {
-            Constants.barcodeSearchHint = "default"
+            barcodeSearchHint = "default"
             Constants.listUpdateFlag = 1
             val intent = Intent(context, BarcodeReaderActivity::class.java)
             barcodeImageResultLauncher.launch(intent)
@@ -466,7 +473,9 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                 if (result.data != null && result.data!!.hasExtra("SCANNED_BARCODE_VALUE")) {
                     val barcodeId = result.data!!.getStringExtra("SCANNED_BARCODE_VALUE") as String
                     if (barcodeId.isNotEmpty()) {
-                        if (Constants.barcodeSearchHint == "default") {
+                        if (barcodeSearchHint == "default") {
+                            searchDialog.insalesProductsSearchBox.setText(barcodeId)
+                            binding.insalesProductsSearch.setText(barcodeId)
                             search(barcodeId, "sku")
                         } else {
                             internetSearchBinding.textInputField.setText(barcodeId)
@@ -635,7 +644,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                             results!![0]
                         }
 
-                if (Constants.voiceSearchHint == "default") {
+                if (voiceSearchHint == "default") {
                     internetSearchBinding.textInputField.setText(spokenText)
                     Constants.hideKeyboar(context)
                     startSearch(
@@ -646,9 +655,10 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                         internetImageAdapter
                     )
                 } else {
-                    internetSearchBinding.textInputField.setText(spokenText)
+                    searchDialog.insalesProductsSearchBox.setText(spokenText)
+                    binding.insalesProductsSearch.setText(spokenText)
                     search(spokenText, "default")
-                    Constants.voiceSearchHint = "default"
+                    voiceSearchHint = "default"
                 }
             }
         }
@@ -926,9 +936,35 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         supportActionBar?.let {
             it.apply {
                 title = getString(R.string.app_name)
+                setDisplayHomeAsUpEnabled(true)
             }
             binding.toolbar.setTitleTextColor(ContextCompat.getColor(context, R.color.white))
         }
+
+        val toggle = ActionBarDrawerToggle(this, binding.drawer, binding.toolbar, 0, 0)
+        binding.drawer.addDrawerListener(toggle)
+        toggle.syncState()
+        binding.navigation.setNavigationItemSelectedListener(this)
+
+        binding.toolbar.setNavigationOnClickListener {
+            hideSoftKeyboard(context, binding.drawer)
+            if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
+                binding.drawer.closeDrawer(GravityCompat.START)
+            } else {
+                binding.drawer.openDrawer(GravityCompat.START)
+            }
+        }
+
+        binding.navigation.menu.findItem(R.id.login).isVisible = false
+//        binding.navigation.menu.findItem(R.id.logout).isVisible = true
+        binding.navigation.menu.findItem(R.id.profile).isVisible = false
+        binding.navigation.menu.findItem(R.id.tables).isVisible = false
+        binding.navigation.menu.findItem(R.id.credit).isVisible = false
+        binding.navigation.menu.findItem(R.id.user_screen).isVisible = true
+//            mNavigation.menu.findItem(R.id.tickets).isVisible = Constants.premiumSupportFeatureStatus == 1
+//        binding.navigation.menu.findItem(R.id.purchase_feature).isVisible = false
+        binding.navigation.menu.findItem(R.id.field_list).isVisible = false
+//        binding.navigation.menu.findItem(R.id.insales).isVisible = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -1052,7 +1088,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
     override fun onItemEditClick(position: Int, imagePosition: Int) {
         val imageItem = productsList[position].productImages!![imagePosition]
         insalesUpdateProductImageLayout =
-            InsalesProductImageUpdateDialogBinding.inflate(LayoutInflater.from(context))
+            InsalesProductImageUpdateDialogBinding.inflate(layoutInflater)
         insalesUpdateProductImageLayout.cameraImageView.setOnClickListener {
             intentType = 1
             if (RuntimePermissionHelper.checkCameraPermission(
@@ -1085,6 +1121,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         }
 
         insalesUpdateProductImageLayout.internetImageView.setOnClickListener {
+            internetSearchBinding = InternetImageSearchDialogLayoutBinding.inflate(layoutInflater)
             intentType = 3
             val tempImageList = mutableListOf<String>()
             searchedImagesList.clear()
@@ -1099,7 +1136,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
             }
 
             internetSearchBinding.barcodeImgSearchInternetImages.setOnClickListener {
-                Constants.barcodeSearchHint = "image"
+                barcodeSearchHint = "image"
                 val intent = Intent(context, BarcodeReaderActivity::class.java)
                 barcodeImageResultLauncher.launch(intent)
             }
@@ -1245,20 +1282,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                     voiceResultLauncher.launch(intent)
                 }
             }
-        }
 
-        internetSearchBinding.internetImageSearchBtn.setOnClickListener {
-            startSearch(
-                internetSearchBinding.textInputField,
-                internetSearchBinding.internetImageSearchBtn,
-                internetSearchBinding.imageLoaderView,
-                searchedImagesList as java.util.ArrayList<String>,
-                internetImageAdapter
-            )
-        }
-
-        internetSearchBinding.textInputField.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            internetSearchBinding.internetImageSearchBtn.setOnClickListener {
                 startSearch(
                     internetSearchBinding.textInputField,
                     internetSearchBinding.internetImageSearchBtn,
@@ -1267,8 +1292,21 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                     internetImageAdapter
                 )
             }
-            false
+
+            internetSearchBinding.textInputField.setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    startSearch(
+                        internetSearchBinding.textInputField,
+                        internetSearchBinding.internetImageSearchBtn,
+                        internetSearchBinding.imageLoaderView,
+                        searchedImagesList as java.util.ArrayList<String>,
+                        internetImageAdapter
+                    )
+                }
+                false
+            }
         }
+
 
         Glide.with(context)
             .load(imageItem.imageUrl)
@@ -1420,6 +1458,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
         }
 
         insalesUpdateProductImageLayout.internetImageView.setOnClickListener {
+            internetSearchBinding = InternetImageSearchDialogLayoutBinding.inflate(layoutInflater)
             intentType = 3
             val tempImageList = mutableListOf<String>()
             searchedImagesList.clear()
@@ -1434,7 +1473,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
             }
 
             internetSearchBinding.barcodeImgSearchInternetImages.setOnClickListener {
-                Constants.barcodeSearchHint = "image"
+               barcodeSearchHint = "image"
                 val intent = Intent(context, BarcodeReaderActivity::class.java)
                 barcodeImageResultLauncher.launch(intent)
             }
@@ -1465,58 +1504,39 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                 }
 
                 override fun onItemAttachClick(btn: MaterialButton, position: Int) {
-                    btn.text = getString(R.string.please_wait)
-
-                    val selectedImage = searchedImagesList[position]
-                    val bitmap: Bitmap? = ImageManager.getBitmapFromURL(
-                        context,
-                        selectedImage
-                    )
-                    if (bitmap != null) {
-                        ImageManager.saveMediaToStorage(
-                            context,
-                            bitmap,
-                            object : ResponseListener {
-                                override fun onSuccess(result: String) {
-                                    if (internetSearchBinding.imageLoaderView.visibility == View.VISIBLE) {
-                                        internetSearchBinding.imageLoaderView.visibility =
-                                            View.INVISIBLE
-                                    }
-
-                                    if (result.isNotEmpty()) {
-                                        currentPhotoPath = ImageManager.getRealPathFromUri(
-                                            context,
-                                            Uri.parse(result)
-                                        )!!
-                                        Glide.with(context)
-                                            .load(currentPhotoPath)
-                                            .placeholder(R.drawable.placeholder)
-                                            .centerInside()
-                                            .into(insalesUpdateProductImageLayout.selectedInsalesProductImageView)
-                                        selectedImageBase64String =
-                                            ImageManager.convertImageToBase64(
-                                                context,
-                                                currentPhotoPath!!
-                                            )
-                                        iAlert.dismiss()
-                                    } else {
-                                        showAlert(
-                                            context,
-                                            getString(R.string.something_wrong_error)
-                                        )
-                                    }
-                                }
-
-                            })
-                    } else {
-                        if (internetSearchBinding.imageLoaderView.visibility == View.VISIBLE) {
-                            internetSearchBinding.imageLoaderView.visibility = View.INVISIBLE
-                        }
-                        showAlert(
-                            context,
-                            getString(R.string.something_wrong_error)
+                    //iAlert.dismiss()
+                    selectedInternetImage = searchedImagesList[position]
+                    Glide.with(context)
+                        .load(selectedInternetImage)
+                        .thumbnail(
+                            Glide.with(context).load(R.drawable.placeholder)
                         )
+                        .fitCenter()
+                        .into(insalesUpdateProductImageLayout.selectedInsalesProductImageView)
+                    if (btn.text.toString()
+                            .toLowerCase(Locale.ENGLISH) == "attach"
+                    ) {
+                        barcodeImageList.add(selectedInternetImage)
+                        multiImagesList.add(selectedInternetImage)
+                        btn.text = getString(R.string.attached_text)
+                        btn.setBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.dark_gray
+                            )
+                        )
+                    } else {
+                        btn.text = getString(R.string.attach_text)
+                        btn.setBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.primary_positive_color
+                            )
+                        )
+                        barcodeImageList.removeAt(position)
+                        multiImagesList.removeAt(position)
                     }
+                    adapter!!.notifyDataSetChanged()
                 }
 
             })
@@ -1580,20 +1600,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                     voiceResultLauncher.launch(intent)
                 }
             }
-        }
 
-        internetSearchBinding.internetImageSearchBtn.setOnClickListener {
-            startSearch(
-                internetSearchBinding.textInputField,
-                internetSearchBinding.internetImageSearchBtn,
-                internetSearchBinding.imageLoaderView,
-                searchedImagesList as java.util.ArrayList<String>,
-                internetImageAdapter
-            )
-        }
-
-        internetSearchBinding.textInputField.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            internetSearchBinding.internetImageSearchBtn.setOnClickListener {
                 startSearch(
                     internetSearchBinding.textInputField,
                     internetSearchBinding.internetImageSearchBtn,
@@ -1602,12 +1610,26 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
                     internetImageAdapter
                 )
             }
-            false
+
+            internetSearchBinding.textInputField.setOnEditorActionListener { v, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    startSearch(
+                        internetSearchBinding.textInputField,
+                        internetSearchBinding.internetImageSearchBtn,
+                        internetSearchBinding.imageLoaderView,
+                        searchedImagesList as java.util.ArrayList<String>,
+                        internetImageAdapter
+                    )
+                }
+                false
+            }
         }
+
+
 
         Glide.with(context)
             .load("")
-            .thumbnail(Glide.with(context).load(R.drawable.loader))
+            .thumbnail(Glide.with(context).load(R.drawable.placeholder))
             .fitCenter()
             .into(insalesUpdateProductImageLayout.selectedInsalesProductImageView)
         val builder = MaterialAlertDialogBuilder(context)
@@ -2313,6 +2335,43 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener 
 
     private fun createImageFile(bitmap: Bitmap) {
         currentPhotoPath = ImageManager.readWriteImage(context, bitmap).absolutePath
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.user_screen -> {
+                getSearchImageDetail()
+                startActivity(Intent(context, UserScreenActivity::class.java))
+            }
+            R.id.nav_setting -> {
+                startActivity(Intent(context, SettingsActivity::class.java))
+            }
+            R.id.nav_rateUs -> {
+                rateUs(this)
+            }
+            R.id.nav_recommend -> {
+                shareApp()
+            }
+            R.id.nav_contact_support -> {
+                contactSupport(this)
+            }
+            else->{
+
+            }
+        }
+        binding.drawer.closeDrawer(GravityCompat.START)
+        return true
+    }
+
+    private fun shareApp() {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "text/plain"
+        shareIntent.putExtra(
+            Intent.EXTRA_TEXT,
+            getString(R.string.share_app_message) + "https://play.google.com/store/apps/details?id=" + packageName
+        )
+        startActivity(shareIntent)
+
     }
 
 

@@ -2,13 +2,12 @@ package com.mywebsite.insalesproductinfoapp.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
 import com.mywebsite.insalesproductinfoapp.R
+import com.mywebsite.insalesproductinfoapp.databinding.RainForestImageItemRowDesignBinding
 
 class RainForestProductImageAdapter(private val context: Context, private val imagesList: ArrayList<String>) : RecyclerView.Adapter<RainForestProductImageAdapter.ItemViewHolder>() {
 
@@ -23,20 +22,21 @@ class RainForestProductImageAdapter(private val context: Context, private val im
         this.mListener = listener
     }
 
-    open class ItemViewHolder(itemView: View, listener: OnItemClickListener) : RecyclerView.ViewHolder(itemView) {
-        val imageView: AppCompatImageView
-        val attachBtn:MaterialButton
+    open class ItemViewHolder(private val binding:RainForestImageItemRowDesignBinding,private val listener: OnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
 
-        init {
-            imageView = itemView.findViewById(R.id.search_image_view)
-            attachBtn = itemView.findViewById(R.id.search_image_attach_btn)
+        fun bindData(item:String,context: Context,position: Int){
+            Glide.with(context)
+                .load(item)
+                .thumbnail(Glide.with(context).load(R.drawable.loader))
+                .fitCenter()
+                .into(binding.searchImageView)
 
-            imageView.setOnClickListener {
+            binding.searchImageView.setOnClickListener {
                 listener.onItemClick(layoutPosition)
             }
 
-            attachBtn.setOnClickListener {
-                listener.onItemAttachClick(attachBtn,layoutPosition)
+            binding.searchImageAttachBtn.setOnClickListener {
+                listener.onItemAttachClick(binding.searchImageAttachBtn,layoutPosition)
             }
         }
     }
@@ -44,18 +44,14 @@ class RainForestProductImageAdapter(private val context: Context, private val im
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
 
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.rain_forest_image_item_row_design, parent, false)
-        return ItemViewHolder(view, mListener!!)
+        val layoutBinding = RainForestImageItemRowDesignBinding.inflate(LayoutInflater.from(parent.context),parent,false)//LayoutInflater.from(parent.context).inflate(R.layout.rain_forest_image_item_row_design, parent, false)
+        return ItemViewHolder(layoutBinding, mListener!!)
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val image = imagesList[position]
 
-        Glide.with(context)
-                .load(image)
-                .thumbnail(Glide.with(context).load(R.drawable.loader))
-                .fitCenter()
-                .into(holder.imageView)
+        holder.bindData(image,context,position)
 
     }
 

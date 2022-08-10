@@ -115,8 +115,7 @@ class Constants {
         var imageLoadingStatus = 0
         var productId = 0
         var selectedRainForestProductImages = ""
-        var voiceSearchHint = "default"
-        var barcodeSearchHint = "default"
+
 
         private fun getBackgroundImageFolderFile(context: Context): File {
             return File(context.externalCacheDir, BACKGROUND_IMAGE_PATH)
