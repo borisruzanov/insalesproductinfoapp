@@ -109,7 +109,7 @@ class CustomDialog(
     private lateinit var dynamicTitleTextViewWrapper: FlowLayout
     private lateinit var dynamicFullDescTextViewWrapper: FlowLayout
     private lateinit var dynamicKeywordsTextViewWrapper: FlowLayout
-
+//    private lateinit var pItem:Product
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +119,7 @@ class CustomDialog(
         )
         appSettings = AppSettings(requireActivity())
         productImagesChanges = false
+//        pItem = currentPItem
     }
 
     override fun onResume() {
@@ -917,7 +918,8 @@ class CustomDialog(
                     R.color.white
                 )
             )
-        } else {
+        }
+        else {
             //holder.productTitle.text = context.getString(R.string.product_title_error)
             titleBox.setBackgroundColor(
                 ContextCompat.getColor(
@@ -946,7 +948,8 @@ class CustomDialog(
                     R.color.white
                 )
             )
-        } else {
+        }
+        else {
             //holder.productDescription.text = context.getString(R.string.product_description_error)
             fullDescriptionBox.setBackgroundColor(
                 ContextCompat.getColor(
@@ -1002,7 +1005,7 @@ class CustomDialog(
             defaultLayout = 1
             swapLayoutBtn.isChecked = true
             titleBox.requestFocus()
-            Constants.openKeyboar(requireContext())
+            BaseActivity.showSoftKeyboard(requireContext(),titleBox)
         }
 
         shortDescClearBrush.setOnClickListener {
@@ -1015,7 +1018,7 @@ class CustomDialog(
             defaultLayout = 1
             swapLayoutBtn.isChecked = true
             productShortDescriptionBox.requestFocus()
-            Constants.openKeyboar(requireContext())
+            BaseActivity.showSoftKeyboard(requireContext(),productShortDescriptionBox)
         }
 
         fullDescClearBrush.setOnClickListener {
@@ -1028,7 +1031,7 @@ class CustomDialog(
             defaultLayout = 1
             swapLayoutBtn.isChecked = true
             fullDescriptionBox.requestFocus()
-            Constants.openKeyboar(requireContext())
+            BaseActivity.showSoftKeyboard(requireContext(),fullDescriptionBox)
         }
 
         titleBox.setText(pItem.title)
@@ -1104,22 +1107,10 @@ class CustomDialog(
             dynamicFullDescTextViewWrapper.addView(textView)
         }
 
-        swapLayoutBtn.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) {
-                secondLinearLayout.visibility = View.GONE
-                firstLinearLayout.visibility = View.VISIBLE
-
-                defaultLayout = 1
-                fullDescriptionBox.setText(pItem.fullDesc)
-//                    if (insalesFragment!!.titleBox.text.toString().isNotEmpty()) {
-                titleBox.setText(pItem.title)
-                titleBox.setSelection(pItem.title.length)
-//                    }
-                Constants.openKeyboar(requireContext())
-                titleBox.requestFocus()
-            } else {
-                Constants.hideKeyboar(requireContext())
-                //BaseActivity.startLoading(requireContext())
+        swapLayoutBtn.setOnClickListener{view ->
+            if (!swapLayoutBtn.isChecked){
+//                swapLayoutBtn.isChecked = false
+                BaseActivity.hideSoftKeyboard(requireContext(),titleBox)
                 firstLinearLayout.visibility = View.GONE
                 secondLinearLayout.visibility = View.VISIBLE
                 defaultLayout = 0
@@ -1188,9 +1179,110 @@ class CustomDialog(
                     textView.setOnClickListener(this)
                     dynamicFullDescTextViewWrapper.addView(textView)
                 }
-                //BaseActivity.dismiss()
+            }
+            else{
+//                swapLayoutBtn.isChecked = true
+                secondLinearLayout.visibility = View.GONE
+                firstLinearLayout.visibility = View.VISIBLE
+
+                defaultLayout = 1
+                fullDescriptionBox.setText(pItem.fullDesc)
+
+                titleBox.setText(pItem.title)
+                titleBox.setSelection(pItem.title.length)
+
+                BaseActivity.showSoftKeyboard(requireContext(),titleBox)
+                titleBox.requestFocus()
             }
         }
+
+//        swapLayoutBtn.setOnCheckedChangeListener { buttonView, isChecked ->
+//            if (isChecked) {
+//                secondLinearLayout.visibility = View.GONE
+//                firstLinearLayout.visibility = View.VISIBLE
+//
+//                defaultLayout = 1
+//                fullDescriptionBox.setText(pItem.fullDesc)
+////                    if (insalesFragment!!.titleBox.text.toString().isNotEmpty()) {
+//                titleBox.setText(pItem.title)
+//                titleBox.setSelection(pItem.title.length)
+////                    }
+//                Constants.openKeyboar(requireContext())
+//                titleBox.requestFocus()
+//            } else {
+////                Constants.hideKeyboar(requireContext())
+//                //BaseActivity.startLoading(requireContext())
+//                firstLinearLayout.visibility = View.GONE
+//                secondLinearLayout.visibility = View.VISIBLE
+//                defaultLayout = 0
+//
+//                titleTextViewList.clear()
+//                shortDescTextViewList.clear()
+//                fullDescTextViewList.clear()
+//                dynamicTitleTextViewWrapper.removeAllViews()
+//                dynamicShortDescTextViewWrapper.removeAllViews()
+//                dynamicFullDescTextViewWrapper.removeAllViews()
+//
+//                val titleTextList1 = pItem.title.trim().split(" ")
+//                val shortDescTextList1 = pItem.shortDesc.trim().split(" ")
+//                val fullDescTextList1 = pItem.fullDesc.trim().split(" ")
+//
+//                for (i in 0 until titleTextList1.size) {
+//                    val params = FlowLayout.LayoutParams(
+//                        FlowLayout.LayoutParams.WRAP_CONTENT,
+//                        FlowLayout.LayoutParams.WRAP_CONTENT
+//                    )
+//                    params.setMargins(5, 5, 5, 5)
+//                    val textView = MaterialTextView(requireActivity())
+//                    textView.layoutParams = params
+//                    textView.text = titleTextList1[i].trim()
+//                    textView.tag = "title"
+//                    textView.id = i
+//                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+//                    textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.black))
+//                    titleTextViewList.add(textView)
+//                    textView.setOnClickListener(this)
+//                    dynamicTitleTextViewWrapper.addView(textView)
+//                }
+//
+//                for (i in 0 until shortDescTextList1.size) {
+//                    val params = FlowLayout.LayoutParams(
+//                        FlowLayout.LayoutParams.WRAP_CONTENT,
+//                        FlowLayout.LayoutParams.WRAP_CONTENT
+//                    )
+//                    params.setMargins(5, 5, 5, 5)
+//                    val textView = MaterialTextView(requireActivity())
+//                    textView.layoutParams = params
+//                    textView.text = shortDescTextList1[i].trim()
+//                    textView.tag = "title"
+//                    textView.id = i
+//                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+//                    textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.black))
+//                    shortDescTextViewList.add(textView)
+//                    textView.setOnClickListener(this)
+//                    dynamicShortDescTextViewWrapper.addView(textView)
+//                }
+////
+//                for (i in 0 until fullDescTextList1.size) {
+//                    val params = FlowLayout.LayoutParams(
+//                        FlowLayout.LayoutParams.WRAP_CONTENT,
+//                        FlowLayout.LayoutParams.WRAP_CONTENT
+//                    )
+//                    params.setMargins(5, 5, 5, 5)
+//                    val textView = MaterialTextView(requireActivity())
+//                    textView.layoutParams = params
+//                    textView.text = fullDescTextList1[i].trim()
+//                    textView.tag = "title"
+//                    textView.id = i
+//                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+//                    textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.black))
+//                    fullDescTextViewList.add(textView)
+//                    textView.setOnClickListener(this)
+//                    dynamicFullDescTextViewWrapper.addView(textView)
+//                }
+//                //BaseActivity.dismiss()
+//            }
+//        }
 
         titleBox.setSelection(pItem.title.length)
         titleBox.addTextChangedListener(object : TextWatcher {
@@ -1208,7 +1300,7 @@ class CustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                pItem.title = titleBox.text.toString()
+//                pItem.title = titleBox.text.toString()
             }
 
         })
@@ -1227,7 +1319,7 @@ class CustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                pItem.fullDesc = fullDescriptionBox.text.toString()
+//                pItem.fullDesc = fullDescriptionBox.text.toString()
             }
 
         })
@@ -1249,7 +1341,16 @@ class CustomDialog(
                     .create().show()
             }
             else{
-                dismiss()
+                if(firstLinearLayout.visibility == View.VISIBLE){
+                    firstLinearLayout.visibility = View.GONE
+                    secondLinearLayout.visibility = View.VISIBLE
+                    defaultLayout = 0
+                    swapLayoutBtn.isChecked = false
+
+                }else{
+                    dismiss()
+                }
+
             }
         }
 

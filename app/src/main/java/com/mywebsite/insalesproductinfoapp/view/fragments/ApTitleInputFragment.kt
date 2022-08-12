@@ -38,6 +38,7 @@ import com.mywebsite.insalesproductinfoapp.adapters.FieldListsAdapter
 import com.mywebsite.insalesproductinfoapp.model.ListItem
 import com.mywebsite.insalesproductinfoapp.utils.*
 import com.mywebsite.insalesproductinfoapp.view.activities.BaseActivity
+import com.mywebsite.insalesproductinfoapp.view.activities.BaseActivity.Companion.capitalized
 import com.mywebsite.insalesproductinfoapp.view.activities.FieldListsActivity
 import com.mywebsite.insalesproductinfoapp.view.activities.OcrActivity
 import com.theartofdev.edmodo.cropper.CropImage
@@ -692,7 +693,7 @@ class ApTitleInputFragment : Fragment() {
 
                 // THIS LINE OF CODE WILL CHECK THE IMAGE HAS BEEN SELECTED OR NOT
                 if (result.resultCode == Activity.RESULT_OK) {
-                    val spokenText: String =
+                    var spokenText: String =
                             result.data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                                     .let { results ->
                                         results!!.get(0)
@@ -700,6 +701,7 @@ class ApTitleInputFragment : Fragment() {
                     val currentPItemTitle = apTitleView.text.toString()
                     val stringBuilder = java.lang.StringBuilder()
                     stringBuilder.append(currentPItemTitle)
+                    spokenText = spokenText.capitalized()
                     stringBuilder.append("$spokenText. ")
                     apTitleView.setText(stringBuilder.toString())
                     apTitleView.setSelection(apTitleView.text.toString().length)

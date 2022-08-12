@@ -37,6 +37,7 @@ import com.mywebsite.insalesproductinfoapp.adapters.FieldListsAdapter
 import com.mywebsite.insalesproductinfoapp.model.ListItem
 import com.mywebsite.insalesproductinfoapp.utils.*
 import com.mywebsite.insalesproductinfoapp.view.activities.*
+import com.mywebsite.insalesproductinfoapp.view.activities.BaseActivity.Companion.capitalized
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.IOException
@@ -677,7 +678,7 @@ class ApDescriptionInputFragment : Fragment() {
 
             // THIS LINE OF CODE WILL CHECK THE IMAGE HAS BEEN SELECTED OR NOT
             if (result.resultCode == Activity.RESULT_OK) {
-                val spokenText: String =
+                var spokenText: String =
                     result.data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                         .let { results ->
                             results!!.get(0)
@@ -685,6 +686,7 @@ class ApDescriptionInputFragment : Fragment() {
                 val currentPItemTitle = apDescriptionView.text.toString()
                 val stringBuilder = java.lang.StringBuilder()
                 stringBuilder.append(currentPItemTitle)
+                spokenText = spokenText.capitalized()
                 stringBuilder.append("$spokenText. ")
                 apDescriptionView.setText(stringBuilder.toString())
                 apDescriptionView.setSelection(apDescriptionView.text.toString().length)

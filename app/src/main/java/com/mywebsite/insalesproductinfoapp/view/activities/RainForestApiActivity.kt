@@ -439,7 +439,6 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
                 val response = JSONObject(it)
                 if (response.has("search_results")) {
-                    chargeCreditsPrice()
                     val searchResults = response.getJSONArray("search_results")
                     if (searchResults.length() > 0) {
                         rainForestList.clear()
@@ -457,11 +456,11 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         }
                         val totalCreditPrice = unitCharacterPrice * totalCharacters
                         howMuchChargeCredits = totalCreditPrice
+                        chargeCreditsPrice()
                         //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 //                        userCurrentCredits = "0"
 //                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
                         try {
-
                             for (i in 0 until rainForestList.size) {
                                 val text = rainForestList[i].title
                                 GcpTranslator.translateFromEngToRus(
@@ -480,60 +479,9 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         }
 
                         dismiss()
-//                        if (rainForestList.size > 0) {
-//                            adapter.notifyItemRangeChanged(0,rainForestList.size)
-//                        }
-//                        CoroutineScope(Dispatchers.Main).launch {
-//                            dismiss()
-//                            if (rainForestList.size > 0) {
-//                                adapter.notifyDataSetChanged()
-//                            }
-//                        }
-                        chargeCreditsPrice()
-//                        CoroutineScope(Dispatchers.IO).launch {
-//                            try {
-//                                for (i in 0 until rainForestList.size) {
-//                                        val text = rainForestList[i].title
-//                                        GcpTranslator.translateFromEngToRus(
-//                                            context,
-//                                            text,
-//                                            object : TranslationCallback {
-//                                                override fun onTextTranslation(translatedText: String) {
-//                                                    rainForestList[i].title = translatedText
-//                                                }
-//
-//                                            })
-//                                }
-//                            } catch (e: Exception) {
-//                                e.printStackTrace()
-//                            }
-//
-//                            CoroutineScope(Dispatchers.Main).launch {
-//                                dismiss()
-//                                if (rainForestList.size > 0) {
-//                                    adapter.notifyDataSetChanged()
-//                                }
-//                            }
-//                            chargeCreditsPrice()
-//                        }
-//                        }
-//                        else{
-//                            if (rainForestList.size > 0) {
-//                                adapter.notifyItemRangeChanged(0, rainForestList.size)
-//                            }
-//                            MaterialAlertDialogBuilder(context)
-//                                .setMessage(getString(R.string.low_credites_error_message))
-//                                .setCancelable(false)
-//                                .setNegativeButton(getString(R.string.no_text)){dialog,which->
-//                                    dialog.dismiss()
-//                                }
-//                                .setPositiveButton(getString(R.string.buy_credits)){dialog,which ->
-//                                    dialog.dismiss()
-//                                    startActivity(Intent(context,UserScreenActivity::class.java))
-//                                }
-//                                .create().show()
-//                        }
-                    } else {
+                    }
+                    else {
+                        Toast.makeText(context,getString(R.string.rain_forest_api_empty_response_message),Toast.LENGTH_LONG).show()
                         dismiss()
                     }
                 }
@@ -637,217 +585,6 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         unitCharacterPrice,
                         howMuchChargeCredits
                     ).show(supportFragmentManager, "dialog")
-
-//                        val layoutBuilder = MaterialAlertDialogBuilder(context)
-//                        val dialogLayout = LayoutInflater.from(context)
-//                                .inflate(R.layout.rain_forest_title_description_layout, null)
-//                        val dialogCloseBtn =
-//                                dialogLayout.findViewById<AppCompatImageView>(R.id.dialog_close_btn)
-//                        val titleTextView =
-//                                dialogLayout.findViewById<MaterialTextView>(R.id.title_text_view)
-//                        val descriptionTextView =
-//                                dialogLayout.findViewById<MaterialTextView>(R.id.description_text_view)
-//                        val titleAddBtn =
-//                                dialogLayout.findViewById<MaterialTextView>(R.id.add_title_button)
-//                        val descriptionAddBtn =
-//                                dialogLayout.findViewById<MaterialTextView>(R.id.add_description_button)
-//                        val doneBtn = dialogLayout.findViewById<MaterialButton>(R.id.rfa_item_done_btn)
-//                        val dynamicTitleTextViewWrapper = dialogLayout.findViewById<FlowLayout>(R.id.dynamic_textview_wrapper)
-//                        val dynamicDescriptionTextViewWrapper = dialogLayout.findViewById<FlowLayout>(R.id.dynamic_description_textview_wrapper)
-//
-//                        titleAddBtn.isEnabled = true
-//                        descriptionAddBtn.isEnabled = true
-//
-//                        layoutBuilder.setView(dialogLayout)
-//                        layoutBuilder.setCancelable(false)
-//                        val alert = layoutBuilder.create()
-//                        alert.show()
-//                        dialogCloseBtn.setOnClickListener {
-//                            alert.dismiss()
-//                        }
-//
-//                        doneBtn.setOnClickListener {
-//                            alert.dismiss()
-//                            val finalTitleText = if (titleAddBtn.isEnabled) {
-//                                ""
-//                            } else {
-//                                val stringBuilder = StringBuilder()
-//                                for (i in 0 until titleTextViewList.size){
-//                                    val titleItem = titleTextViewList[i]
-//                                    stringBuilder.append(titleItem.text.toString())
-//                                    stringBuilder.append(" ")
-//                                }
-//
-//                                stringBuilder.toString().trim()
-//                            }
-//                            val finalDescriptionText = if (descriptionAddBtn.isEnabled) {
-//                                ""
-//                            } else {
-//                                val stringBuilder = StringBuilder()
-//                                for (i in 0 until descriptionTextViewList.size){
-//                                    val titleItem = descriptionTextViewList[i]
-//                                    stringBuilder.append(titleItem.text.toString())
-//                                    stringBuilder.append(" ")
-//                                }
-//
-//                                stringBuilder.toString().trim()
-//                                //descriptionTextView.text.toString()
-//                            }
-//                            setResult(RESULT_OK, Intent().apply {
-//                                putExtra("TITLE", finalTitleText)
-//                                putExtra("DESCRIPTION", finalDescriptionText)
-//                            })
-//                            finish()
-//                        }
-//                        val totalCharacters = title.length + description.length
-//                        val totalCreditPrice = unitCharacterPrice * totalCharacters
-//                        howMuchChargeCredits = totalCreditPrice
-//                        //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-////                    userCurrentCredits = "0"
-////                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
-//
-//                        GcpTranslator.translateFromEngToRus(
-//                                context,
-//                                title,
-//                                object : TranslationCallback {
-//                                    override fun onTextTranslation(translatedText: String) {
-//                                        if (translatedText.isNotEmpty()) {
-//                                            titleTextView.text = translatedText
-//
-//                                            val textList = translatedText.split(" ")
-//
-//                                            titleTextViewList.clear()
-//                                            for (i in 0 until textList.size) {
-//                                                val params = FlowLayout.LayoutParams(FlowLayout.LayoutParams.WRAP_CONTENT,
-//                                                        FlowLayout.LayoutParams.WRAP_CONTENT)
-//                                                params.setMargins(5, 5, 5, 5)
-//                                                val textView = MaterialTextView(context)
-//                                                textView.layoutParams = params
-//                                                textView.text = textList[i]
-//                                                textView.tag = "title"
-//                                                textView.id = i
-//                                                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-//                                                textView.setTextColor(ContextCompat.getColor(context,R.color.black))
-//                                                titleTextViewList.add(textView)
-//                                                textView.setOnClickListener(this@RainForestApiActivity)
-//                                                dynamicTitleTextViewWrapper.addView(textView)
-//                                            }
-//
-//
-//                                        } else {
-//                                            titleTextView.text = ""
-//                                        }
-//                                    }
-//
-//                                })
-//
-////                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
-////                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
-//
-//
-//                        if (description.isNotEmpty()) {
-//                            GcpTranslator.translateFromEngToRus(
-//                                    context,
-//                                    description,
-//                                    object : TranslationCallback {
-//                                        override fun onTextTranslation(translatedText: String) {
-//                                            if (translatedText.isNotEmpty()) {
-//                                                descriptionTextView.text = translatedText
-//
-//                                                val textList = translatedText.split(" ")
-//
-//                                                descriptionTextViewList.clear()
-//                                                for (i in 0 until textList.size) {
-//                                                    val params = FlowLayout.LayoutParams(FlowLayout.LayoutParams.WRAP_CONTENT,
-//                                                            FlowLayout.LayoutParams.WRAP_CONTENT)
-//                                                    params.setMargins(5, 5, 5, 5)
-//                                                    val textView = MaterialTextView(context)
-//                                                    textView.layoutParams = params
-//                                                    textView.text = textList[i]
-//                                                    textView.tag = "title"
-//                                                    textView.id = i
-//                                                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-//                                                    textView.setTextColor(ContextCompat.getColor(context,R.color.black))
-//                                                    descriptionTextViewList.add(textView)
-//                                                    textView.setOnClickListener(this@RainForestApiActivity)
-//                                                    dynamicDescriptionTextViewWrapper.addView(textView)
-//                                                }
-//
-//                                            } else {
-//                                                descriptionTextView.text = ""
-//                                            }
-//                                        }
-//
-//                                    })
-//                        }else{
-//                            val params = FlowLayout.LayoutParams(FlowLayout.LayoutParams.WRAP_CONTENT,
-//                                FlowLayout.LayoutParams.WRAP_CONTENT)
-//                            params.setMargins(5, 5, 5, 5)
-//                            val textView = MaterialTextView(context)
-//                            textView.layoutParams = params
-//                            textView.text = "Nothing to show"
-//                            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-//                            textView.setTextColor(ContextCompat.getColor(context,R.color.red))
-//                            dynamicDescriptionTextViewWrapper.addView(textView)
-//                        }
-////                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
-////                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
-//                        chargeCreditsPrice()
-////                    }
-////                    else{
-////                        titleTextView.text = title
-////                        descriptionTextView.text = description
-////                        MaterialAlertDialogBuilder(context)
-////                                .setMessage(getString(R.string.low_credites_error_message))
-////                                .setCancelable(false)
-////                                .setNegativeButton(getString(R.string.no_text)){dialog,which->
-////                                    dialog.dismiss()
-////                                }
-////                                .setPositiveButton(getString(R.string.buy_credits)){dialog,which ->
-////                                    dialog.dismiss()
-////                                    startActivity(Intent(context,UserScreenActivity::class.java))
-////                                }
-////                                .create().show()
-////                    }
-//
-//                        titleAddBtn.setOnClickListener {
-//                            val builder = MaterialAlertDialogBuilder(context)
-//                            builder.setMessage(getString(R.string.apply_warning_message))
-//                            builder.setCancelable(false)
-//                            builder.setNegativeButton(getString(R.string.cancel_text)) { dialog, which ->
-//                                dialog.dismiss()
-//                            }
-//                            builder.setPositiveButton(getString(R.string.apply_text)) { dialog, which ->
-//                                dialog.dismiss()
-//                                titleAddBtn.text = getString(R.string.added_text)
-//                                titleAddBtn.isEnabled = false
-//                                doneBtn.visibility = View.VISIBLE
-//                            }
-//
-//                            val alert1 = builder.create()
-//                            alert1.show()
-//
-//                        }
-//
-//                        descriptionAddBtn.setOnClickListener {
-//                            if (description.isNotEmpty()) {
-//                                val builder = MaterialAlertDialogBuilder(context)
-//                                builder.setMessage(getString(R.string.apply_warning_message))
-//                                builder.setCancelable(false)
-//                                builder.setNegativeButton(getString(R.string.cancel_text)) { dialog, which ->
-//                                    dialog.dismiss()
-//                                }
-//                                builder.setPositiveButton(getString(R.string.apply_text)) { dialog, which ->
-//                                    dialog.dismiss()
-//                                    descriptionAddBtn.text = getString(R.string.added_text)
-//                                    descriptionAddBtn.isEnabled = false
-//                                    doneBtn.visibility = View.VISIBLE
-//                                }
-//
-//                                val alert1 = builder.create()
-//                                alert1.show()
-//                            }
-//                        }
 
                 }
             },

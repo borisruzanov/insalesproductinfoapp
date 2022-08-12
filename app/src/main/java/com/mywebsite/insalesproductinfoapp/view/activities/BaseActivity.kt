@@ -496,6 +496,14 @@ abstract class BaseActivity :  AppCompatActivity() {
             }
         }
 
+        fun String.capitalized(): String {
+            return this.replaceFirstChar {
+                if (it.isLowerCase())
+                    it.titlecase(Locale.getDefault())
+                else it.toString()
+            }
+        }
+
         fun addDaysCalenderDate(days: Int): Calendar {
             val sdf = SimpleDateFormat("yyyy-MM-dd kk:mm a", Locale.ENGLISH)
             val c = Calendar.getInstance()

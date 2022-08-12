@@ -58,6 +58,7 @@ import com.mywebsite.insalesproductinfoapp.model.Category
 import com.mywebsite.insalesproductinfoapp.model.ListItem
 import com.mywebsite.insalesproductinfoapp.utils.*
 import com.mywebsite.insalesproductinfoapp.view.activities.*
+import com.mywebsite.insalesproductinfoapp.view.activities.BaseActivity.Companion.capitalized
 import com.mywebsite.insalesproductinfoapp.viewmodel.AddProductViewModel
 import com.mywebsite.insalesproductinfoapp.viewmodel.SalesCustomersViewModel
 import com.theartofdev.edmodo.cropper.CropImage
@@ -144,6 +145,31 @@ class AddProductCustomDialog(
         LocalBroadcastManager.getInstance(
             requireActivity()
         ).registerReceiver(broadcastReceiver, intentFilter)
+
+        val tempImageList = mutableListOf<String>()
+        val images = Constants.selectedRainForestProductImages
+        if (images.isNotEmpty()) {
+
+            if (images.contains(",")) {
+                tempImageList.addAll(images.split(","))
+            } else {
+                tempImageList.add(images)
+            }
+            if (tempImageList.isNotEmpty()) {
+                for (i in 0 until tempImageList.size) {
+                    if (!checkImageAlreadyExist(multiImagesList, tempImageList[i])) {
+                        multiImagesList.add(tempImageList[i])
+                        barcodeImageList.add(tempImageList[i])
+                    }
+                }
+                Glide.with(requireActivity())
+                    .load(barcodeImageList[barcodeImageList.size-1])
+                    .placeholder(R.drawable.placeholder)
+                    .centerInside()
+                    .into(selectedImageView)
+                imagesAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     override fun onPause() {
@@ -374,26 +400,6 @@ class AddProductCustomDialog(
             apSecondLayout.visibility = View.GONE
             apNextPreviousButtons.visibility = View.GONE
             apFirstLayout.visibility = View.VISIBLE
-
-            val tempImageList = mutableListOf<String>()
-            val images = Constants.selectedRainForestProductImages
-            if (images.isNotEmpty()) {
-
-                if (images.contains(",")) {
-                    tempImageList.addAll(images.split(","))
-                } else {
-                    tempImageList.add(images)
-                }
-                if (tempImageList.isNotEmpty()) {
-                    for (i in 0 until tempImageList.size) {
-                        if (!checkImageAlreadyExist(multiImagesList, tempImageList[i])) {
-                            multiImagesList.add(tempImageList[i])
-                            barcodeImageList.add(tempImageList[i])
-                        }
-                    }
-                    imagesAdapter.notifyDataSetChanged()
-                }
-            }
         }
         quickModeCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
             userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
@@ -452,6 +458,11 @@ class AddProductCustomDialog(
                                 barcodeImageList.add(tempImageList[i])
                             }
                         }
+                        Glide.with(requireActivity())
+                            .load(barcodeImageList[barcodeImageList.size-1])
+                            .placeholder(R.drawable.placeholder)
+                            .centerInside()
+                            .into(selectedImageView)
                         imagesAdapter.notifyDataSetChanged()
                     }
                 }
@@ -1263,8 +1274,18 @@ class AddProductCustomDialog(
             apQuantityActiveListNameView.visibility = View.VISIBLE
             apQuantityViewWrapper.visibility = View.GONE
             apQuantityListSpinner.visibility = View.VISIBLE
+//            val listOptions: String = tableGenerator.getListValues(apQuantityListId)
+//            val listValues = listOptions.split(",")
+//            val apQuantitySpinnerAdapter = ArrayAdapter(
+//                requireActivity(),
+//                android.R.layout.simple_spinner_item,
+//                listValues
+//            )
             val listOptions: String = tableGenerator.getListValues(apQuantityListId)
             val listValues = listOptions.split(",")
+            if (listValues.isNotEmpty()){
+                appSettings.putString("AP_PRODUCT_QUANTITY",listValues[0])
+            }
             val apQuantitySpinnerAdapter = ArrayAdapter(
                 requireActivity(),
                 android.R.layout.simple_spinner_item,
@@ -1335,6 +1356,7 @@ class AddProductCustomDialog(
                 if (position == 1) {
                     apQuantityListSpinner.visibility = View.GONE
                     apQuantityListBtn.visibility = View.GONE
+                    apQuantityActiveListNameView.visibility = View.GONE
                     apQuantityDefaultInputWrapper.visibility = View.VISIBLE
                     apQuantityViewWrapper.visibility = View.VISIBLE
                     apQuantityDefaultValue = appSettings.getString("AP_QUANTITY_DEFAULT_VALUE")
@@ -1348,12 +1370,23 @@ class AddProductCustomDialog(
                 } else if (position == 2) {
                     apQuantityDefaultInputWrapper.visibility = View.GONE
                     apQuantityListBtn.visibility = View.VISIBLE
+                    apQuantityActiveListNameView.visibility = View.VISIBLE
                     apQuantityViewWrapper.visibility = View.GONE
                     apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                     apQuantityView.setSelection(apQuantityView.text.toString().length)
                     apQuantityListSpinner.visibility = View.VISIBLE
+//                    val listOptions: String = tableGenerator.getListValues(apQuantityListId)
+//                    val listValues = listOptions.split(",")
+//                    val apQuantitySpinnerAdapter = ArrayAdapter(
+//                        requireActivity(),
+//                        android.R.layout.simple_spinner_item,
+//                        listValues
+//                    )
                     val listOptions: String = tableGenerator.getListValues(apQuantityListId)
                     val listValues = listOptions.split(",")
+                    if (listValues.isNotEmpty()){
+                        appSettings.putString("AP_PRODUCT_QUANTITY",listValues[0])
+                    }
                     val apQuantitySpinnerAdapter = ArrayAdapter(
                         requireActivity(),
                         android.R.layout.simple_spinner_item,
@@ -1383,6 +1416,7 @@ class AddProductCustomDialog(
                     apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                     apQuantityView.setSelection(apQuantityView.text.toString().length)
                     apQuantityListBtn.visibility = View.GONE
+                    apQuantityActiveListNameView.visibility = View.GONE
                     apQuantityDefaultInputWrapper.visibility = View.GONE
                     apQuantityListSpinner.visibility = View.GONE
                 }
@@ -1452,8 +1486,18 @@ class AddProductCustomDialog(
             apPriceActiveListNameView.visibility = View.VISIBLE
             apPriceViewWrapper.visibility = View.GONE
             apPriceListSpinner.visibility = View.VISIBLE
+//            val listOptions: String = tableGenerator.getListValues(apPriceListId)
+//            val listValues = listOptions.split(",")
+//            val apPriceSpinnerAdapter = ArrayAdapter(
+//                requireActivity(),
+//                android.R.layout.simple_spinner_item,
+//                listValues
+//            )
             val listOptions: String = tableGenerator.getListValues(apPriceListId)
             val listValues = listOptions.split(",")
+            if (listValues.isNotEmpty()){
+                appSettings.putString("AP_PRODUCT_PRICE",listValues[0])
+            }
             val apPriceSpinnerAdapter = ArrayAdapter(
                 requireActivity(),
                 android.R.layout.simple_spinner_item,
@@ -1520,6 +1564,7 @@ class AddProductCustomDialog(
                     apPriceListSpinner.visibility = View.GONE
                     apPriceListBtn.visibility = View.GONE
                     apPriceDefaultInputWrapper.visibility = View.VISIBLE
+                    apPriceActiveListNameView.visibility = View.GONE
                     apPriceViewWrapper.visibility = View.VISIBLE
                     apPriceDefaultValue = appSettings.getString("AP_PRICE_DEFAULT_VALUE")
                     if (apPriceDefaultValue!!.isNotEmpty()) {
@@ -1532,12 +1577,23 @@ class AddProductCustomDialog(
                 } else if (position == 2) {
                     apPriceDefaultInputWrapper.visibility = View.GONE
                     apPriceListBtn.visibility = View.VISIBLE
+                    apPriceActiveListNameView.visibility = View.VISIBLE
                     apPriceViewWrapper.visibility = View.GONE
                     apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                     apPriceView.setSelection(apPriceView.text.toString().length)
                     apPriceListSpinner.visibility = View.VISIBLE
+//                    val listOptions: String = tableGenerator.getListValues(apPriceListId)
+//                    val listValues = listOptions.split(",")
+//                    val apPriceSpinnerAdapter = ArrayAdapter(
+//                        requireActivity(),
+//                        android.R.layout.simple_spinner_item,
+//                        listValues
+//                    )
                     val listOptions: String = tableGenerator.getListValues(apPriceListId)
                     val listValues = listOptions.split(",")
+                    if (listValues.isNotEmpty()){
+                        appSettings.putString("AP_PRODUCT_PRICE",listValues[0])
+                    }
                     val apPriceSpinnerAdapter = ArrayAdapter(
                         requireActivity(),
                         android.R.layout.simple_spinner_item,
@@ -1567,6 +1623,7 @@ class AddProductCustomDialog(
                     apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                     apPriceView.setSelection(apPriceView.text.toString().length)
                     apPriceListBtn.visibility = View.GONE
+                    apPriceActiveListNameView.visibility = View.GONE
                     apPriceDefaultInputWrapper.visibility = View.GONE
                     apPriceListSpinner.visibility = View.GONE
                 }
@@ -2127,7 +2184,7 @@ class AddProductCustomDialog(
 
             // THIS LINE OF CODE WILL CHECK THE IMAGE HAS BEEN SELECTED OR NOT
             if (result.resultCode == Activity.RESULT_OK) {
-                val spokenText: String =
+                var spokenText: String =
                     result.data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                         .let { results ->
                             results!!.get(0)
@@ -2136,6 +2193,7 @@ class AddProductCustomDialog(
                     val currentPItemTitle = apTitleView.text.toString().trim()
                     val stringBuilder = java.lang.StringBuilder()
                     stringBuilder.append(currentPItemTitle)
+                    spokenText = spokenText.capitalized()
                     stringBuilder.append("$spokenText. ")
                     apTitleView.setText(stringBuilder.toString())
                     apTitleView.setSelection(apTitleView.text.toString().length)
@@ -2146,6 +2204,7 @@ class AddProductCustomDialog(
                     val currentPItemTitle = apDescriptionView.text.toString().trim()
                     val stringBuilder = java.lang.StringBuilder()
                     stringBuilder.append(currentPItemTitle)
+                    spokenText = spokenText.capitalized()
                     stringBuilder.append("$spokenText. ")
                     apDescriptionView.setText(stringBuilder.toString())
                     apDescriptionView.setSelection(apDescriptionView.text.toString().length)
