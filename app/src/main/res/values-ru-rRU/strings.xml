@@ -265,6 +265,8 @@
     <string name="list_text">List</string>
     <string name="exit_without_saving_warning_message">Do you really want to exit without saving changes?</string>
     <string name="rain_forest_api_empty_response_message">Search results not found, please try something else.</string>
+    <string name="previous_text">Previous</string>
+    <string name="nxt_text">Next</string>
 
     <string-array name="features_keys">
         <item>compressor_feature</item>

@@ -1533,8 +1533,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                                 R.color.primary_positive_color
                             )
                         )
-                        barcodeImageList.removeAt(position)
-                        multiImagesList.removeAt(position)
+                        barcodeImageList.remove(selectedInternetImage)
+                        multiImagesList.remove(selectedInternetImage)
                     }
                     adapter!!.notifyDataSetChanged()
                 }
