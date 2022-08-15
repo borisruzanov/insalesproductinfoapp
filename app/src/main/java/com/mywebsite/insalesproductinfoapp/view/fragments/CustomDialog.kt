@@ -109,6 +109,7 @@ class CustomDialog(
     private lateinit var dynamicTitleTextViewWrapper: FlowLayout
     private lateinit var dynamicFullDescTextViewWrapper: FlowLayout
     private lateinit var dynamicKeywordsTextViewWrapper: FlowLayout
+    private lateinit var htmlPreviewBtn:AppCompatImageView
 //    private lateinit var pItem:Product
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -175,6 +176,12 @@ class CustomDialog(
             dialogLayout.findViewById<AppCompatImageView>(R.id.short_desc_clear_brush_view)
         val fullDescClearBrush =
             dialogLayout.findViewById<AppCompatImageView>(R.id.full_desc_clear_brush_view)
+
+        htmlPreviewBtn = dialogLayout.findViewById<AppCompatImageView>(R.id.full_desc_html_preview)
+
+        htmlPreviewBtn.setOnClickListener {
+            HtmlPreviewFragment(pItem.fullDesc).show(childFragmentManager, "preview-dialog")
+        }
 
         val productImagesRecyclerView = dialogLayout.findViewById<RecyclerView>(R.id.products_images_recyclerview)
         productImagesRecyclerView.layoutManager =

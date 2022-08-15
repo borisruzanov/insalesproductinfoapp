@@ -347,31 +347,31 @@ class ApImageUploadFragment : Fragment() {
                 selectedCategoryId == 0 -> {
                     BaseActivity.showAlert(
                         requireActivity(),
-                        "Product category is missing!"
+                        resources.getString(R.string.product_category_missing_text)
                     )
                 }
                 finalTitleText.isEmpty() -> {
                     BaseActivity.showAlert(
                         requireActivity(),
-                        "Product title is missing!"
+                        resources.getString(R.string.product_title_missing_text)
                     )
                 }
                 finalDescriptionText.isEmpty() -> {
                     BaseActivity.showAlert(
                         requireActivity(),
-                        "Product description is missing!"
+                        resources.getString(R.string.product_description_missing_text)
                     )
                 }
                 finalQuantityText.isEmpty() -> {
                     BaseActivity.showAlert(
                         requireActivity(),
-                        "Product quantity is missing!"
+                        resources.getString(R.string.product_quantity_missing_text)
                     )
                 }
                 finalPriceText.isEmpty() -> {
                     BaseActivity.showAlert(
                         requireActivity(),
-                        "Product price is missing!"
+                        resources.getString(R.string.product_price_missing_text)
                     )
                 }
                 else -> {

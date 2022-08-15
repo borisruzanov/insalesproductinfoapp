@@ -569,6 +569,16 @@
     <string name="rain_forest_api_empty_response_message">Search results not found, please try something else.</string>
     <string name="previous_text">Previous</string>
     <string name="nxt_text">Next</string>
+    <string name="active_list_text">Active List</string>
+    <string name="description_already_exist_text">Description already have data, Are you sure you want to erase data?</string>
+    <string name="product_category_missing_text">Product category is missing!</string>
+    <string name="product_title_missing_text">Product title is missing!</string>
+    <string name="product_description_missing_text">Product description is missing!</string>
+    <string name="product_quantity_missing_text">Product quantity is missing!</string>
+    <string name="product_price_missing_text">Product price is missing!</string>
+    <string name="quantity_value_error_text">Quantity value should start from greater then 0!</string>
+    <string name="quantity_default_value_error_text">Default Quantity value should start from greater then 0!</string>
+    <string name="title_already_exist_text">Title already have data, Are you sure you want to erase data?</string>
 
     <string-array name="features_keys">
         <item>compressor_feature</item>

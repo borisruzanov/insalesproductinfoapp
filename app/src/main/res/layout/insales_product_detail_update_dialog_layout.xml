@@ -385,6 +385,13 @@
                                     android:textSize="@dimen/mediumText" />
 
                                 <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/full_desc_html_preview"
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:layout_marginEnd="@dimen/eightDpMargin"
+                                    android:src="@drawable/ic_eye" />
+
+                                <androidx.appcompat.widget.AppCompatImageView
                                     android:id="@+id/full_desc_clear_brush_view"
                                     android:layout_width="36dp"
                                     android:layout_height="36dp"

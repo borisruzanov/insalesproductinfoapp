@@ -129,9 +129,9 @@ class ApTitleInputFragment : Fragment() {
         val apTitleListId = appSettings.getInt("AP_TITLE_LIST_ID")
         val apTitleActiveListName = appSettings.getString("AP_TITLE_LIST_NAME")
         if (apTitleActiveListName!!.isEmpty()) {
-            apTitleActiveListNameView.text = "Active List: None"
+            apTitleActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         } else {
-            apTitleActiveListNameView.text = "Active List: $apTitleActiveListName"
+            apTitleActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apTitleActiveListName"
         }
         apTitleSpinner.setSelection(apTitleSpinnerSelectedPosition)
 
@@ -582,7 +582,7 @@ class ApTitleInputFragment : Fragment() {
                     //selectedListTextView.text = listValue.value
                     appSettings.putInt("AP_TITLE_LIST_ID", listId!!)
                     appSettings.putString("AP_TITLE_LIST_NAME", listValue.value)
-                    apTitleActiveListNameView.text = "Active List: ${listValue.value}"
+                    apTitleActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: ${listValue.value}"
                     val listOptions: String = tableGenerator.getListValues(listId!!)
                     val listValues = listOptions.split(",")
                     if (listValues.isNotEmpty()) {
@@ -800,7 +800,7 @@ class ApTitleInputFragment : Fragment() {
                 apTitleSpinner.setSelection(0, false)
                 dialog.dismiss()
             }
-            builder.setMessage("Title already have data, Are you sure you want to erase data?")
+            builder.setMessage(resources.getString(R.string.title_already_exist_text))
             val alert = builder.create()
             alert.show()
         }

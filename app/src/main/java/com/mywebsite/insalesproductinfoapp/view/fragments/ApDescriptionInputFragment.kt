@@ -250,10 +250,10 @@ class ApDescriptionInputFragment : Fragment() {
         val apDescriptionListId = appSettings.getInt("AP_DESCRIPTION_LIST_ID")
         val apDescriptionActiveListName = appSettings.getString("AP_DESCRIPTION_LIST_NAME")
         if (apDescriptionActiveListName!!.isEmpty()){
-            apDescriptionActiveListNameView.text = "Active List: None"
+            apDescriptionActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         }
         else{
-            apDescriptionActiveListNameView.text = "Active List: $apDescriptionActiveListName"
+            apDescriptionActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apDescriptionActiveListName"
         }
         apDescriptionSpinner.setSelection(apDescriptionSpinnerSelectedPosition)
         apDescriptionListBtn.setOnClickListener {
@@ -569,7 +569,7 @@ class ApDescriptionInputFragment : Fragment() {
                     //selectedListTextView.text = listValue.value
                         appSettings.putInt("AP_DESCRIPTION_LIST_ID", listId!!)
                     appSettings.putString("AP_DESCRIPTION_LIST_NAME",listValue.value)
-                    apDescriptionActiveListNameView.text = "Active List: ${listValue.value}"
+                    apDescriptionActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: ${listValue.value}"
                     //appSettings.putString("AP_PRODUCT_DESCRIPTION",list.split(",")[0])
                     val listOptions: String = tableGenerator.getListValues(listId!!)
                     val listValues = listOptions.split(",")
@@ -787,7 +787,7 @@ class ApDescriptionInputFragment : Fragment() {
                 apDescriptionSpinner.setSelection(0,false)
                 dialog.dismiss()
             }
-            builder.setMessage("Description already have data, Are you sure you want to erase data?")
+            builder.setMessage(resources.getString(R.string.description_already_exist_text))
             val alert = builder.create()
             alert.show()
         }

@@ -106,16 +106,7 @@ class InSalesProductsAdapter(
                 )
             }
 
-            binding.insalesPItemTitle.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                HtmlCompat.fromHtml(
-                    HtmlCompat.fromHtml(
-                        item.title,
-                        HtmlCompat.FROM_HTML_MODE_LEGACY
-                    ).toString(), HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            } else {
-                Html.fromHtml(Html.fromHtml(item.title).toString())
-            }
+            binding.insalesPItemTitle.text = item.title
             binding.insalesPItemTitle.isExpanded = false
             binding.insalesPItemTitle.movementMethod = ScrollingMovementMethod.getInstance()
 
@@ -136,16 +127,7 @@ class InSalesProductsAdapter(
                 )
             }
 
-            binding.insalesPItemDescription.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                HtmlCompat.fromHtml(
-                    HtmlCompat.fromHtml(
-                        item.fullDesc,
-                        HtmlCompat.FROM_HTML_MODE_LEGACY
-                    ).toString(), HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            } else {
-                Html.fromHtml(Html.fromHtml(item.fullDesc).toString())
-            }
+            binding.insalesPItemDescription.text = item.fullDesc
             binding.insalesPItemDescription.isExpanded = false
             binding.insalesPItemDescription.movementMethod = ScrollingMovementMethod.getInstance()
 
@@ -322,16 +304,7 @@ class InSalesProductsAdapter(
                 )
             }
 
-            binding.insalesPItemTitle.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                HtmlCompat.fromHtml(
-                    HtmlCompat.fromHtml(
-                        item.title,
-                        HtmlCompat.FROM_HTML_MODE_LEGACY
-                    ).toString(), HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            } else {
-                    Html.fromHtml(Html.fromHtml(item.title).toString())
-            }
+            binding.insalesPItemTitle.text = item.title
             binding.insalesPItemTitle.isExpanded = false
             binding.insalesPItemTitle.movementMethod = ScrollingMovementMethod.getInstance()
 
@@ -352,16 +325,7 @@ class InSalesProductsAdapter(
                 )
             }
 
-            binding.insalesPItemDescription.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                HtmlCompat.fromHtml(
-                    HtmlCompat.fromHtml(
-                        item.fullDesc,
-                        HtmlCompat.FROM_HTML_MODE_LEGACY
-                    ).toString(), HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            } else {
-                Html.fromHtml(Html.fromHtml(item.fullDesc).toString())
-            }
+            binding.insalesPItemDescription.text = item.fullDesc
             binding.insalesPItemDescription.isExpanded = false
             binding.insalesPItemDescription.movementMethod = ScrollingMovementMethod.getInstance()
             item.productImages!!.sortByDescending { it.id }

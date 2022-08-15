@@ -125,6 +125,10 @@ class AddProductCustomDialog(
     private var barcodeImageList = mutableListOf<String>()
     var multiImagesList = mutableListOf<String>()
     private lateinit var imagesAdapter: BarcodeImageAdapter
+    private lateinit var apTitleListSpinner: AppCompatSpinner
+    private lateinit var apDescriptionListSpinner:AppCompatSpinner
+    private lateinit var apQuantityListSpinner:AppCompatSpinner
+    private lateinit var apPriceListSpinner:AppCompatSpinner
 
     var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -370,12 +374,12 @@ class AddProductCustomDialog(
             view.findViewById<TextInputEditText>(R.id.ap_price_non_changeable_default_text_input)
 
 
-        val apTitleListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_list_spinner)
-        val apDescriptionListSpinner =
+        apTitleListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_list_spinner)
+        apDescriptionListSpinner =
             view.findViewById<AppCompatSpinner>(R.id.ap_description_list_spinner)
-        val apQuantityListSpinner =
+        apQuantityListSpinner =
             view.findViewById<AppCompatSpinner>(R.id.ap_quantity_list_spinner)
-        val apPriceListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_list_spinner)
+        apPriceListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_list_spinner)
 
         apTitleActiveListNameView =
             view.findViewById<MaterialTextView>(R.id.ap_title_active_list_name)
@@ -727,9 +731,9 @@ class AddProductCustomDialog(
         val apTitleListId = appSettings.getInt("AP_TITLE_LIST_ID")
         val apTitleActiveListName = appSettings.getString("AP_TITLE_LIST_NAME")
         if (apTitleActiveListName!!.isEmpty()) {
-            apTitleActiveListNameView.text = "Active List: None"
+            apTitleActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         } else {
-            apTitleActiveListNameView.text = "Active List: $apTitleActiveListName"
+            apTitleActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apTitleActiveListName"
         }
         apTitleSpinner.setSelection(apTitleSpinnerSelectedPosition)
 
@@ -760,6 +764,9 @@ class AddProductCustomDialog(
             apTitleListSpinner.visibility = View.VISIBLE
             val listOptions: String = tableGenerator.getListValues(apTitleListId)
             val listValues = listOptions.split(",")
+            if (listValues.isNotEmpty()) {
+                appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
+            }
             val apTitleSpinnerAdapter = ArrayAdapter(
                 requireActivity(),
                 android.R.layout.simple_spinner_item,
@@ -885,6 +892,9 @@ class AddProductCustomDialog(
                     apTitleListSpinner.visibility = View.VISIBLE
                     val listOptions: String = tableGenerator.getListValues(apTitleListId)
                     val listValues = listOptions.split(",")
+                    if (listValues.isNotEmpty()) {
+                        appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
+                    }
                     val apTitleSpinnerAdapter = ArrayAdapter(
                         requireActivity(),
                         android.R.layout.simple_spinner_item,
@@ -989,9 +999,9 @@ class AddProductCustomDialog(
         val apDescriptionListId = appSettings.getInt("AP_DESCRIPTION_LIST_ID")
         val apDescriptionActiveListName = appSettings.getString("AP_DESCRIPTION_LIST_NAME")
         if (apDescriptionActiveListName!!.isEmpty()) {
-            apDescriptionActiveListNameView.text = "Active List: None"
+            apDescriptionActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         } else {
-            apDescriptionActiveListNameView.text = "Active List: $apDescriptionActiveListName"
+            apDescriptionActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apDescriptionActiveListName"
         }
         apDescriptionSpinner.setSelection(apDescriptionSpinnerSelectedPosition)
         apDescriptionListBtn.setOnClickListener {
@@ -1019,6 +1029,9 @@ class AddProductCustomDialog(
             apDescriptionListSpinner.visibility = View.VISIBLE
             val listOptions: String = tableGenerator.getListValues(apDescriptionListId)
             val listValues = listOptions.split(",")
+            if (listValues.isNotEmpty()){
+                appSettings.putString("AP_PRODUCT_DESCRIPTION",listValues[0])
+            }
             val apDescriptionSpinnerAdapter = ArrayAdapter(
                 requireActivity(),
                 android.R.layout.simple_spinner_item,
@@ -1140,9 +1153,11 @@ class AddProductCustomDialog(
                         apDescriptionListSpinner.visibility = View.VISIBLE
                         apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
                         apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-                        val listOptions: String =
-                            tableGenerator.getListValues(apDescriptionListId)
+                        val listOptions: String = tableGenerator.getListValues(apDescriptionListId)
                         val listValues = listOptions.split(",")
+                        if (listValues.isNotEmpty()){
+                            appSettings.putString("AP_PRODUCT_DESCRIPTION",listValues[0])
+                        }
                         val apDescriptionSpinnerAdapter = ArrayAdapter(
                             requireActivity(),
                             android.R.layout.simple_spinner_item,
@@ -1247,9 +1262,9 @@ class AddProductCustomDialog(
         val apQuantityListId = appSettings.getInt("AP_QUANTITY_LIST_ID")
         val apQuantityActiveListName = appSettings.getString("AP_QUANTITY_LIST_NAME")
         if (apQuantityActiveListName!!.isEmpty()) {
-            apQuantityActiveListNameView.text = "Active List: None"
+            apQuantityActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         } else {
-            apQuantityActiveListNameView.text = "Active List: $apQuantityActiveListName"
+            apQuantityActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apQuantityActiveListName"
         }
         apQuantitySpinner.setSelection(apQuantitySpinnerSelectedPosition)
         apQuantityListBtn.setOnClickListener {
@@ -1459,9 +1474,9 @@ class AddProductCustomDialog(
         val apPriceListId = appSettings.getInt("AP_PRICE_LIST_ID")
         val apPriceActiveListName = appSettings.getString("AP_PRICE_LIST_NAME")
         if (apPriceActiveListName!!.isEmpty()) {
-            apPriceActiveListNameView.text = "Active List: None"
+            apPriceActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         } else {
-            apPriceActiveListNameView.text = "Active List: $apPriceActiveListName"
+            apPriceActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apPriceActiveListName"
         }
         apPriceSpinner.setSelection(apPriceSpinnerSelectedPosition)
         apPriceListBtn.setOnClickListener {
@@ -2488,18 +2503,145 @@ class AddProductCustomDialog(
                         appSettings.putInt("AP_TITLE_LIST_ID", listId!!)
                         appSettings.putString("AP_TITLE_LIST_NAME", listValue.value)
                         apTitleActiveListNameView.text = "Active List: ${listValue.value}"
-                    } else if (fieldType == "ap_description") {
+
+                        val listOptions: String = tableGenerator.getListValues(listId!!)
+                        val listValues = listOptions.split(",")
+                        if (listValues.isNotEmpty()) {
+                            appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
+                        }
+                        val apTitleSpinnerAdapter = ArrayAdapter(
+                            requireActivity(),
+                            android.R.layout.simple_spinner_item,
+                            listValues
+                        )
+                        apTitleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        apTitleListSpinner.adapter = apTitleSpinnerAdapter
+
+                        apTitleListSpinner.onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>?,
+                                    view: View?,
+                                    position: Int,
+                                    id: Long
+                                ) {
+                                    appSettings.putString("AP_PRODUCT_TITLE", parent!!.selectedItem.toString())
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                                }
+
+                            }
+
+
+                    }
+                    else if (fieldType == "ap_description") {
                         appSettings.putInt("AP_DESCRIPTION_LIST_ID", listId!!)
                         appSettings.putString("AP_DESCRIPTION_LIST_NAME", listValue.value)
                         apDescriptionActiveListNameView.text = "Active List: ${listValue.value}"
+
+                        val listOptions: String = tableGenerator.getListValues(listId!!)
+                        val listValues = listOptions.split(",")
+                        if (listValues.isNotEmpty()){
+                            appSettings.putString("AP_PRODUCT_DESCRIPTION",listValues[0])
+                        }
+                        val apDescriptionSpinnerAdapter = ArrayAdapter(
+                            requireActivity(),
+                            android.R.layout.simple_spinner_item,
+                            listValues
+                        )
+                        apDescriptionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        apDescriptionListSpinner.adapter = apDescriptionSpinnerAdapter
+
+                        apDescriptionListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                parent: AdapterView<*>?,
+                                view: View?,
+                                position: Int,
+                                id: Long
+                            ) {
+                                appSettings.putString("AP_PRODUCT_DESCRIPTION",parent!!.selectedItem.toString())
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                            }
+
+                        }
+
                     } else if (fieldType == "ap_quantity") {
                         appSettings.putInt("AP_QUANTITY_LIST_ID", listId!!)
                         appSettings.putString("AP_QUANTITY_LIST_NAME", listValue.value)
                         apQuantityActiveListNameView.text = "Active Lis: ${listValue.value}"
+
+                        val listOptions: String = tableGenerator.getListValues(listId!!)
+                        val listValues = listOptions.split(",")
+                        if (listValues.isNotEmpty()) {
+                            appSettings.putString("AP_PRODUCT_QUANTITY", listValues[0])
+                        }
+                        val apQuantitySpinnerAdapter = ArrayAdapter(
+                            requireActivity(),
+                            android.R.layout.simple_spinner_item,
+                            listValues
+                        )
+                        apQuantitySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        apQuantityListSpinner.adapter = apQuantitySpinnerAdapter
+
+                        apQuantityListSpinner.onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>?,
+                                    view: View?,
+                                    position: Int,
+                                    id: Long
+                                ) {
+                                    appSettings.putString(
+                                        "AP_PRODUCT_QUANTITY",
+                                        parent!!.selectedItem.toString()
+                                    )
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                                }
+
+                            }
+
                     } else if (fieldType == "ap_price") {
                         appSettings.putInt("AP_PRICE_LIST_ID", listId!!)
                         appSettings.putString("AP_PRICE_LIST_NAME", listValue.value)
                         apPriceActiveListNameView.text = "Active List: ${listValue.value}"
+
+                        val listOptions: String = tableGenerator.getListValues(listId!!)
+                        val listValues = listOptions.split(",")
+                        if (listValues.isNotEmpty()){
+                            appSettings.putString("AP_PRODUCT_PRICE",listValues[0])
+                        }
+                        val apPriceSpinnerAdapter = ArrayAdapter(
+                            requireActivity(),
+                            android.R.layout.simple_spinner_item,
+                            listValues
+                        )
+                        apPriceSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                        apPriceListSpinner.adapter = apPriceSpinnerAdapter
+
+                        apPriceListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(
+                                parent: AdapterView<*>?,
+                                view: View?,
+                                position: Int,
+                                id: Long
+                            ) {
+                                appSettings.putString("AP_PRODUCT_PRICE",parent!!.selectedItem.toString())
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                            }
+
+                        }
+
                     }
                     alert.dismiss()
                 } else {

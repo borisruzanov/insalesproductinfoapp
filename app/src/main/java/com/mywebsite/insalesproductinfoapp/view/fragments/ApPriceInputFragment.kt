@@ -83,10 +83,10 @@ class ApPriceInputFragment : Fragment() {
         val apPriceListId = appSettings.getInt("AP_PRICE_LIST_ID")
         val apPriceActiveListName = appSettings.getString("AP_PRICE_LIST_NAME")
         if (apPriceActiveListName!!.isEmpty()){
-            apPriceActiveListNameView.text = "Active List: None"
+            apPriceActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         }
         else{
-            apPriceActiveListNameView.text = "Active List: $apPriceActiveListName"
+            apPriceActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apPriceActiveListName"
         }
         apPriceSpinner.setSelection(apPriceSpinnerSelectedPosition)
         apPriceListBtn.setOnClickListener {
@@ -357,7 +357,7 @@ class ApPriceInputFragment : Fragment() {
                     //selectedListTextView.text = listValue.value
                     appSettings.putInt("AP_PRICE_LIST_ID", listId!!)
                     appSettings.putString("AP_PRICE_LIST_NAME",listValue.value)
-                    apPriceActiveListNameView.text = "Active List: ${listValue.value}"
+                    apPriceActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: ${listValue.value}"
                     //appSettings.putString("AP_PRODUCT_PRICE",list.split(",")[0])
                     val listOptions: String = tableGenerator.getListValues(listId!!)
                     val listValues = listOptions.split(",")

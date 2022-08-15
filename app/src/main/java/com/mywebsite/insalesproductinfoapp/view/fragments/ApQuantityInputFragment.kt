@@ -83,10 +83,10 @@ class ApQuantityInputFragment : Fragment() {
         val apQuantityListId = appSettings.getInt("AP_QUANTITY_LIST_ID")
         val apQuantityActiveListName = appSettings.getString("AP_QUANTITY_LIST_NAME")
         if (apQuantityActiveListName!!.isEmpty()){
-            apQuantityActiveListNameView.text = "Active List: None"
+            apQuantityActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: None"
         }
         else{
-            apQuantityActiveListNameView.text = "Active List: $apQuantityActiveListName"
+            apQuantityActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: $apQuantityActiveListName"
         }
         apQuantitySpinner.setSelection(apQuantitySpinnerSelectedPosition)
         apQuantityListBtn.setOnClickListener {
@@ -172,7 +172,7 @@ class ApQuantityInputFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString().substring(0) == "0"){
-                    BaseActivity.showAlert(requireActivity(),"Default Quantity value should start from greater then 0!")
+                    BaseActivity.showAlert(requireActivity(),resources.getString(R.string.quantity_default_value_error_text))
                     apQuantityDefaultInputBox.setText(s.toString().substring(1))
                 }
                 else{
@@ -287,7 +287,7 @@ class ApQuantityInputFragment : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 if (s.toString().substring(0) == "0"){
-                    BaseActivity.showAlert(requireActivity(),"Quantity value should start from greater then 0!")
+                    BaseActivity.showAlert(requireActivity(),resources.getString(R.string.quantity_value_error_text))
                     apQuantityView.setText(s.toString().substring(1))
                 }
                 else{
@@ -384,7 +384,7 @@ class ApQuantityInputFragment : Fragment() {
                         //selectedListTextView.text = listValue.value
                         appSettings.putInt("AP_QUANTITY_LIST_ID", listId!!)
                         appSettings.putString("AP_QUANTITY_LIST_NAME", listValue.value)
-                        apQuantityActiveListNameView.text = "Active Lis: ${listValue.value}"
+                        apQuantityActiveListNameView.text = "${resources.getString(R.string.active_list_text)}: ${listValue.value}"
                         //appSettings.putString("AP_PRODUCT_QUANTITY",list.split(",")[0])
                         val listOptions: String = tableGenerator.getListValues(listId!!)
                         val listValues = listOptions.split(",")
