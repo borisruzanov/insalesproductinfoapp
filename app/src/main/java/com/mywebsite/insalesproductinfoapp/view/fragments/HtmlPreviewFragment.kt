@@ -49,16 +49,15 @@ class HtmlPreviewFragment(private val fullDesc:String) : DialogFragment() {
             dismiss()
         }
 
-        textView.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        val htmlText = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             HtmlCompat.fromHtml(
-                HtmlCompat.fromHtml(
-                    fullDesc,
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                ).toString(), HtmlCompat.FROM_HTML_MODE_LEGACY
+                fullDesc,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
             )
         } else {
             Html.fromHtml(Html.fromHtml(fullDesc).toString())
         }
+        textView.text = htmlText
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
