@@ -1513,12 +1513,11 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                         )
                         .fitCenter()
                         .into(insalesUpdateProductImageLayout.selectedInsalesProductImageView)
-                    if (btn.text.toString()
-                            .toLowerCase(Locale.ENGLISH) == "attach"
-                    ) {
+                    if (btn.tag.toString().lowercase() == "attach") {
                         barcodeImageList.add(selectedInternetImage)
                         multiImagesList.add(selectedInternetImage)
                         btn.text = getString(R.string.attached_text)
+                        btn.tag = "attached"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 context,
@@ -1527,6 +1526,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                         )
                     } else {
                         btn.text = getString(R.string.attach_text)
+                        btn.tag = "attach"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 context,
@@ -1537,6 +1537,15 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                         multiImagesList.remove(selectedInternetImage)
                     }
                     adapter!!.notifyDataSetChanged()
+                    if (multiImagesList.isEmpty()){
+                        Glide.with(context)
+                            .load("")
+                            .thumbnail(
+                                Glide.with(context).load(R.drawable.placeholder)
+                            )
+                            .fitCenter()
+                            .into(insalesUpdateProductImageLayout.selectedInsalesProductImageView)
+                    }
                 }
 
             })

@@ -818,13 +818,12 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
                     val selectedImage = rainForestProductImagesList[position]
                     //Toast.makeText(requireActivity(),selectedImage,Toast.LENGTH_SHORT).show()
-                    if (btn.text.toString()
-                            .toLowerCase(Locale.ENGLISH) == "attach"
-                    ) {
+                    if (btn.tag.toString().lowercase() == "attach") {
                         finalSelectedImageList.add(selectedImage)
 
                         btn.text =
                             requireActivity().resources.getString(R.string.attached_text)
+                        btn.tag = "attached"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 requireActivity(),
@@ -834,6 +833,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     } else {
                         btn.text =
                             requireActivity().resources.getString(R.string.attach_text)
+                        btn.tag = "attach"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 requireActivity(),

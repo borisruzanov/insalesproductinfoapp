@@ -1783,12 +1783,11 @@ class AddProductCustomDialog(
                         )
                         .fitCenter()
                         .into(selectedImageView)
-                    if (btn.text.toString()
-                            .toLowerCase(Locale.ENGLISH) == "attach"
-                    ) {
+                    if (btn.tag.toString().lowercase() == "attach") {
                         barcodeImageList.add(selectedInternetImage)
                         multiImagesList.add(selectedInternetImage)
                         btn.text = requireActivity().resources.getString(R.string.attached_text)
+                        btn.tag = "attached"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 requireActivity(),
@@ -1797,6 +1796,7 @@ class AddProductCustomDialog(
                         )
                     } else {
                         btn.text = requireActivity().resources.getString(R.string.attach_text)
+                        btn.tag = "attach"
                         btn.setBackgroundColor(
                             ContextCompat.getColor(
                                 requireActivity(),
@@ -1807,6 +1807,15 @@ class AddProductCustomDialog(
                         multiImagesList.remove(selectedInternetImage)
                     }
                     imagesAdapter.notifyDataSetChanged()
+                    if (multiImagesList.isEmpty()){
+                        Glide.with(requireActivity())
+                            .load("")
+                            .thumbnail(
+                                Glide.with(requireActivity()).load(R.drawable.placeholder)
+                            )
+                            .fitCenter()
+                            .into(selectedImageView)
+                    }
                 }
 
             })

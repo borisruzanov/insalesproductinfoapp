@@ -34,7 +34,7 @@ class InternetImageAdapter(private val context: Context, private val imagesList:
             binding.searchImageView.setOnClickListener {
                 listener.onItemClick(layoutPosition)
             }
-
+            binding.searchImageAttachBtn.tag = "attach"
             binding.searchImageAttachBtn.setOnClickListener {
                 listener.onItemAttachClick(binding.searchImageAttachBtn,layoutPosition)
             }
