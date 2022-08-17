@@ -517,6 +517,11 @@ class ApImageUploadFragment : Fragment() {
                     barcodeImageList.add(tempImageList[i])
                 }
                 adapter.notifyDataSetChanged()
+                Glide.with(requireActivity())
+                    .load(barcodeImageList[barcodeImageList.size-1])
+                    .placeholder(R.drawable.placeholder)
+                    .centerInside()
+                    .into(selectedImageView)
             }
         }
     }

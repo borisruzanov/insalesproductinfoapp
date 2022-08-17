@@ -147,7 +147,7 @@
                         <androidx.appcompat.widget.AppCompatImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_open_new"
+                            android:src="@drawable/ic_eye"
                             android:layout_marginEnd="@dimen/eightDpMargin"
                             android:id="@+id/full_description_button"
                             />
