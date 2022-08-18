@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 object GcpTranslator {
 
     fun translateFromEngToRus(context: Context, text: String, listener: TranslationCallback){
-        listener.onTextTranslation(text)
-        return
+//        listener.onTextTranslation(text)
+//        return
         System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -55,8 +55,8 @@ object GcpTranslator {
     }
 
     fun translateFromRusToEng(context: Context, text: String, listener: TranslationCallback){
-        listener.onTextTranslation(text)
-        return
+//        listener.onTextTranslation(text)
+//        return
         System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
         val translate = TranslateOptions.getDefaultInstance().service
         val detection: Detection = translate.detect(text)

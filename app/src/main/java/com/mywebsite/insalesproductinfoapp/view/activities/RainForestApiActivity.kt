@@ -290,24 +290,23 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
     override fun onItemClick(position: Int) {
         val item = rainForestList[position]
-//        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-//        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= pDetailsPrice) {
+        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= pDetailsPrice) {
 
-        getProductDescription(item.asin)
-//        }
-//        else{
-//            MaterialAlertDialogBuilder(context)
-//                .setMessage(getString(R.string.low_credites_error_message))
-//                .setCancelable(false)
-//                .setNegativeButton(getString(R.string.no_text)){dialog,which->
-//                    dialog.dismiss()
-//                }
-//                .setPositiveButton(getString(R.string.buy_credits)){dialog,which ->
-//                    dialog.dismiss()
-//                    startActivity(Intent(context,UserScreenActivity::class.java))
-//                }
-//                .create().show()
-//        }
+            getProductDescription(item.asin)
+        } else {
+            MaterialAlertDialogBuilder(context)
+                .setMessage(getString(R.string.low_credites_error_message))
+                .setCancelable(false)
+                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                    dialog.dismiss()
+                    startActivity(Intent(context, UserScreenActivity::class.java))
+                }
+                .create().show()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -456,7 +455,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         }
                         val totalCreditPrice = unitCharacterPrice * totalCharacters
                         howMuchChargeCredits = totalCreditPrice
-                        chargeCreditsPrice()
+
                         //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 //                        userCurrentCredits = "0"
 //                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
@@ -477,11 +476,14 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-
+                        chargeCreditsPrice()
                         dismiss()
-                    }
-                    else {
-                        Toast.makeText(context,getString(R.string.rain_forest_api_empty_response_message),Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.rain_forest_api_empty_response_message),
+                            Toast.LENGTH_LONG
+                        ).show()
                         dismiss()
                     }
                 }
@@ -723,7 +725,8 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         private var titleTextViewList = mutableListOf<TextView>()
         private var descriptionTextViewList = mutableListOf<TextView>()
         private var rainForestApiInstance: RainForestApiActivity? = null
-//        private lateinit var sharedViewModel: SharedViewModel
+        private lateinit var appSettings:AppSettings
+        //        private lateinit var sharedViewModel: SharedViewModel
         private var finalTitleText = ""
         private var finalDescriptionText = ""
         private var finalSelectedImageList = mutableListOf<String>()
@@ -734,6 +737,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
         override fun onAttach(context: Context) {
             super.onAttach(context)
+            appSettings = AppSettings(requireActivity())
 //            sharedViewModel = ViewModelProviders.of(
 //                requireActivity() as RainForestApiActivity,
 //                ViewModelFactory(SharedViewModel()).createFor()
@@ -909,68 +913,20 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             val totalCharacters = title.length + description.length
             val totalCreditPrice = unitCharacterPrice * totalCharacters
             howMuchChargeCredits = totalCreditPrice
-            //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-//                    userCurrentCredits = "0"
-//                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+            userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+            if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
 
-            GcpTranslator.translateFromEngToRus(
-                requireActivity(),
-                title,
-                object : TranslationCallback {
-                    override fun onTextTranslation(translatedText: String) {
-                        if (translatedText.isNotEmpty()) {
-                            titleTextView.text = translatedText
-
-                            val textList = translatedText.split(" ")
-
-                            titleTextViewList.clear()
-                            for (i in 0 until textList.size) {
-                                val params = FlowLayout.LayoutParams(
-                                    FlowLayout.LayoutParams.WRAP_CONTENT,
-                                    FlowLayout.LayoutParams.WRAP_CONTENT
-                                )
-                                params.setMargins(5, 5, 5, 5)
-                                val textView = MaterialTextView(requireActivity())
-                                textView.layoutParams = params
-                                textView.text = textList[i]
-                                textView.tag = "title"
-                                textView.id = i
-                                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                                textView.setTextColor(
-                                    ContextCompat.getColor(
-                                        requireActivity(),
-                                        R.color.black
-                                    )
-                                )
-                                titleTextViewList.add(textView)
-                                textView.setOnClickListener(this@CustomDialog)
-                                dynamicTitleTextViewWrapper.addView(textView)
-                            }
-
-
-                        } else {
-                            titleTextView.text = ""
-                        }
-                    }
-
-                })
-
-//                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
-//                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
-
-
-            if (description.isNotEmpty()) {
                 GcpTranslator.translateFromEngToRus(
                     requireActivity(),
-                    description,
+                    title,
                     object : TranslationCallback {
                         override fun onTextTranslation(translatedText: String) {
                             if (translatedText.isNotEmpty()) {
-                                descriptionTextView.text = translatedText
+                                titleTextView.text = translatedText
 
                                 val textList = translatedText.split(" ")
 
-                                descriptionTextViewList.clear()
+                                titleTextViewList.clear()
                                 for (i in 0 until textList.size) {
                                     val params = FlowLayout.LayoutParams(
                                         FlowLayout.LayoutParams.WRAP_CONTENT,
@@ -989,65 +945,111 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                             R.color.black
                                         )
                                     )
-                                    descriptionTextViewList.add(textView)
+                                    titleTextViewList.add(textView)
                                     textView.setOnClickListener(this@CustomDialog)
-                                    dynamicDescriptionTextViewWrapper.addView(textView)
+                                    dynamicTitleTextViewWrapper.addView(textView)
                                 }
 
+
                             } else {
-                                descriptionTextView.text = ""
+                                titleTextView.text = ""
                             }
                         }
 
                     })
-            } else {
-                val params = FlowLayout.LayoutParams(
-                    FlowLayout.LayoutParams.WRAP_CONTENT,
-                    FlowLayout.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(5, 5, 5, 5)
-                val textView = MaterialTextView(requireActivity())
-                textView.layoutParams = params
-                textView.text = getString(R.string.nothing_show_text)
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.red))
-                dynamicDescriptionTextViewWrapper.addView(textView)
-            }
+
+//                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
+//                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
+
+
+                if (description.isNotEmpty()) {
+                    GcpTranslator.translateFromEngToRus(
+                        requireActivity(),
+                        description,
+                        object : TranslationCallback {
+                            override fun onTextTranslation(translatedText: String) {
+                                if (translatedText.isNotEmpty()) {
+                                    descriptionTextView.text = translatedText
+
+                                    val textList = translatedText.split(" ")
+
+                                    descriptionTextViewList.clear()
+                                    for (i in 0 until textList.size) {
+                                        val params = FlowLayout.LayoutParams(
+                                            FlowLayout.LayoutParams.WRAP_CONTENT,
+                                            FlowLayout.LayoutParams.WRAP_CONTENT
+                                        )
+                                        params.setMargins(5, 5, 5, 5)
+                                        val textView = MaterialTextView(requireActivity())
+                                        textView.layoutParams = params
+                                        textView.text = textList[i]
+                                        textView.tag = "title"
+                                        textView.id = i
+                                        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                                        textView.setTextColor(
+                                            ContextCompat.getColor(
+                                                requireActivity(),
+                                                R.color.black
+                                            )
+                                        )
+                                        descriptionTextViewList.add(textView)
+                                        textView.setOnClickListener(this@CustomDialog)
+                                        dynamicDescriptionTextViewWrapper.addView(textView)
+                                    }
+
+                                } else {
+                                    descriptionTextView.text = ""
+                                }
+                            }
+
+                        })
+                } else {
+                    val params = FlowLayout.LayoutParams(
+                        FlowLayout.LayoutParams.WRAP_CONTENT,
+                        FlowLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.setMargins(5, 5, 5, 5)
+                    val textView = MaterialTextView(requireActivity())
+                    textView.layoutParams = params
+                    textView.text = getString(R.string.nothing_show_text)
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                    textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.red))
+                    dynamicDescriptionTextViewWrapper.addView(textView)
+                }
 //                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
 //                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
-            val firebaseDatabase = FirebaseDatabase.getInstance().reference
-            val hashMap = HashMap<String, Any>()
-            val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
-            userCurrentCredits = remaining.toString()
-            hashMap["credits"] = userCurrentCredits
-            firebaseDatabase.child(Constants.firebaseUserCredits)
-                .child(Constants.firebaseUserId)
-                .updateChildren(hashMap)
-                .addOnSuccessListener {
-                    howMuchChargeCredits = 0F
-                    getUserCredits(
-                        requireActivity()
-                    )
-                }
-                .addOnFailureListener {
+                val firebaseDatabase = FirebaseDatabase.getInstance().reference
+                val hashMap = HashMap<String, Any>()
+                val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
+                userCurrentCredits = remaining.toString()
+                hashMap["credits"] = userCurrentCredits
+                firebaseDatabase.child(Constants.firebaseUserCredits)
+                    .child(Constants.firebaseUserId)
+                    .updateChildren(hashMap)
+                    .addOnSuccessListener {
+                        howMuchChargeCredits = 0F
+                        getUserCredits(
+                            requireActivity()
+                        )
+                    }
+                    .addOnFailureListener {
 
-                }
-//                    }
-//                    else{
-//                        titleTextView.text = title
-//                        descriptionTextView.text = description
-//                        MaterialAlertDialogBuilder(context)
-//                                .setMessage(getString(R.string.low_credites_error_message))
-//                                .setCancelable(false)
-//                                .setNegativeButton(getString(R.string.no_text)){dialog,which->
-//                                    dialog.dismiss()
-//                                }
-//                                .setPositiveButton(getString(R.string.buy_credits)){dialog,which ->
-//                                    dialog.dismiss()
-//                                    startActivity(Intent(context,UserScreenActivity::class.java))
-//                                }
-//                                .create().show()
-//                    }
+                    }
+            } else {
+                titleTextView.text = title
+                descriptionTextView.text = description
+                MaterialAlertDialogBuilder(requireActivity())
+                    .setMessage(getString(R.string.low_credites_error_message))
+                    .setCancelable(false)
+                    .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                        dialog.dismiss()
+                    }
+                    .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                        dialog.dismiss()
+                        startActivity(Intent(requireActivity(), UserScreenActivity::class.java))
+                    }
+                    .create().show()
+            }
 
             titleAddBtn.setOnClickListener {
                 val builder = MaterialAlertDialogBuilder(requireActivity())
