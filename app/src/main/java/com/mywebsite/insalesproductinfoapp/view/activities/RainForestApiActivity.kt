@@ -20,8 +20,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.mywebsite.insalesproductinfoapp.R
 import com.mywebsite.insalesproductinfoapp.adapters.RainForestApiAdapter
 import com.mywebsite.insalesproductinfoapp.adapters.RainForestProductImageAdapter
+import com.mywebsite.insalesproductinfoapp.interfaces.ResponseListener
 import com.mywebsite.insalesproductinfoapp.interfaces.TranslationCallback
 import com.mywebsite.insalesproductinfoapp.model.RainForestApiObject
 import com.mywebsite.insalesproductinfoapp.utils.*
@@ -49,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.apmem.tools.layouts.FlowLayout
 import org.json.JSONObject
-import java.lang.StringBuilder
 import java.text.BreakIterator
 import java.util.*
 
@@ -60,8 +60,11 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private lateinit var context: Context
     private lateinit var toolbar: Toolbar
     private lateinit var rainForestRecyclerView: RecyclerView
+    private lateinit var gridLayoutManager: GridLayoutManager
+    private lateinit var loadMoreBtn: MaterialButton
     private lateinit var adapter: RainForestApiAdapter
     private var rainForestList = mutableListOf<RainForestApiObject>()
+    private var tempRainForestList = mutableListOf<RainForestApiObject>()
     private lateinit var searchBox: TextInputEditText
     private lateinit var searchImageBtn: ImageButton
     private lateinit var appSettings: AppSettings
@@ -75,6 +78,14 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private var userCurrentCredits = ""
     private var howMuchChargeCredits = 0F
     private var voiceLanguageCode = "en"
+    private var currentPage = 1
+    private var totalPages = 1
+    private var searchQuery = ""
+    private var currentItems = 0
+    private var totalItems = 0
+    private var scrollOutItems = 0
+    private var previousListIndex = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,8 +106,10 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         searchImageBtn.setOnClickListener(this)
         voiceSearchIcon = findViewById(R.id.rain_forest_voice_search_icon)
         barcodeSearchIcon = findViewById(R.id.rain_forest_barcode_search_icon)
-
-        rainForestRecyclerView.layoutManager = GridLayoutManager(context, 2)
+        loadMoreBtn = findViewById(R.id.load_more_btn)
+        loadMoreBtn.setOnClickListener(this)
+        gridLayoutManager = GridLayoutManager(context, 2)
+        rainForestRecyclerView.layoutManager = gridLayoutManager
         rainForestRecyclerView.hasFixedSize()
         adapter = RainForestApiAdapter(context, rainForestList as ArrayList<RainForestApiObject>)
         rainForestRecyclerView.adapter = adapter
@@ -117,7 +130,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         hideSoftKeyboard(context, searchBox)
                         searchBox.clearFocus()
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-                        startLoading(context)
+
                         CoroutineScope(Dispatchers.IO).launch {
 //                        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
 //                        val translate = TranslateOptions.getDefaultInstance().service
@@ -191,7 +204,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         id: Long
                     ) {
                         voiceLanguageCode =
-                            if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH)
+                            if (parent!!.selectedItem.toString().lowercase(Locale.ENGLISH)
                                     .contains("english")
                             ) {
                                 "en"
@@ -209,7 +222,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 }
             val builder = MaterialAlertDialogBuilder(context)
             builder.setView(voiceLayout)
-            val alert = builder.create();
+            val alert = builder.create()
             alert.show()
             voiceLanguageSaveBtn.setOnClickListener {
                 alert.dismiss()
@@ -229,6 +242,26 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             val intent = Intent(context, BarcodeReaderActivity::class.java)
             barcodeImageResultLauncher.launch(intent)
         }
+
+        rainForestRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                currentItems = gridLayoutManager.childCount
+                totalItems = gridLayoutManager.itemCount
+                scrollOutItems = gridLayoutManager.findFirstVisibleItemPosition()
+                if (currentItems + scrollOutItems == totalItems) {
+                    if (loadMoreBtn.visibility == View.GONE) {
+                        loadMoreBtn.visibility = View.VISIBLE
+                    }
+                } else {
+                    if (loadMoreBtn.visibility == View.VISIBLE) {
+                        loadMoreBtn.visibility = View.GONE
+                    }
+                }
+            }
+
+        })
     }
 
     private fun setUpToolbar() {
@@ -312,6 +345,16 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     override fun onClick(v: View?) {
         val view = v!!
         when (view.id) {
+            R.id.load_more_btn -> {
+                currentPage += 1
+                if (currentPage <= totalPages) {
+                    if (loadMoreBtn.visibility == View.VISIBLE) {
+                        loadMoreBtn.visibility = View.GONE
+                    }
+                    getProducts(searchQuery)
+                }
+
+            }
             R.id.rainforest_products_search_btn -> {
 //                userCurrentCredits = "0"
                 val query = searchBox.text.toString().trim()
@@ -386,7 +429,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
 
     private fun startSearch(query: String) {
-        startLoading(context)
+//        startLoading(context)
         CoroutineScope(Dispatchers.IO).launch {
 //                        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
 //                        val translate = TranslateOptions.getDefaultInstance().service
@@ -428,23 +471,29 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     }
 
     private fun getProducts(query: String) {
-
+        startLoading(context)
+        searchQuery = query
         val url =
-            "https://api.rainforestapi.com/request?api_key=2ADA91B95479431FAFCDEDFA36717046&type=search&amazon_domain=amazon.com&search_term=$query"
+            "https://api.rainforestapi.com/request?api_key=2ADA91B95479431FAFCDEDFA36717046&type=search&amazon_domain=amazon.com&search_term=$query&page=$currentPage"
         val stringRequest = StringRequest(
             Request.Method.GET,
             url,
             {
 
                 val response = JSONObject(it)
+
                 if (response.has("search_results")) {
                     val searchResults = response.getJSONArray("search_results")
+                    if (response.has("pagination")) {
+                        val paginationResult = response.getJSONObject("pagination")
+                        totalPages = paginationResult.getInt("total_pages")
+                    }
                     if (searchResults.length() > 0) {
-                        rainForestList.clear()
                         var totalCharacters = 0
+                        previousListIndex = rainForestList.size
                         for (i in 0 until searchResults.length()) {
                             val item = searchResults.getJSONObject(i)
-                            rainForestList.add(
+                            tempRainForestList.add(
                                 RainForestApiObject(
                                     item.getString("asin"),
                                     item.getString("image"),
@@ -453,31 +502,57 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                             )
                             totalCharacters += item.getString("title").length
                         }
+
                         val totalCreditPrice = unitCharacterPrice * totalCharacters
                         howMuchChargeCredits = totalCreditPrice
+                        Log.d("TEST199LISTSIZE", "${tempRainForestList.size}:$previousListIndex")
 
-                        //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-//                        userCurrentCredits = "0"
-//                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
-                        try {
-                            for (i in 0 until rainForestList.size) {
-                                val text = rainForestList[i].title
-                                GcpTranslator.translateFromEngToRus(
+                        userCurrentCredits =
+                            appSettings.getString(Constants.userCreditsValue) as String
+
+                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+                            try {
+
+                                translateText(
                                     context,
-                                    text,
-                                    object : TranslationCallback {
-                                        override fun onTextTranslation(translatedText: String) {
-                                            rainForestList[i].title = translatedText
-                                            adapter.notifyItemChanged(i)
+                                    tempRainForestList,
+                                    object : ResponseListener {
+                                        override fun onSuccess(result: String) {
+                                            if (result.contains("success")) {
+                                                rainForestList.addAll(
+                                                    rainForestList.size,
+                                                    tempRainForestList
+                                                )
+                                                adapter.notifyItemChanged(
+                                                    previousListIndex,
+                                                    rainForestList.size
+                                                )
+                                                tempRainForestList.clear()
+                                                dismiss()
+                                                chargeCreditsPrice()
+                                            }
                                         }
 
                                     })
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                dismiss()
                             }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+                        } else {
+                            MaterialAlertDialogBuilder(context)
+                                .setMessage(getString(R.string.low_credites_error_message))
+                                .setCancelable(false)
+                                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                                    dialog.dismiss()
+                                }
+                                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                                    dialog.dismiss()
+                                    startActivity(Intent(context, UserScreenActivity::class.java))
+                                }
+                                .create().show()
                         }
-                        chargeCreditsPrice()
-                        dismiss()
+
                     } else {
                         Toast.makeText(
                             context,
@@ -529,6 +604,29 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             }
     }
 
+    private var index = 0
+    private fun translateText(
+        context: Context,
+        tempList: List<RainForestApiObject>,
+        listener: ResponseListener
+    ) {
+        val text = tempList[index].title
+        GcpTranslator.translateFromEngToRus(
+            context,
+            text,
+            object : TranslationCallback {
+                override fun onTextTranslation(translatedText: String) {
+                    tempRainForestList[i].title = translatedText
+                    if (index == tempList.size - 1) {
+                        listener.onSuccess("success")
+                    } else {
+                        index += 1
+                        translateText(context, tempList, listener)
+                    }
+                }
+            })
+    }
+
     private fun getProductDescription(asin: String) {
         startLoading(context)
         val url =
@@ -537,12 +635,12 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             Request.Method.GET,
             url,
             {
-                dismiss()
+
                 val descriptionBuilder = StringBuilder()
                 val response = JSONObject(it)
                 if (response.has("product")) {
                     val productResults = response.getJSONObject("product")
-                    val title = productResults.getString("title")
+                    var title = productResults.getString("title")
                     if (productResults.has("specifications_flat")) {
                         descriptionBuilder.append(productResults.getString("specifications_flat"))
                         descriptionBuilder.append("\n\n")
@@ -567,7 +665,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     }
 
 
-                    val description = if (descriptionBuilder.toString().isEmpty()) {
+                    var description = if (descriptionBuilder.toString().isEmpty()) {
                         ""
                     } else {
                         descriptionBuilder.toString()
@@ -579,15 +677,94 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         ""
                     }
 
-                    CustomDialog(
-                        title,
-                        description,
-                        imageList,
-                        userCurrentCredits,
-                        unitCharacterPrice,
-                        howMuchChargeCredits
-                    ).show(supportFragmentManager, "dialog")
 
+                    val totalCharacters = title.length + description.length
+                    val totalCreditPrice = unitCharacterPrice * totalCharacters
+                    howMuchChargeCredits = totalCreditPrice
+                    userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+                        GcpTranslator.translateFromEngToRus(
+                            context,
+                            title,
+                            object : TranslationCallback {
+                                override fun onTextTranslation(translatedText: String) {
+                                    if (translatedText.isNotEmpty()) {
+                                        title = translatedText
+                                    }
+                                    if (description.isNotEmpty()) {
+                                        GcpTranslator.translateFromEngToRus(
+                                            context,
+                                            description,
+                                            object : TranslationCallback {
+                                                override fun onTextTranslation(translatedText: String) {
+                                                    if (translatedText.isNotEmpty()) {
+                                                        description = translatedText
+                                                    }
+                                                    dismiss()
+                                                    CustomDialog(
+                                                        title,
+                                                        description,
+                                                        imageList,
+                                                        userCurrentCredits,
+                                                        unitCharacterPrice,
+                                                        howMuchChargeCredits
+                                                    ).show(supportFragmentManager, "dialog")
+                                                }
+
+                                            })
+                                    }
+                                    else{
+                                        dismiss()
+                                        CustomDialog(
+                                            title,
+                                            description,
+                                            imageList,
+                                            userCurrentCredits,
+                                            unitCharacterPrice,
+                                            howMuchChargeCredits
+                                        ).show(supportFragmentManager, "dialog")
+                                    }
+                                }
+
+                            })
+
+//                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
+//                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
+
+//                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
+//                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
+                        val firebaseDatabase = FirebaseDatabase.getInstance().reference
+                        val hashMap = HashMap<String, Any>()
+                        val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
+                        userCurrentCredits = remaining.toString()
+                        hashMap["credits"] = userCurrentCredits
+                        firebaseDatabase.child(Constants.firebaseUserCredits)
+                            .child(Constants.firebaseUserId)
+                            .updateChildren(hashMap)
+                            .addOnSuccessListener {
+                                howMuchChargeCredits = 0F
+                                getUserCredits(
+                                    context
+                                )
+                            }
+                            .addOnFailureListener {
+
+                            }
+                    }
+                    else {
+                        dismiss()
+                        MaterialAlertDialogBuilder(context)
+                            .setMessage(getString(R.string.low_credites_error_message))
+                            .setCancelable(false)
+                            .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                                dialog.dismiss()
+                            }
+                            .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                                dialog.dismiss()
+                                startActivity(Intent(context, UserScreenActivity::class.java))
+                            }
+                            .create().show()
+                    }
                 }
             },
             {
@@ -725,7 +902,8 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         private var titleTextViewList = mutableListOf<TextView>()
         private var descriptionTextViewList = mutableListOf<TextView>()
         private var rainForestApiInstance: RainForestApiActivity? = null
-        private lateinit var appSettings:AppSettings
+        private lateinit var appSettings: AppSettings
+
         //        private lateinit var sharedViewModel: SharedViewModel
         private var finalTitleText = ""
         private var finalDescriptionText = ""
@@ -910,21 +1088,21 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 requireActivity().finish()
                 dismiss()
             }
-            val totalCharacters = title.length + description.length
-            val totalCreditPrice = unitCharacterPrice * totalCharacters
-            howMuchChargeCredits = totalCreditPrice
-            userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-            if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+//            val totalCharacters = title.length + description.length
+//            val totalCreditPrice = unitCharacterPrice * totalCharacters
+//            howMuchChargeCredits = totalCreditPrice
+//            userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+//            if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+//
+//                GcpTranslator.translateFromEngToRus(
+//                    requireActivity(),
+//                    title,
+//                    object : TranslationCallback {
+//                        override fun onTextTranslation(translatedText: String) {
+//                            if (translatedText.isNotEmpty()) {
+                                titleTextView.text = title
 
-                GcpTranslator.translateFromEngToRus(
-                    requireActivity(),
-                    title,
-                    object : TranslationCallback {
-                        override fun onTextTranslation(translatedText: String) {
-                            if (translatedText.isNotEmpty()) {
-                                titleTextView.text = translatedText
-
-                                val textList = translatedText.split(" ")
+                                val textList = title.split(" ")
 
                                 titleTextViewList.clear()
                                 for (i in 0 until textList.size) {
@@ -949,32 +1127,32 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                     textView.setOnClickListener(this@CustomDialog)
                                     dynamicTitleTextViewWrapper.addView(textView)
                                 }
-
-
-                            } else {
-                                titleTextView.text = ""
-                            }
-                        }
-
-                    })
-
-//                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
-//                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
-
-
+//
+//
+//                            } else {
+//                                titleTextView.text = ""
+//                            }
+//                        }
+//
+//                    })
+//
+////                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
+////                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
+//
+//
                 if (description.isNotEmpty()) {
-                    GcpTranslator.translateFromEngToRus(
-                        requireActivity(),
-                        description,
-                        object : TranslationCallback {
-                            override fun onTextTranslation(translatedText: String) {
-                                if (translatedText.isNotEmpty()) {
-                                    descriptionTextView.text = translatedText
+//                    GcpTranslator.translateFromEngToRus(
+//                        requireActivity(),
+//                        description,
+//                        object : TranslationCallback {
+//                            override fun onTextTranslation(translatedText: String) {
+//                                if (translatedText.isNotEmpty()) {
+                                    descriptionTextView.text = description
 
-                                    val textList = translatedText.split(" ")
+                                    val textList1 = description.split(" ")
 
                                     descriptionTextViewList.clear()
-                                    for (i in 0 until textList.size) {
+                                    for (i in 0 until textList1.size) {
                                         val params = FlowLayout.LayoutParams(
                                             FlowLayout.LayoutParams.WRAP_CONTENT,
                                             FlowLayout.LayoutParams.WRAP_CONTENT
@@ -982,7 +1160,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                         params.setMargins(5, 5, 5, 5)
                                         val textView = MaterialTextView(requireActivity())
                                         textView.layoutParams = params
-                                        textView.text = textList[i]
+                                        textView.text = textList1[i]
                                         textView.tag = "title"
                                         textView.id = i
                                         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
@@ -997,12 +1175,12 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                         dynamicDescriptionTextViewWrapper.addView(textView)
                                     }
 
-                                } else {
-                                    descriptionTextView.text = ""
-                                }
-                            }
-
-                        })
+//                                } else {
+//                                    descriptionTextView.text = ""
+//                                }
+//                            }
+//
+//                        })
                 } else {
                     val params = FlowLayout.LayoutParams(
                         FlowLayout.LayoutParams.WRAP_CONTENT,
@@ -1016,40 +1194,41 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.red))
                     dynamicDescriptionTextViewWrapper.addView(textView)
                 }
-//                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
-//                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
-                val firebaseDatabase = FirebaseDatabase.getInstance().reference
-                val hashMap = HashMap<String, Any>()
-                val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
-                userCurrentCredits = remaining.toString()
-                hashMap["credits"] = userCurrentCredits
-                firebaseDatabase.child(Constants.firebaseUserCredits)
-                    .child(Constants.firebaseUserId)
-                    .updateChildren(hashMap)
-                    .addOnSuccessListener {
-                        howMuchChargeCredits = 0F
-                        getUserCredits(
-                            requireActivity()
-                        )
-                    }
-                    .addOnFailureListener {
-
-                    }
-            } else {
-                titleTextView.text = title
-                descriptionTextView.text = description
-                MaterialAlertDialogBuilder(requireActivity())
-                    .setMessage(getString(R.string.low_credites_error_message))
-                    .setCancelable(false)
-                    .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
-                        dialog.dismiss()
-                    }
-                    .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
-                        dialog.dismiss()
-                        startActivity(Intent(requireActivity(), UserScreenActivity::class.java))
-                    }
-                    .create().show()
-            }
+////                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
+////                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
+//                val firebaseDatabase = FirebaseDatabase.getInstance().reference
+//                val hashMap = HashMap<String, Any>()
+//                val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
+//                userCurrentCredits = remaining.toString()
+//                hashMap["credits"] = userCurrentCredits
+//                firebaseDatabase.child(Constants.firebaseUserCredits)
+//                    .child(Constants.firebaseUserId)
+//                    .updateChildren(hashMap)
+//                    .addOnSuccessListener {
+//                        howMuchChargeCredits = 0F
+//                        getUserCredits(
+//                            requireActivity()
+//                        )
+//                    }
+//                    .addOnFailureListener {
+//
+//                    }
+//            }
+//            else {
+//                titleTextView.text = title
+//                descriptionTextView.text = description
+//                MaterialAlertDialogBuilder(requireActivity())
+//                    .setMessage(getString(R.string.low_credites_error_message))
+//                    .setCancelable(false)
+//                    .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+//                        dialog.dismiss()
+//                    }
+//                    .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+//                        dialog.dismiss()
+//                        startActivity(Intent(requireActivity(), UserScreenActivity::class.java))
+//                    }
+//                    .create().show()
+//            }
 
             titleAddBtn.setOnClickListener {
                 val builder = MaterialAlertDialogBuilder(requireActivity())
@@ -1223,7 +1402,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             dialogCloseBtn = view.findViewById(R.id.dialog_close_btn)
 
 
-            fullDescriptionView.setText(description)
+            fullDescriptionView.text = description
             dialogCloseBtn.setOnClickListener {
                 dismiss()
             }

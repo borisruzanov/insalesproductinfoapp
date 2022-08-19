@@ -91,16 +91,35 @@
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rainforest_search_products_layout"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:id="@+id/rainforest_result_recyclerview"
         android:layout_margin="@dimen/defaultDpMargin"
-        tools:listitem="@layout/rain_forest_api_item_row_design"
-        />
+        android:gravity="center"
+        >
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/rainforest_result_recyclerview"
+            tools:listitem="@layout/rain_forest_api_item_row_design"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/load_more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/load_more_text"
+            android:textAllCaps="false"
+            android:layout_margin="@dimen/defaultDpMargin"
+            android:visibility="gone"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -33,7 +33,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_close_btn"
-            app:layout_constraintBottom_toTopOf="@id/rfa_item_done_btn"
+            app:layout_constraintBottom_toTopOf="@id/bottom_buttons_wrapper"
             >
 
             <androidx.cardview.widget.CardView
@@ -189,29 +189,42 @@
         </LinearLayout>
 
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/rfa_item_done_btn"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/eightDpMargin"
-        android:text="@string/done_text"
-        android:textSize="@dimen/largeText"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rf_linearlayout" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/rfa_item_back_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/eightDpMargin"
-        app:backgroundTint="@color/secondary_positive_color"
-        android:text="@string/back_text"
-        android:textSize="@dimen/largeText"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rfa_item_done_btn" />
+        app:layout_constraintTop_toBottomOf="@+id/rf_linearlayout"
+        android:id="@+id/bottom_buttons_wrapper"
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rfa_item_back_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/eightDpMargin"
+            app:backgroundTint="@color/secondary_positive_color"
+            android:text="@string/back_text"
+            android:textSize="@dimen/largeText"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rfa_item_done_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/eightDpMargin"
+            android:text="@string/done_text"
+            android:textSize="@dimen/largeText"
+            android:visibility="gone"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+
     <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

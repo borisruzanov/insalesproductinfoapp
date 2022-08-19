@@ -565,8 +565,9 @@
     <string name="quantity_value_error_text">Quantity value should start from greater then 0!</string>
 	<string name="quantity_default_value_error_text">Default Quantity value should start from greater then 0!</string>
 	<string name="title_already_exist_text">Title already have data, Are you sure you want to erase data?</string>
+    <string name="load_more_text">Load More</string>
 
-	<string-array name="features_keys">
+    <string-array name="features_keys">
 		<item>compressor_feature</item>
 		<item>modes_switcher</item>
 		<item>premium_support</item>

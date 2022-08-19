@@ -4,21 +4,20 @@ import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
-import com.google.android.material.textview.MaterialTextView
 import com.mywebsite.insalesproductinfoapp.R
 
 
 class HtmlPreviewFragment(private val fullDesc:String) : DialogFragment() {
 
-    private lateinit var textView:MaterialTextView
+    private lateinit var textView: TextView
     private lateinit var dialogCloseBtn:AppCompatImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +54,7 @@ class HtmlPreviewFragment(private val fullDesc:String) : DialogFragment() {
                 HtmlCompat.FROM_HTML_MODE_LEGACY
             )
         } else {
-            Html.fromHtml(Html.fromHtml(fullDesc).toString())
+            Html.fromHtml(fullDesc,0)
         }
         textView.text = htmlText
     }

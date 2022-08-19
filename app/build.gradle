@@ -168,4 +168,5 @@ dependencies {
     // TOOLTIPS LIBRARY
     implementation 'com.github.douglasjunior:android-simple-tooltip:1.0.0-rc.0'
 
+
 }
