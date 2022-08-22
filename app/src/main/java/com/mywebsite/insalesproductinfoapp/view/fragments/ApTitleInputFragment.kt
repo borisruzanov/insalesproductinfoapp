@@ -93,9 +93,16 @@ class ApTitleInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
         val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-        apTitleView.setSelection(apTitleView.text.toString().length)
+        if (position == 1){
+            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+            apTitleView.setSelection(apTitleView.text.toString().length)
+        }
+        else{
+            apTitleDefaultInputBox.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
+        }
+
         if (position == 0 || position == 1){
 //           Handler(Looper.myLooper()!!).postDelayed(Runnable {
                BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)

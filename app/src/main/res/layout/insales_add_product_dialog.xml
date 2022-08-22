@@ -48,7 +48,7 @@
                     android:id="@+id/ap_quick_product_mode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/quick_mode_text" />
+                    android:text="@string/scan_mode_text" />
 
             </LinearLayout>
 
@@ -219,10 +219,13 @@
                             android:id="@+id/ap_title_non_changeable_default_text_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:maxHeight="300dp"
+                            android:gravity="start"
+                            android:isScrollContainer="true"
                             android:hint="@string/set_the_default_value"
                             android:textSize="@dimen/largeText"
                             android:imeOptions="actionDone"
-                            android:inputType="text"
+                            android:inputType="textMultiLine"
                              />
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -396,10 +399,13 @@
                             android:id="@+id/ap_description_non_changeable_default_text_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:maxHeight="300dp"
+                            android:gravity="start"
+                            android:isScrollContainer="true"
                             android:textSize="@dimen/largeText"
                             android:hint="@string/set_the_default_value"
                             android:imeOptions="actionDone"
-                            android:inputType="text"
+                            android:inputType="textMultiLine"
                              />
                         </com.google.android.material.textfield.TextInputLayout>
                         <LinearLayout

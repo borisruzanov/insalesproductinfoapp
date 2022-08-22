@@ -53,6 +53,7 @@ class ApDescriptionInputFragment : Fragment() {
     private lateinit var apDescriptionCameraRecView: LinearLayout
     private lateinit var apDescriptionDefaultValueMessage: MaterialTextView
     private lateinit var apDescriptionDefaultInputWrapper: TextInputLayout
+    private lateinit var apDescriptionDefaultInputBox:TextInputEditText
     private lateinit var apDescriptionListBtn: MaterialButton
     private lateinit var apDescriptionViewWrapper: TextInputLayout
     private lateinit var apDescriptionActiveListNameView: MaterialTextView
@@ -95,7 +96,7 @@ class ApDescriptionInputFragment : Fragment() {
         getDescriptionBtn  = view.findViewById(R.id.get_description_text_view)
         apDescriptionSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_description_options_spinner)
         apDescriptionListBtn = view.findViewById<MaterialButton>(R.id.ap_description_list_with_fields_btn)
-        val apDescriptionDefaultInputBox = view.findViewById<TextInputEditText>(R.id.ap_description_non_changeable_default_text_input)
+        apDescriptionDefaultInputBox = view.findViewById<TextInputEditText>(R.id.ap_description_non_changeable_default_text_input)
         apDescriptionDefaultInputWrapper = view.findViewById<TextInputLayout>(R.id.ap_description_non_changeable_default_text_input_wrapper)
         apDescriptionDefaultValueMessage =
             view.findViewById<MaterialTextView>(R.id.ap_description_default_value_message)
@@ -516,9 +517,16 @@ class ApDescriptionInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
         val position = appSettings.getInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION")
-        apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+        if (position == 1){
+            apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
+            apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+        }
+        else{
+            apDescriptionDefaultInputBox.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
+            apDescriptionDefaultInputBox.setSelection(apDescriptionDefaultInputBox.text.toString().length)
+        }
+
         if (position == 0 || position == 1){
 //            Handler(Looper.myLooper()!!).postDelayed(Runnable {
                 BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)

@@ -96,7 +96,9 @@ class AddProductCustomDialog(
     private var intentType = 0
     private lateinit var categoriesSpinner: AppCompatSpinner
     private lateinit var apTitleView: TextInputEditText
+    private lateinit var apTitleDefaultInputBox: TextInputEditText
     private lateinit var apDescriptionView: TextInputEditText
+    private lateinit var apDescriptionDefaultInputBox: TextInputEditText
     private var finalTitleText = ""
     private var finalDescriptionText = ""
     private var finalQuantityText = ""
@@ -364,9 +366,9 @@ class AddProductCustomDialog(
         val apPriceListBtn =
             view.findViewById<MaterialButton>(R.id.ap_price_list_with_fields_btn)
 
-        val apTitleDefaultInputBox =
+        apTitleDefaultInputBox =
             view.findViewById<TextInputEditText>(R.id.ap_title_non_changeable_default_text_input)
-        val apDescriptionDefaultInputBox =
+        apDescriptionDefaultInputBox =
             view.findViewById<TextInputEditText>(R.id.ap_description_non_changeable_default_text_input)
         val apQuantityDefaultInputBox =
             view.findViewById<TextInputEditText>(R.id.ap_quantity_non_changeable_default_text_input)
@@ -2715,26 +2717,49 @@ class AddProductCustomDialog(
                 if (data != null && data.hasExtra("TITLE")) {
                     val title = data.getStringExtra("TITLE") as String
                     if (title.isNotEmpty()) {
-                        val currentPItemTitle = apTitleView.text.toString().trim()
-                        val stringBuilder = java.lang.StringBuilder()
-                        stringBuilder.append(currentPItemTitle)
-                        stringBuilder.append(title)
-                        apTitleView.setText(stringBuilder.toString())
+                        val apTitleSpinnerSelectedPosition = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+
+                        if (apTitleSpinnerSelectedPosition == 1){
+                            val currentPItemTitle = apTitleDefaultInputBox.text.toString().trim()
+                            val stringBuilder = java.lang.StringBuilder()
+                            stringBuilder.append(currentPItemTitle)
+                            stringBuilder.append(title)
+                            apTitleDefaultInputBox.setText(stringBuilder.toString())
+                        }
+                        else{
+                            val currentPItemTitle = apTitleView.text.toString().trim()
+                            val stringBuilder = java.lang.StringBuilder()
+                            stringBuilder.append(currentPItemTitle)
+                            stringBuilder.append(title)
+                            apTitleView.setText(stringBuilder.toString())
+                        }
+
                     }
                 }
 
                 if (data != null && data.hasExtra("DESCRIPTION")) {
                     val description = data.getStringExtra("DESCRIPTION") as String
                     if (description.isNotEmpty()) {
+                        val apDescriptionSpinnerSelectedPosition = appSettings.getInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION")
+                        if (apDescriptionSpinnerSelectedPosition == 1){
+                            val currentPItemDescription = apDescriptionDefaultInputBox.text.toString().trim()
+                            val stringBuilder = java.lang.StringBuilder()
+                            stringBuilder.append(currentPItemDescription)
+                            stringBuilder.append(description)
+                            apDescriptionDefaultInputBox.setText(stringBuilder.toString())
+                        }
+                        else{
+                            val currentPItemDescription = apDescriptionView.text.toString().trim()
+                            val stringBuilder = java.lang.StringBuilder()
+                            stringBuilder.append(currentPItemDescription)
+                            stringBuilder.append(description)
+                            apDescriptionView.setText(stringBuilder.toString())
+                        }
 
-                        val currentPItemDescription = apDescriptionView.text.toString().trim()
-                        val stringBuilder = java.lang.StringBuilder()
-                        stringBuilder.append(currentPItemDescription)
-                        stringBuilder.append(description)
-                        apDescriptionView.setText(stringBuilder.toString())
 
                     }
                 }
+
                 if (apDescriptionView.text.toString().isNotEmpty()) {
                     apDescriptionView.setSelection(apDescriptionView.text.toString().length)
                     apDescriptionView.requestFocus()

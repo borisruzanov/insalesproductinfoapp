@@ -704,10 +704,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                                     CustomDialog(
                                                         title,
                                                         description,
-                                                        imageList,
-                                                        userCurrentCredits,
-                                                        unitCharacterPrice,
-                                                        howMuchChargeCredits
+                                                        imageList
                                                     ).show(supportFragmentManager, "dialog")
                                                 }
 
@@ -718,10 +715,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                                         CustomDialog(
                                             title,
                                             description,
-                                            imageList,
-                                            userCurrentCredits,
-                                            unitCharacterPrice,
-                                            howMuchChargeCredits
+                                            imageList
                                         ).show(supportFragmentManager, "dialog")
                                     }
                                 }
@@ -893,10 +887,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     open class CustomDialog(
         private val title: String,
         private val description: String,
-        private val imageList: String,
-        private var userCurrentCredits: String,
-        private val unitCharacterPrice: Float,
-        private var howMuchChargeCredits: Float
+        private val imageList: String
     ) : DialogFragment(), View.OnClickListener {
 
         private var titleTextViewList = mutableListOf<TextView>()

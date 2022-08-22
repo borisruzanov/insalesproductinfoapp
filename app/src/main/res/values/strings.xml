@@ -580,6 +580,7 @@
     <string name="quantity_default_value_error_text">Default Quantity value should start from greater then 0!</string>
     <string name="title_already_exist_text">Title already have data, Are you sure you want to erase data?</string>
     <string name="load_more_text">Load More</string>
+    <string name="scan_mode_text">Scan Mode</string>
 
     <string-array name="features_keys">
         <item>compressor_feature</item>

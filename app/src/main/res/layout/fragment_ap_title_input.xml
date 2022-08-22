@@ -190,10 +190,13 @@
             android:id="@+id/ap_title_non_changeable_default_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxHeight="300dp"
+            android:gravity="start"
+            android:isScrollContainer="true"
             android:hint="@string/set_the_default_value"
             android:imeOptions="actionDone"
             android:textSize="@dimen/largeText"
-            android:inputType="text"
+            android:inputType="textMultiLine"
              />
         </com.google.android.material.textfield.TextInputLayout>
 
