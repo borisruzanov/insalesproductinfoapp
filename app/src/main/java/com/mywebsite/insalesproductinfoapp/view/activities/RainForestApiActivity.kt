@@ -33,7 +33,10 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.*
+import com.google.firebase.ktx.Firebase
 import com.mywebsite.insalesproductinfoapp.R
 import com.mywebsite.insalesproductinfoapp.adapters.RainForestApiAdapter
 import com.mywebsite.insalesproductinfoapp.adapters.RainForestProductImageAdapter
@@ -50,6 +53,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.apmem.tools.layouts.FlowLayout
 import org.json.JSONObject
+import java.math.RoundingMode
 import java.text.BreakIterator
 import java.util.*
 
@@ -62,6 +66,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private lateinit var rainForestRecyclerView: RecyclerView
     private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var loadMoreBtn: MaterialButton
+    private lateinit var currentCreditsView:MaterialTextView
     private lateinit var adapter: RainForestApiAdapter
     private var rainForestList = mutableListOf<RainForestApiObject>()
     private var tempRainForestList = mutableListOf<RainForestApiObject>()
@@ -85,6 +90,9 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private var totalItems = 0
     private var scrollOutItems = 0
     private var previousListIndex = 0
+    var userCurrentCreditsValue: Float = 0F
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firebaseDatabase: DatabaseReference
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,11 +101,13 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
         initViews()
         setUpToolbar()
-
+        getUserCredit()
     }
 
     private fun initViews() {
         context = this
+        auth = Firebase.auth
+        firebaseDatabase = FirebaseDatabase.getInstance().reference
         appSettings = AppSettings(context)
         toolbar = findViewById(R.id.toolbar)
         rainForestRecyclerView = findViewById(R.id.rainforest_result_recyclerview)
@@ -107,6 +117,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         voiceSearchIcon = findViewById(R.id.rain_forest_voice_search_icon)
         barcodeSearchIcon = findViewById(R.id.rain_forest_barcode_search_icon)
         loadMoreBtn = findViewById(R.id.load_more_btn)
+        currentCreditsView = findViewById(R.id.current_credits_view)
         loadMoreBtn.setOnClickListener(this)
         gridLayoutManager = GridLayoutManager(context, 2)
         rainForestRecyclerView.layoutManager = gridLayoutManager
@@ -269,6 +280,40 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         supportActionBar!!.title = ""
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         toolbar.setTitleTextColor(ContextCompat.getColor(context, R.color.black))
+    }
+
+
+    private fun getUserCredit() {
+        if (auth.currentUser != null) {
+
+            val userId = auth.currentUser!!.uid
+            Constants.firebaseUserId = userId
+            firebaseDatabase.child(Constants.firebaseUserCredits)
+                .child(userId).addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
+                            val previousCredits =
+                                snapshot.child("credits").getValue(String::class.java)
+                            userCurrentCreditsValue = if (previousCredits!!.isNotEmpty()) {
+                                previousCredits.toFloat()
+                            } else {
+                                0F
+                            }
+                        }
+                        val roundedCreditValues =
+                            userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.UP)
+                                .toDouble()
+                        currentCreditsView.text = "$roundedCreditValues"
+                        appSettings.putString(Constants.userCreditsValue, "$roundedCreditValues")
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+
+                })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

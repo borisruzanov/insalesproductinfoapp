@@ -106,6 +106,11 @@ class ApDescriptionInputFragment : Fragment() {
         apDescriptionImageRecView = view.findViewById<LinearLayout>(R.id.ap_description_images_layout)
         apDescriptionVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_description_voice_layout)
 
+
+    }
+
+
+    private fun renderView(){
         getDescriptionBtn.setOnClickListener {
             userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 
@@ -171,23 +176,23 @@ class ApDescriptionInputFragment : Fragment() {
             }
 
             voiceLanguageSpinner.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: View?,
-                                position: Int,
-                                id: Long
-                        ) {
-                            voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
-                            appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
-
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                        }
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
+                        appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
 
                     }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    }
+
+                }
             val builder = MaterialAlertDialogBuilder(requireActivity())
             builder.setView(voiceLayout)
             val alert = builder.create();
@@ -196,8 +201,8 @@ class ApDescriptionInputFragment : Fragment() {
                 alert.dismiss()
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                     putExtra(
-                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                     )
                     putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode)
 
@@ -212,7 +217,7 @@ class ApDescriptionInputFragment : Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-              appSettings.putString("AP_PRODUCT_DESCRIPTION",s.toString())
+                appSettings.putString("AP_PRODUCT_DESCRIPTION",s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -231,6 +236,15 @@ class ApDescriptionInputFragment : Fragment() {
             false
         })
 
+        apDescriptionDefaultInputBox.setOnTouchListener(View.OnTouchListener { v, event ->
+            if (v.id == R.id.ap_description_non_changeable_default_text_input) {
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                when (event.action and MotionEvent.ACTION_MASK) {
+                    MotionEvent.ACTION_UP -> v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        })
 
 
         apDescriptionView.setOnEditorActionListener(object:TextView.OnEditorActionListener{
@@ -247,6 +261,12 @@ class ApDescriptionInputFragment : Fragment() {
         })
 
         val apDescriptionSpinnerSelectedPosition = appSettings.getInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION")
+                if (apDescriptionSpinnerSelectedPosition == 0 || apDescriptionSpinnerSelectedPosition == 1){
+//            Handler(Looper.myLooper()!!).postDelayed(Runnable {
+                    apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
+//            },1000)
+        }
         val apDescriptionDefaultValue = appSettings.getString("AP_DESCRIPTION_DEFAULT_VALUE")
         val apDescriptionListId = appSettings.getInt("AP_DESCRIPTION_LIST_ID")
         val apDescriptionActiveListName = appSettings.getString("AP_DESCRIPTION_LIST_NAME")
@@ -273,6 +293,7 @@ class ApDescriptionInputFragment : Fragment() {
                 apDescriptionViewWrapper.visibility = View.VISIBLE
                 apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
                 apDescriptionView.setText(apDescriptionDefaultValue)
+                apDescriptionView.setSelection(apDescriptionView.text.toString().length)
 //                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
             }
             2 -> {
@@ -417,6 +438,7 @@ class ApDescriptionInputFragment : Fragment() {
                         apDescriptionViewWrapper.visibility = View.VISIBLE
                         apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
                         apDescriptionView.setText(apDescriptionDefaultValue)
+                        apDescriptionView.setSelection(apDescriptionView.text.toString().length)
 //                        BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
                     }
                     2 -> {
@@ -514,24 +536,25 @@ class ApDescriptionInputFragment : Fragment() {
         }
     }
 
-
     override fun onResume() {
         super.onResume()
-        val position = appSettings.getInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION")
-        if (position == 1){
-            apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
-            apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-        }
-        else{
-            apDescriptionDefaultInputBox.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
-            apDescriptionDefaultInputBox.setSelection(apDescriptionDefaultInputBox.text.toString().length)
-        }
-
-        if (position == 0 || position == 1){
-//            Handler(Looper.myLooper()!!).postDelayed(Runnable {
-                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
-//            },1000)
-        }
+        renderView()
+//        val position = appSettings.getInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION")
+//        if (position == 1){
+//            apDescriptionDefaultInputBox.setText(appSettings.getString("AP_DESCRIPTION_DEFAULT_VALUE"))
+//            apDescriptionDefaultInputBox.setSelection(apDescriptionDefaultInputBox.text.toString().length)
+//
+//        }
+//        else{
+//            apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
+//            apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+//        }
+//
+//        if (position == 0 || position == 1){
+////            Handler(Looper.myLooper()!!).postDelayed(Runnable {
+//                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
+////            },1000)
+//        }
     }
 
     private fun openListWithFieldsDialog(fieldType: String) {

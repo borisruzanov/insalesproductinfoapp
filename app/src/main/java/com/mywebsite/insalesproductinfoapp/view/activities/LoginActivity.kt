@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -183,8 +184,8 @@ class LoginActivity : BaseActivity() {
     private fun add50CreditsFree() {
         startLoading(context)
         val user = Firebase.auth.currentUser
+        var freeCreditsValue = ""
         if (user != null) {
-
             val id = user.uid as String
             Constants.firebaseUserId = id
             val email = user.email.toString()
@@ -195,113 +196,125 @@ class LoginActivity : BaseActivity() {
             params["email"] = email
             params["deviceId"] = deviceId
 
-            usedIdReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.hasChildren()) {
-                        var isFound = false
+                    freeCreditsValue = snapshot.child("value").getValue(String::class.java) as String
+                    Log.d("TEST199FREECREDITS",freeCreditsValue)
 
-                        for (item: DataSnapshot in snapshot.children) {
-                            if (item.child("deviceId").getValue(String::class.java) == deviceId &&
-                                item.child("email").getValue(String::class.java) == email) {
-                                isFound = true
+                    usedIdReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.hasChildren()) {
+                                var isFound = false
 
-                                break
-                            }
-                        }
+                                for (item: DataSnapshot in snapshot.children) {
+                                    if (item.child("deviceId").getValue(String::class.java) == deviceId &&
+                                        item.child("email").getValue(String::class.java) == email) {
+                                        isFound = true
+                                        break
+                                    }
+                                }
 
-                        if (!isFound) {
-                            firebaseDatabase.child(Constants.firebaseUserCredits)
-                                .child(id).addListenerForSingleValueEvent(object :
-                                    ValueEventListener {
-                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                if (!isFound) {
+                                    firebaseDatabase.child(Constants.firebaseUserCredits)
+                                        .child(id).addListenerForSingleValueEvent(object :
+                                            ValueEventListener {
+                                            override fun onDataChange(snapshot: DataSnapshot) {
 
-                                        if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
-                                            val previousCredits =
-                                                snapshot.child("credits").getValue(String::class.java)
-                                            userCurrentCreditsValue =
-                                                if (previousCredits!!.isNotEmpty()) {
-                                                    previousCredits.toFloat()
-                                                } else {
-                                                    0F
+                                                if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
+                                                    val previousCredits =
+                                                        snapshot.child("credits").getValue(String::class.java)
+                                                    userCurrentCreditsValue =
+                                                        if (previousCredits!!.isNotEmpty()) {
+                                                            previousCredits.toFloat()
+                                                        } else {
+                                                            0F
+                                                        }
+                                                }
+
+                                                val roundedCreditValues =
+                                                    userCurrentCreditsValue.toBigDecimal()
+                                                        .setScale(2, RoundingMode.UP)
+                                                        .toDouble()
+                                                val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
+                                                val hashMap = HashMap<String, Any>()
+
+                                                hashMap["credits"] = totalCredits.toString()
+                                                firebaseDatabase.child(Constants.firebaseUserCredits)
+                                                    .child(id)
+                                                    .updateChildren(hashMap)
+                                                    .addOnSuccessListener {
+                                                        usedIdReference.push().setValue(params)
+                                                        moveNext()
+                                                    }
+                                                    .addOnFailureListener {
+                                                        moveNext()
+                                                    }
+                                            }
+
+                                            override fun onCancelled(error: DatabaseError) {
+                                                moveNext()
+                                            }
+
+                                        })
+                                }
+                                else {
+                                    moveNext()
+                                }
+                            } else {
+
+                                firebaseDatabase.child(Constants.firebaseUserCredits)
+                                    .child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onDataChange(snapshot: DataSnapshot) {
+
+                                            if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
+                                                val previousCredits =
+                                                    snapshot.child("credits").getValue(String::class.java)
+                                                userCurrentCreditsValue =
+                                                    if (previousCredits!!.isNotEmpty()) {
+                                                        previousCredits.toFloat()
+                                                    } else {
+                                                        0F
+                                                    }
+                                            }
+
+                                            val roundedCreditValues =
+                                                userCurrentCreditsValue.toBigDecimal()
+                                                    .setScale(2, RoundingMode.UP)
+                                                    .toDouble()
+                                            val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
+                                            val hashMap = HashMap<String, Any>()
+
+                                            hashMap["credits"] = totalCredits.toString()
+                                            firebaseDatabase.child(Constants.firebaseUserCredits)
+                                                .child(id)
+                                                .updateChildren(hashMap)
+                                                .addOnSuccessListener {
+                                                    usedIdReference.push().setValue(params)
+                                                    moveNext()
+                                                }
+                                                .addOnFailureListener {
+//                                            moveNext()
                                                 }
                                         }
 
-                                        val roundedCreditValues =
-                                            userCurrentCreditsValue.toBigDecimal()
-                                                .setScale(2, RoundingMode.UP)
-                                                .toDouble()
-                                        val totalCredits = roundedCreditValues + 50
-                                        val hashMap = HashMap<String, Any>()
-
-                                        hashMap["credits"] = totalCredits.toString()
-                                        firebaseDatabase.child(Constants.firebaseUserCredits)
-                                            .child(id)
-                                            .updateChildren(hashMap)
-                                            .addOnSuccessListener {
-                                                usedIdReference.push().setValue(params)
-                                                moveNext()
-                                            }
-                                            .addOnFailureListener {
-                                                moveNext()
-                                            }
-                                    }
-
-                                    override fun onCancelled(error: DatabaseError) {
-                                        moveNext()
-                                    }
-
-                                })
-                        }
-                        else {
-                            moveNext()
-                        }
-                    } else {
-
-                        firebaseDatabase.child(Constants.firebaseUserCredits)
-                            .child(id).addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-
-                                    if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
-                                        val previousCredits =
-                                            snapshot.child("credits").getValue(String::class.java)
-                                        userCurrentCreditsValue =
-                                            if (previousCredits!!.isNotEmpty()) {
-                                                previousCredits.toFloat()
-                                            } else {
-                                                0F
-                                            }
-                                    }
-
-                                    val roundedCreditValues =
-                                        userCurrentCreditsValue.toBigDecimal()
-                                            .setScale(2, RoundingMode.UP)
-                                            .toDouble()
-                                    val totalCredits = roundedCreditValues + 50
-                                    val hashMap = HashMap<String, Any>()
-
-                                    hashMap["credits"] = totalCredits.toString()
-                                    firebaseDatabase.child(Constants.firebaseUserCredits)
-                                        .child(id)
-                                        .updateChildren(hashMap)
-                                        .addOnSuccessListener {
-                                            usedIdReference.push().setValue(params)
+                                        override fun onCancelled(error: DatabaseError) {
                                             moveNext()
                                         }
-                                        .addOnFailureListener {
-//                                            moveNext()
-                                        }
-                                }
 
-                                override fun onCancelled(error: DatabaseError) {
-                                    moveNext()
-                                }
+                                    })
+                            }
+                        }
 
-                            })
-                    }
+                        override fun onCancelled(error: DatabaseError) {
+//                    moveNext()
+                        }
+
+                    })
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-//                    moveNext()
+
                 }
 
             })

@@ -43,6 +43,7 @@ class Constants {
         const val firebaseUsedCoupons = "UsedCoupons"
         const val firebasePurchaseHistory = "PurchaseHistory"
         const val firebaseUserCredits = "UserCredits"
+        const val firebaseFreeCredits = "FreeCredits"
         const val firebaseUserFeatureDetails = "UserFeatureDetails"
         const val firebaseStorageSizes = "StorageSizes"
         const val firebaseBarcodeImages = "BarcodeImages"

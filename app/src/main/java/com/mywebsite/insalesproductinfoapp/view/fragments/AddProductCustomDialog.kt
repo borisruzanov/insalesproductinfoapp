@@ -25,10 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
+import androidx.fragment.app.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -78,6 +75,25 @@ class AddProductCustomDialog(
     private val listener: ResponseListener
 ) : DialogFragment() {
 
+    private lateinit var apQuantityView: TextInputEditText
+    private lateinit var apPriceView: TextInputEditText
+    private lateinit var cameraImageView: AppCompatImageView
+    private lateinit var imagesImageView: AppCompatImageView
+    private lateinit var internetImageView: AppCompatImageView
+    private lateinit var apPriceDefaultInputBox: TextInputEditText
+    private lateinit var apQuantityDefaultInputBox: TextInputEditText
+    private lateinit var apPriceListBtn: MaterialButton
+    private lateinit var apQuantityListBtn: MaterialButton
+    private lateinit var apPriceSpinner: AppCompatSpinner
+    private lateinit var apQuantitySpinner: AppCompatSpinner
+    private lateinit var apCancelBtn: MaterialButton
+    private lateinit var apSubmitBtn: MaterialButton
+    private lateinit var apAddDescriptionView: MaterialTextView
+    private lateinit var apPriceDefaultInputWrapper: TextInputLayout
+    private lateinit var apPriceViewWrapper: TextInputLayout
+    private lateinit var apQuantityDefaultInputWrapper: TextInputLayout
+    private lateinit var apQuantityViewWrapper: TextInputLayout
+    private lateinit var apTestDataView: MaterialTextView
     private lateinit var tableGenerator: TableGenerator
     private lateinit var internetImageRecyclerView: RecyclerView
     private lateinit var internetImageDoneBtn: MaterialButton
@@ -131,6 +147,24 @@ class AddProductCustomDialog(
     private lateinit var apDescriptionListSpinner:AppCompatSpinner
     private lateinit var apQuantityListSpinner:AppCompatSpinner
     private lateinit var apPriceListSpinner:AppCompatSpinner
+
+    private lateinit var apDescriptionSpinner: AppCompatSpinner
+    private lateinit var apDescriptionVoiceRecView: LinearLayout
+    private lateinit var apDescriptionImageRecView: LinearLayout
+    private lateinit var apDescriptionCameraRecView: LinearLayout
+    private lateinit var apDescriptionDefaultValueMessage: MaterialTextView
+    private lateinit var apDescriptionDefaultInputWrapper: TextInputLayout
+    private lateinit var apDescriptionListBtn: MaterialButton
+    private lateinit var apDescriptionViewWrapper: TextInputLayout
+
+    private lateinit var apTitleVoiceRecView: LinearLayout
+    private lateinit var apTitleImageRecView: LinearLayout
+    private lateinit var apTitleCameraRecView: LinearLayout
+    private lateinit var apTitleDefaultValueMessage: MaterialTextView
+    private lateinit var apTitleDefaultInputWrapper: TextInputLayout
+    private lateinit var apTitleListBtn: MaterialButton
+    private lateinit var apTitleSpinner: AppCompatSpinner
+    private lateinit var apTitleViewWrapper: TextInputLayout
 
     var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -220,7 +254,7 @@ class AddProductCustomDialog(
         categoriesSpinner =
             view.findViewById(R.id.ap_cate_spinner)
         apTitleView = view.findViewById(R.id.ap_title)
-        val apTestDataView = view.findViewById<MaterialTextView>(R.id.test_data_button)
+        apTestDataView = view.findViewById<MaterialTextView>(R.id.test_data_button)
         apDescriptionView =
             view.findViewById(R.id.ap_description)
         testDataBtn = view.findViewById(R.id.test_data_button1)
@@ -233,6 +267,92 @@ class AddProductCustomDialog(
         apBackArrowBtn = view.findViewById(R.id.ap_back_arrow)
         apNextPreviousButtons = view.findViewById(R.id.ap_next_previous_buttons)
         getTitleBtn = view.findViewById(R.id.get_title_text_view)
+        apTitleViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_title_wrapper)
+        apTitleDefaultInputWrapper =
+            view.findViewById<TextInputLayout>(R.id.ap_title_non_changeable_default_text_input_wrapper)
+        apDescriptionViewWrapper =
+            view.findViewById<TextInputLayout>(R.id.ap_description_wrapper)
+        apDescriptionDefaultInputWrapper =
+            view.findViewById<TextInputLayout>(R.id.ap_description_non_changeable_default_text_input_wrapper)
+        apQuantityViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_quantity_wrapper)
+        apQuantityDefaultInputWrapper =
+            view.findViewById<TextInputLayout>(R.id.ap_quantity_non_changeable_default_text_input_wrapper)
+        apPriceViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_price_wrapper)
+        apPriceDefaultInputWrapper =
+            view.findViewById<TextInputLayout>(R.id.ap_price_non_changeable_default_text_input_wrapper)
+
+
+        apAddDescriptionView =
+            view.findViewById<MaterialTextView>(R.id.ap_add_description_text_view)
+        apQuantityView = view.findViewById<TextInputEditText>(R.id.ap_quantity)
+        apPriceView = view.findViewById<TextInputEditText>(R.id.ap_price)
+        apSubmitBtn = view.findViewById<MaterialButton>(R.id.ap_dialog_submit_btn)
+        apCancelBtn = view.findViewById<MaterialButton>(R.id.ap_dialog_cancel_btn)
+
+        apTitleSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_options_spinner)
+        apDescriptionSpinner =
+            view.findViewById<AppCompatSpinner>(R.id.ap_description_options_spinner)
+        apQuantitySpinner =
+            view.findViewById<AppCompatSpinner>(R.id.ap_quantity_options_spinner)
+        apPriceSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_options_spinner)
+
+        apTitleListBtn =
+            view.findViewById<MaterialButton>(R.id.ap_title_list_with_fields_btn)
+        apDescriptionListBtn =
+            view.findViewById<MaterialButton>(R.id.ap_description_list_with_fields_btn)
+        apQuantityListBtn =
+            view.findViewById<MaterialButton>(R.id.ap_quantity_list_with_fields_btn)
+        apPriceListBtn =
+            view.findViewById<MaterialButton>(R.id.ap_price_list_with_fields_btn)
+
+        apTitleDefaultInputBox =
+            view.findViewById<TextInputEditText>(R.id.ap_title_non_changeable_default_text_input)
+        apDescriptionDefaultInputBox =
+            view.findViewById<TextInputEditText>(R.id.ap_description_non_changeable_default_text_input)
+        apQuantityDefaultInputBox =
+            view.findViewById<TextInputEditText>(R.id.ap_quantity_non_changeable_default_text_input)
+        apPriceDefaultInputBox =
+            view.findViewById<TextInputEditText>(R.id.ap_price_non_changeable_default_text_input)
+
+
+        apTitleListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_list_spinner)
+        apDescriptionListSpinner =
+            view.findViewById<AppCompatSpinner>(R.id.ap_description_list_spinner)
+        apQuantityListSpinner =
+            view.findViewById<AppCompatSpinner>(R.id.ap_quantity_list_spinner)
+        apPriceListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_list_spinner)
+
+        apTitleActiveListNameView =
+            view.findViewById<MaterialTextView>(R.id.ap_title_active_list_name)
+        apDescriptionActiveListNameView =
+            view.findViewById<MaterialTextView>(R.id.ap_description_active_list_name)
+        apQuantityActiveListNameView =
+            view.findViewById<MaterialTextView>(R.id.ap_quantity_active_list_name)
+        apPriceActiveListNameView =
+            view.findViewById<MaterialTextView>(R.id.ap_price_active_list_name)
+
+
+        apTitleCameraRecView = view.findViewById<LinearLayout>(R.id.ap_title_camera_layout)
+        apTitleImageRecView = view.findViewById<LinearLayout>(R.id.ap_title_images_layout)
+        apTitleVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_title_voice_layout)
+
+        apDescriptionCameraRecView =
+            view.findViewById<LinearLayout>(R.id.ap_description_camera_layout)
+        apDescriptionImageRecView =
+            view.findViewById<LinearLayout>(R.id.ap_description_images_layout)
+        apDescriptionVoiceRecView =
+            view.findViewById<LinearLayout>(R.id.ap_description_voice_layout)
+
+        selectedImageView =
+            view.findViewById(R.id.selected_insales_add_product_image_view)
+        cameraImageView =
+            view.findViewById<AppCompatImageView>(R.id.camera_image_view)
+        imagesImageView =
+            view.findViewById<AppCompatImageView>(R.id.images_image_view)
+        internetImageView =
+            view.findViewById<AppCompatImageView>(R.id.internet_image_view)
+
+
         imagesRecyclerView = view.findViewById(R.id.ap_images_recyclerview)
         imagesRecyclerView.layoutManager = LinearLayoutManager(
             requireActivity(), RecyclerView.HORIZONTAL,
@@ -292,8 +412,28 @@ class AddProductCustomDialog(
             false
         })
 
+        apTitleDefaultInputBox.setOnTouchListener(View.OnTouchListener { v, event ->
+            if (v.id == R.id.ap_title_non_changeable_default_text_input) {
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                when (event.action and MotionEvent.ACTION_MASK) {
+                    MotionEvent.ACTION_UP -> v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        })
+
         apDescriptionView.setOnTouchListener(View.OnTouchListener { v, event ->
             if (v.id == R.id.ap_description) {
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                when (event.action and MotionEvent.ACTION_MASK) {
+                    MotionEvent.ACTION_UP -> v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        })
+
+        apDescriptionDefaultInputBox.setOnTouchListener(View.OnTouchListener { v, event ->
+            if (v.id == R.id.ap_description_non_changeable_default_text_input) {
                 v.parent.requestDisallowInterceptTouchEvent(true)
                 when (event.action and MotionEvent.ACTION_MASK) {
                     MotionEvent.ACTION_UP -> v.parent.requestDisallowInterceptTouchEvent(false)
@@ -328,74 +468,7 @@ class AddProductCustomDialog(
             }
         }
 
-        val apTitleViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_title_wrapper)
-        val apTitleDefaultInputWrapper =
-            view.findViewById<TextInputLayout>(R.id.ap_title_non_changeable_default_text_input_wrapper)
-        val apDescriptionViewWrapper =
-            view.findViewById<TextInputLayout>(R.id.ap_description_wrapper)
-        val apDescriptionDefaultInputWrapper =
-            view.findViewById<TextInputLayout>(R.id.ap_description_non_changeable_default_text_input_wrapper)
-        val apQuantityViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_quantity_wrapper)
-        val apQuantityDefaultInputWrapper =
-            view.findViewById<TextInputLayout>(R.id.ap_quantity_non_changeable_default_text_input_wrapper)
-        val apPriceViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_price_wrapper)
-        val apPriceDefaultInputWrapper =
-            view.findViewById<TextInputLayout>(R.id.ap_price_non_changeable_default_text_input_wrapper)
 
-
-        val apAddDescriptionView =
-            view.findViewById<MaterialTextView>(R.id.ap_add_description_text_view)
-        val apQuantityView = view.findViewById<TextInputEditText>(R.id.ap_quantity)
-        val apPriceView = view.findViewById<TextInputEditText>(R.id.ap_price)
-        val apSubmitBtn = view.findViewById<MaterialButton>(R.id.ap_dialog_submit_btn)
-        val apCancelBtn = view.findViewById<MaterialButton>(R.id.ap_dialog_cancel_btn)
-
-        val apTitleSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_options_spinner)
-        val apDescriptionSpinner =
-            view.findViewById<AppCompatSpinner>(R.id.ap_description_options_spinner)
-        val apQuantitySpinner =
-            view.findViewById<AppCompatSpinner>(R.id.ap_quantity_options_spinner)
-        val apPriceSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_options_spinner)
-
-        val apTitleListBtn =
-            view.findViewById<MaterialButton>(R.id.ap_title_list_with_fields_btn)
-        val apDescriptionListBtn =
-            view.findViewById<MaterialButton>(R.id.ap_description_list_with_fields_btn)
-        val apQuantityListBtn =
-            view.findViewById<MaterialButton>(R.id.ap_quantity_list_with_fields_btn)
-        val apPriceListBtn =
-            view.findViewById<MaterialButton>(R.id.ap_price_list_with_fields_btn)
-
-        apTitleDefaultInputBox =
-            view.findViewById<TextInputEditText>(R.id.ap_title_non_changeable_default_text_input)
-        apDescriptionDefaultInputBox =
-            view.findViewById<TextInputEditText>(R.id.ap_description_non_changeable_default_text_input)
-        val apQuantityDefaultInputBox =
-            view.findViewById<TextInputEditText>(R.id.ap_quantity_non_changeable_default_text_input)
-        val apPriceDefaultInputBox =
-            view.findViewById<TextInputEditText>(R.id.ap_price_non_changeable_default_text_input)
-
-
-        apTitleListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_list_spinner)
-        apDescriptionListSpinner =
-            view.findViewById<AppCompatSpinner>(R.id.ap_description_list_spinner)
-        apQuantityListSpinner =
-            view.findViewById<AppCompatSpinner>(R.id.ap_quantity_list_spinner)
-        apPriceListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_list_spinner)
-
-        apTitleActiveListNameView =
-            view.findViewById<MaterialTextView>(R.id.ap_title_active_list_name)
-        apDescriptionActiveListNameView =
-            view.findViewById<MaterialTextView>(R.id.ap_description_active_list_name)
-        apQuantityActiveListNameView =
-            view.findViewById<MaterialTextView>(R.id.ap_quantity_active_list_name)
-        apPriceActiveListNameView =
-            view.findViewById<MaterialTextView>(R.id.ap_price_active_list_name)
-
-
-        val apTitleCameraRecView = view.findViewById<LinearLayout>(R.id.ap_title_camera_layout)
-        val apTitleImageRecView = view.findViewById<LinearLayout>(R.id.ap_title_images_layout)
-        val apTitleVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_title_voice_layout)
         val quickModeStatus = appSettings.getInt("QUICK_MODE_STATUS")
         if (quickModeStatus == 1) {
             quickModeCheckBox.isChecked = true
@@ -407,6 +480,7 @@ class AddProductCustomDialog(
             apNextPreviousButtons.visibility = View.GONE
             apFirstLayout.visibility = View.VISIBLE
         }
+        renderView()
         quickModeCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
             userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
             if (isChecked) {
@@ -417,7 +491,7 @@ class AddProductCustomDialog(
                     apFirstLayout.visibility = View.GONE
                     apSecondLayout.visibility = View.VISIBLE
                     apNextPreviousButtons.visibility = View.VISIBLE
-
+                    renderView()
                 } else {
                     quickModeCheckBox.isChecked = false
                     MaterialAlertDialogBuilder(requireActivity())
@@ -447,7 +521,7 @@ class AddProductCustomDialog(
                 apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
                 apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                 apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
-
+                renderView()
                 val tempImageList = mutableListOf<String>()
                 val images = Constants.selectedRainForestProductImages
                 if (images.isNotEmpty()) {
@@ -478,6 +552,12 @@ class AddProductCustomDialog(
         apBackArrowBtn.setOnClickListener {
             dismiss()
         }
+
+
+    }
+
+    private fun renderView(){
+
         apViewPager.offscreenPageLimit = 7
         val fragmentAdapter = ViewPagerAdapter(childFragmentManager)
         fragmentAdapter.addFragment(ApScannerFragment(), "ap_scanner_fr")
@@ -488,6 +568,8 @@ class AddProductCustomDialog(
         fragmentAdapter.addFragment(ApPriceInputFragment(), "ap_price_fr")
         fragmentAdapter.addFragment(ApImageUploadFragment(), "ap_image_fr")
         apViewPager.adapter = fragmentAdapter
+        val currentPage = appSettings.getInt("CURRENT_PAGE")
+        apViewPager.currentItem = currentPage
 
         testDataBtn.setOnClickListener {
             val currentFragment =
@@ -513,7 +595,7 @@ class AddProductCustomDialog(
             }
 
             override fun onPageSelected(position: Int) {
-
+                appSettings.putInt("CURRENT_PAGE",position)
                 if (position == 2 || position == 3) {
                     getTitleBtn.visibility = View.VISIBLE
                 } else {
@@ -635,12 +717,6 @@ class AddProductCustomDialog(
             }
         }
 
-        val apDescriptionCameraRecView =
-            view.findViewById<LinearLayout>(R.id.ap_description_camera_layout)
-        val apDescriptionImageRecView =
-            view.findViewById<LinearLayout>(R.id.ap_description_images_layout)
-        val apDescriptionVoiceRecView =
-            view.findViewById<LinearLayout>(R.id.ap_description_voice_layout)
 
         apDescriptionCameraRecView.setOnClickListener {
             Constants.CIVType = "ap_description"
@@ -726,7 +802,6 @@ class AddProductCustomDialog(
             }
         }
 
-
         val apTitleSpinnerSelectedPosition =
             appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
         val apTitleDefaultValue = appSettings.getString("AP_TITLE_DEFAULT_VALUE")
@@ -744,92 +819,100 @@ class AddProductCustomDialog(
             openListWithFieldsDialog("ap_title")
         }
 
-        if (apTitleSpinnerSelectedPosition == 1) {
-            apTitleVoiceRecView.visibility = View.GONE
-            apTitleCameraRecView.visibility = View.GONE
-            apTitleImageRecView.visibility = View.GONE
-            apTitleListBtn.visibility = View.GONE
-            apTitleActiveListNameView.visibility = View.GONE
-            apTitleListSpinner.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.VISIBLE
-            apTitleViewWrapper.visibility = View.VISIBLE
-            apTitleDefaultInputBox.setText(apTitleDefaultValue)
-            apTitleView.setText(apTitleDefaultValue)
-        } else if (apTitleSpinnerSelectedPosition == 2) {
-            apTitleVoiceRecView.visibility = View.GONE
-            apTitleCameraRecView.visibility = View.GONE
-            apTitleImageRecView.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.GONE
-            apTitleListBtn.visibility = View.VISIBLE
-            apTitleActiveListNameView.visibility = View.VISIBLE
-            apTitleViewWrapper.visibility = View.GONE
-            apTitleListSpinner.visibility = View.VISIBLE
-            val listOptions: String = tableGenerator.getListValues(apTitleListId)
-            val listValues = listOptions.split(",")
-            if (listValues.isNotEmpty()) {
-                appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
+        when (apTitleSpinnerSelectedPosition)
+        {
+            1 -> {
+                apTitleVoiceRecView.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
+                apTitleListBtn.visibility = View.GONE
+                apTitleActiveListNameView.visibility = View.GONE
+                apTitleListSpinner.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.VISIBLE
+                apTitleViewWrapper.visibility = View.VISIBLE
+                apTitleDefaultInputBox.setText(apTitleDefaultValue)
+                apTitleView.setText(apTitleDefaultValue)
             }
-            val apTitleSpinnerAdapter = ArrayAdapter(
-                requireActivity(),
-                android.R.layout.simple_spinner_item,
-                listValues
-            )
-            apTitleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            apTitleListSpinner.adapter = apTitleSpinnerAdapter
-
-            apTitleListSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    }
-
+            2 -> {
+                apTitleVoiceRecView.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleListBtn.visibility = View.VISIBLE
+                apTitleActiveListNameView.visibility = View.VISIBLE
+                apTitleViewWrapper.visibility = View.GONE
+                apTitleListSpinner.visibility = View.VISIBLE
+                val listOptions: String = tableGenerator.getListValues(apTitleListId)
+                val listValues = listOptions.split(",")
+                if (listValues.isNotEmpty()) {
+                    appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
                 }
+                val apTitleSpinnerAdapter = ArrayAdapter(
+                    requireActivity(),
+                    android.R.layout.simple_spinner_item,
+                    listValues
+                )
+                apTitleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                apTitleListSpinner.adapter = apTitleSpinnerAdapter
 
-        } else if (apTitleSpinnerSelectedPosition == 3) {
-            apTitleListBtn.visibility = View.GONE
-            apTitleActiveListNameView.visibility = View.GONE
-            apTitleListSpinner.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.GONE
-            apTitleCameraRecView.visibility = View.GONE
-            apTitleImageRecView.visibility = View.GONE
-            apTitleViewWrapper.visibility = View.VISIBLE
-            apTitleVoiceRecView.visibility = View.VISIBLE
-        } else if (apTitleSpinnerSelectedPosition == 4) {
-            apTitleListBtn.visibility = View.GONE
-            apTitleActiveListNameView.visibility = View.GONE
-            apTitleListSpinner.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.GONE
-            apTitleVoiceRecView.visibility = View.GONE
-            apTitleImageRecView.visibility = View.GONE
-            apTitleViewWrapper.visibility = View.VISIBLE
-            apTitleCameraRecView.visibility = View.VISIBLE
-        } else if (apTitleSpinnerSelectedPosition == 5) {
-            apTitleListBtn.visibility = View.GONE
-            apTitleActiveListNameView.visibility = View.GONE
-            apTitleListSpinner.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.GONE
-            apTitleVoiceRecView.visibility = View.GONE
-            apTitleCameraRecView.visibility = View.GONE
-            apTitleViewWrapper.visibility = View.VISIBLE
-            apTitleImageRecView.visibility = View.VISIBLE
-        } else {
-            apTitleVoiceRecView.visibility = View.GONE
-            apTitleCameraRecView.visibility = View.GONE
-            apTitleImageRecView.visibility = View.GONE
-            apTitleListBtn.visibility = View.GONE
-            apTitleActiveListNameView.visibility = View.GONE
-            apTitleDefaultInputWrapper.visibility = View.GONE
-            apTitleListSpinner.visibility = View.GONE
-            apTitleViewWrapper.visibility = View.VISIBLE
+                apTitleListSpinner.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+
+                    }
+
+            }
+            3 -> {
+                apTitleListBtn.visibility = View.GONE
+                apTitleActiveListNameView.visibility = View.GONE
+                apTitleListSpinner.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
+                apTitleViewWrapper.visibility = View.VISIBLE
+                apTitleVoiceRecView.visibility = View.VISIBLE
+            }
+            4 -> {
+                apTitleListBtn.visibility = View.GONE
+                apTitleActiveListNameView.visibility = View.GONE
+                apTitleListSpinner.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleVoiceRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
+                apTitleViewWrapper.visibility = View.VISIBLE
+                apTitleCameraRecView.visibility = View.VISIBLE
+            }
+            5 -> {
+                apTitleListBtn.visibility = View.GONE
+                apTitleActiveListNameView.visibility = View.GONE
+                apTitleListSpinner.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleVoiceRecView.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleViewWrapper.visibility = View.VISIBLE
+                apTitleImageRecView.visibility = View.VISIBLE
+            }
+            else -> {
+                apTitleVoiceRecView.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
+                apTitleListBtn.visibility = View.GONE
+                apTitleActiveListNameView.visibility = View.GONE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleListSpinner.visibility = View.GONE
+                apTitleViewWrapper.visibility = View.VISIBLE
+            }
         }
 
 
@@ -849,9 +932,9 @@ class AddProductCustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                apTitleView.setText(s.toString())
+                //apTitleView.setText(s.toString())
                 appSettings.putString("AP_TITLE_DEFAULT_VALUE", s.toString())
-                appSettings.putString("AP_PRODUCT_TITLE", s.toString())
+                //appSettings.putString("AP_PRODUCT_TITLE", s.toString())
             }
 
         })
@@ -1009,92 +1092,99 @@ class AddProductCustomDialog(
         apDescriptionListBtn.setOnClickListener {
             openListWithFieldsDialog("ap_description")
         }
-        if (apDescriptionSpinnerSelectedPosition == 1) {
-            apDescriptionVoiceRecView.visibility = View.GONE
-            apDescriptionCameraRecView.visibility = View.GONE
-            apDescriptionImageRecView.visibility = View.GONE
-            apDescriptionListBtn.visibility = View.GONE
-            apDescriptionActiveListNameView.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
-            apDescriptionViewWrapper.visibility = View.VISIBLE
-            apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
-            apDescriptionView.setText(apDescriptionDefaultValue)
-        } else if (apDescriptionSpinnerSelectedPosition == 2) {
-            apDescriptionVoiceRecView.visibility = View.GONE
-            apDescriptionCameraRecView.visibility = View.GONE
-            apDescriptionImageRecView.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.GONE
-            apDescriptionListBtn.visibility = View.VISIBLE
-            apDescriptionActiveListNameView.visibility = View.VISIBLE
-            apDescriptionViewWrapper.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.VISIBLE
-            val listOptions: String = tableGenerator.getListValues(apDescriptionListId)
-            val listValues = listOptions.split(",")
-            if (listValues.isNotEmpty()){
-                appSettings.putString("AP_PRODUCT_DESCRIPTION",listValues[0])
+        when (apDescriptionSpinnerSelectedPosition) {
+            1 -> {
+                apDescriptionVoiceRecView.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
+                apDescriptionListBtn.visibility = View.GONE
+                apDescriptionActiveListNameView.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+                apDescriptionViewWrapper.visibility = View.VISIBLE
+                apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
+                apDescriptionView.setText(apDescriptionDefaultValue)
             }
-            val apDescriptionSpinnerAdapter = ArrayAdapter(
-                requireActivity(),
-                android.R.layout.simple_spinner_item,
-                listValues
-            )
-            apDescriptionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            apDescriptionListSpinner.adapter = apDescriptionSpinnerAdapter
-
-            apDescriptionListSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                    }
-
+            2 -> {
+                apDescriptionVoiceRecView.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionListBtn.visibility = View.VISIBLE
+                apDescriptionActiveListNameView.visibility = View.VISIBLE
+                apDescriptionViewWrapper.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.VISIBLE
+                val listOptions: String = tableGenerator.getListValues(apDescriptionListId)
+                val listValues = listOptions.split(",")
+                if (listValues.isNotEmpty()){
+                    appSettings.putString("AP_PRODUCT_DESCRIPTION",listValues[0])
                 }
+                val apDescriptionSpinnerAdapter = ArrayAdapter(
+                    requireActivity(),
+                    android.R.layout.simple_spinner_item,
+                    listValues
+                )
+                apDescriptionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                apDescriptionListSpinner.adapter = apDescriptionSpinnerAdapter
 
-        } else if (apDescriptionSpinnerSelectedPosition == 3) {
-            apDescriptionListBtn.visibility = View.GONE
-            apDescriptionActiveListNameView.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.GONE
-            apDescriptionCameraRecView.visibility = View.GONE
-            apDescriptionImageRecView.visibility = View.GONE
-            apDescriptionViewWrapper.visibility = View.VISIBLE
-            apDescriptionVoiceRecView.visibility = View.VISIBLE
-        } else if (apDescriptionSpinnerSelectedPosition == 4) {
-            apDescriptionListBtn.visibility = View.GONE
-            apDescriptionActiveListNameView.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.GONE
-            apDescriptionVoiceRecView.visibility = View.GONE
-            apDescriptionImageRecView.visibility = View.GONE
-            apDescriptionViewWrapper.visibility = View.VISIBLE
-            apDescriptionCameraRecView.visibility = View.VISIBLE
-        } else if (apDescriptionSpinnerSelectedPosition == 5) {
-            apDescriptionListBtn.visibility = View.GONE
-            apDescriptionActiveListNameView.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.GONE
-            apDescriptionVoiceRecView.visibility = View.GONE
-            apDescriptionCameraRecView.visibility = View.GONE
-            apDescriptionViewWrapper.visibility = View.VISIBLE
-            apDescriptionImageRecView.visibility = View.VISIBLE
-        } else {
-            apDescriptionVoiceRecView.visibility = View.GONE
-            apDescriptionCameraRecView.visibility = View.GONE
-            apDescriptionImageRecView.visibility = View.GONE
-            apDescriptionListBtn.visibility = View.GONE
-            apDescriptionActiveListNameView.visibility = View.GONE
-            apDescriptionDefaultInputWrapper.visibility = View.GONE
-            apDescriptionListSpinner.visibility = View.GONE
-            apDescriptionViewWrapper.visibility = View.VISIBLE
+                apDescriptionListSpinner.onItemSelectedListener =
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+
+                    }
+
+            }
+            3 -> {
+                apDescriptionListBtn.visibility = View.GONE
+                apDescriptionActiveListNameView.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
+                apDescriptionViewWrapper.visibility = View.VISIBLE
+                apDescriptionVoiceRecView.visibility = View.VISIBLE
+            }
+            4 -> {
+                apDescriptionListBtn.visibility = View.GONE
+                apDescriptionActiveListNameView.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionVoiceRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
+                apDescriptionViewWrapper.visibility = View.VISIBLE
+                apDescriptionCameraRecView.visibility = View.VISIBLE
+            }
+            5 -> {
+                apDescriptionListBtn.visibility = View.GONE
+                apDescriptionActiveListNameView.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionVoiceRecView.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionViewWrapper.visibility = View.VISIBLE
+                apDescriptionImageRecView.visibility = View.VISIBLE
+            }
+            else -> {
+                apDescriptionVoiceRecView.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
+                apDescriptionListBtn.visibility = View.GONE
+                apDescriptionActiveListNameView.visibility = View.GONE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionListSpinner.visibility = View.GONE
+                apDescriptionViewWrapper.visibility = View.VISIBLE
+            }
         }
 
         apDescriptionDefaultInputBox.addTextChangedListener(object : TextWatcher {
@@ -1112,9 +1202,9 @@ class AddProductCustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                apDescriptionView.setText(s.toString())
+                //apDescriptionView.setText(s.toString())
                 appSettings.putString("AP_DESCRIPTION_DEFAULT_VALUE", s.toString())
-                appSettings.putString("AP_PRODUCT_DESCRIPTION", s.toString())
+                //appSettings.putString("AP_PRODUCT_DESCRIPTION", s.toString())
             }
 
         })
@@ -1673,15 +1763,6 @@ class AddProductCustomDialog(
         })
 
 
-        selectedImageView =
-            view.findViewById(R.id.selected_insales_add_product_image_view)
-        val cameraImageView =
-            view.findViewById<AppCompatImageView>(R.id.camera_image_view)
-        val imagesImageView =
-            view.findViewById<AppCompatImageView>(R.id.images_image_view)
-        val internetImageView =
-            view.findViewById<AppCompatImageView>(R.id.internet_image_view)
-
         cameraImageView.setOnClickListener {
             intentType = 1
             if (RuntimePermissionHelper.checkCameraPermission(
@@ -1990,7 +2071,7 @@ class AddProductCustomDialog(
             ) {
                 BaseActivity.startLoading(requireActivity())
                 finalTitleText = if (apTitleSpinnerSelectedPosition == 1) {
-                    apTitleDefaultInputBox.text.toString().toString()
+                    apTitleView.text.toString().toString()
                 } else if (apTitleSpinnerSelectedPosition == 2) {
                     apTitleListSpinner.selectedItem.toString().trim()
                 } else {
@@ -1998,7 +2079,7 @@ class AddProductCustomDialog(
                 }
 
                 finalDescriptionText = if (apDescriptionSpinnerSelectedPosition == 1) {
-                    apDescriptionDefaultInputBox.text.toString().toString()
+                    apDescriptionView.text.toString().toString()
                 } else if (apDescriptionSpinnerSelectedPosition == 2) {
                     apDescriptionListSpinner.selectedItem.toString().trim()
                 } else {
@@ -2071,7 +2152,6 @@ class AddProductCustomDialog(
                     })
             }
         }
-
     }
 
     private fun checkImageAlreadyExist(list: List<String>, source: String): Boolean {
@@ -2724,7 +2804,19 @@ class AddProductCustomDialog(
                             val stringBuilder = java.lang.StringBuilder()
                             stringBuilder.append(currentPItemTitle)
                             stringBuilder.append(title)
-                            apTitleDefaultInputBox.setText(stringBuilder.toString())
+                            appSettings.putString("AP_PRODUCT_TITLE", stringBuilder.toString())
+                            apTitleView.setText(stringBuilder.toString())
+                            apTitleVoiceRecView.visibility = View.GONE
+                            apTitleCameraRecView.visibility = View.GONE
+                            apTitleImageRecView.visibility = View.GONE
+                            apTitleListBtn.visibility = View.GONE
+                            apTitleActiveListNameView.visibility = View.GONE
+                            apTitleDefaultInputWrapper.visibility = View.GONE
+//                            apTitleDefaultValueMessage.visibility = View.GONE
+                            apTitleListSpinner.visibility = View.GONE
+                            apTitleViewWrapper.visibility = View.VISIBLE
+                            appSettings.putInt("AP_TITLE_SPINNER_SELECTED_POSITION", 0)
+                            apTitleSpinner.setSelection(0, false)
                         }
                         else{
                             val currentPItemTitle = apTitleView.text.toString().trim()
@@ -2732,6 +2824,7 @@ class AddProductCustomDialog(
                             stringBuilder.append(currentPItemTitle)
                             stringBuilder.append(title)
                             apTitleView.setText(stringBuilder.toString())
+                            appSettings.putString("AP_PRODUCT_TITLE", stringBuilder.toString())
                         }
 
                     }
@@ -2746,7 +2839,19 @@ class AddProductCustomDialog(
                             val stringBuilder = java.lang.StringBuilder()
                             stringBuilder.append(currentPItemDescription)
                             stringBuilder.append(description)
-                            apDescriptionDefaultInputBox.setText(stringBuilder.toString())
+                            appSettings.putString("AP_PRODUCT_DESCRIPTION", stringBuilder.toString())
+                            apDescriptionView.setText(stringBuilder.toString())
+                            apDescriptionVoiceRecView.visibility = View.GONE
+                            apDescriptionCameraRecView.visibility = View.GONE
+                            apDescriptionImageRecView.visibility = View.GONE
+                            apDescriptionListBtn.visibility = View.GONE
+                            apDescriptionActiveListNameView.visibility = View.GONE
+                            apDescriptionDefaultInputWrapper.visibility = View.GONE
+//                            apDescriptionDefaultValueMessage.visibility = View.GONE
+                            apDescriptionListSpinner.visibility = View.GONE
+                            apDescriptionViewWrapper.visibility = View.VISIBLE
+                            appSettings.putInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION", 0)
+                            apDescriptionSpinner.setSelection(0,false)
                         }
                         else{
                             val currentPItemDescription = apDescriptionView.text.toString().trim()
@@ -2754,6 +2859,7 @@ class AddProductCustomDialog(
                             stringBuilder.append(currentPItemDescription)
                             stringBuilder.append(description)
                             apDescriptionView.setText(stringBuilder.toString())
+                            appSettings.putString("AP_PRODUCT_DESCRIPTION", stringBuilder.toString())
                         }
 
 

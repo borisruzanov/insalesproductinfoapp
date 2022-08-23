@@ -671,7 +671,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     }
 
     private fun addProduct() {
-
+        appSettings.putInt("CURRENT_PAGE",0)
         Constants.selectedRainForestProductImages = ""
         AddProductCustomDialog(
             originalCategoriesList,

@@ -93,21 +93,22 @@ class ApTitleInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-        if (position == 1){
-            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
-            apTitleView.setSelection(apTitleView.text.toString().length)
-        }
-        else{
-            apTitleDefaultInputBox.setText(appSettings.getString("AP_PRODUCT_TITLE"))
-            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
-        }
-
-        if (position == 0 || position == 1){
-//           Handler(Looper.myLooper()!!).postDelayed(Runnable {
-               BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)
-//           }, 1000)
-        }
+//        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+//        if (position == 1){
+//            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
+//            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
+//        }
+//        else{
+//            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+//            apTitleView.setSelection(apTitleView.text.toString().length)
+//        }
+//
+//        if (position == 0 || position == 1){
+////           Handler(Looper.myLooper()!!).postDelayed(Runnable {
+//               BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)
+////           }, 1000)
+//        }
+        renderView()
     }
 
     private fun initViews(view: View) {
@@ -130,8 +131,16 @@ class ApTitleInputFragment : Fragment() {
         apTitleImageRecView = view.findViewById<LinearLayout>(R.id.ap_title_images_layout)
         apTitleVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_title_voice_layout)
 
-        val apTitleSpinnerSelectedPosition =
-                appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+    }
+
+    private fun renderView(){
+        val apTitleSpinnerSelectedPosition = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+                if (apTitleSpinnerSelectedPosition == 0 || apTitleSpinnerSelectedPosition == 1){
+//           Handler(Looper.myLooper()!!).postDelayed(Runnable {
+                    apTitleView.setSelection(apTitleView.text.toString().length)
+               BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)
+//           }, 1000)
+        }
         val apTitleDefaultValue = appSettings.getString("AP_TITLE_DEFAULT_VALUE")
         val apTitleListId = appSettings.getInt("AP_TITLE_LIST_ID")
         val apTitleActiveListName = appSettings.getString("AP_TITLE_LIST_NAME")
@@ -167,13 +176,23 @@ class ApTitleInputFragment : Fragment() {
             false
         })
 
+        apTitleDefaultInputBox.setOnTouchListener(View.OnTouchListener { v, event ->
+            if (v.id == R.id.ap_title_non_changeable_default_text_input) {
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                when (event.action and MotionEvent.ACTION_MASK) {
+                    MotionEvent.ACTION_UP -> v.parent.requestDisallowInterceptTouchEvent(false)
+                }
+            }
+            false
+        })
+
         apTitleView.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
                 if (actionId == EditorInfo.IME_ACTION_NEXT) {
                     BaseActivity.hideSoftKeyboard(requireActivity(), apTitleView)
                     val intent = Intent("move-next")
                     LocalBroadcastManager.getInstance(requireActivity())
-                            .sendBroadcast(intent)
+                        .sendBroadcast(intent)
                 }
                 return false
             }
@@ -212,8 +231,8 @@ class ApTitleInputFragment : Fragment() {
 
         apTitleCameraRecView.setOnClickListener {
             if (RuntimePermissionHelper.checkCameraPermission(
-                            requireActivity(), Constants.CAMERA_PERMISSION
-                    )
+                    requireActivity(), Constants.CAMERA_PERMISSION
+                )
             ) {
                 BaseActivity.hideSoftKeyboard(requireActivity(), apTitleCameraRecView)
                 pickImageFromCamera()
@@ -222,9 +241,9 @@ class ApTitleInputFragment : Fragment() {
         apTitleImageRecView.setOnClickListener {
             Constants.hint = "ap_title"
             if (RuntimePermissionHelper.checkCameraPermission(
-                            requireActivity(),
-                            Constants.READ_STORAGE_PERMISSION
-                    )
+                    requireActivity(),
+                    Constants.READ_STORAGE_PERMISSION
+                )
             ) {
                 BaseActivity.hideSoftKeyboard(requireActivity(), apTitleImageRecView)
                 pickImageFromGallery()
@@ -243,33 +262,33 @@ class ApTitleInputFragment : Fragment() {
             }
 
             voiceLanguageSpinner.onItemSelectedListener =
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                                parent: AdapterView<*>?,
-                                view: View?,
-                                position: Int,
-                                id: Long
-                        ) {
-                            voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
-                            appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
-
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                        }
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
+                        appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
 
                     }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    }
+
+                }
             val builder = MaterialAlertDialogBuilder(requireActivity())
             builder.setView(voiceLayout)
             val alert = builder.create();
             alert.show()
             voiceLanguageSaveBtn.setOnClickListener {
-               alert.dismiss()
+                alert.dismiss()
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                     putExtra(
-                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
                     )
                     putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode)
 
@@ -297,6 +316,7 @@ class ApTitleInputFragment : Fragment() {
                 apTitleViewWrapper.visibility = View.VISIBLE
                 apTitleDefaultInputBox.setText(apTitleDefaultValue)
                 apTitleView.setText(apTitleDefaultValue)
+                apTitleView.setSelection(apTitleView.text.toString().length)
 
             }
             2 -> {
@@ -315,30 +335,30 @@ class ApTitleInputFragment : Fragment() {
                     appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
                 }
                 val apTitleSpinnerAdapter = ArrayAdapter(
-                        requireActivity(),
-                        android.R.layout.simple_spinner_item,
-                        listValues
+                    requireActivity(),
+                    android.R.layout.simple_spinner_item,
+                    listValues
                 )
                 apTitleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 apTitleListSpinner.adapter = apTitleSpinnerAdapter
 
                 apTitleListSpinner.onItemSelectedListener =
-                        object : AdapterView.OnItemSelectedListener {
-                            override fun onItemSelected(
-                                    parent: AdapterView<*>?,
-                                    view: View?,
-                                    position: Int,
-                                    id: Long
-                            ) {
-                                appSettings.putString("AP_PRODUCT_TITLE", parent!!.selectedItem.toString())
-
-                            }
-
-                            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                            }
+                    object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>?,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            appSettings.putString("AP_PRODUCT_TITLE", parent!!.selectedItem.toString())
 
                         }
+
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+
+                    }
 
             }
             3 -> {
@@ -391,18 +411,18 @@ class ApTitleInputFragment : Fragment() {
 
         apTitleDefaultInputBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
             ) {
 
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                apTitleView.setText(s.toString())
+                //apTitleView.setText(s.toString())
                 appSettings.putString("AP_TITLE_DEFAULT_VALUE", s.toString())
-                appSettings.putString("AP_PRODUCT_TITLE", s.toString())
+                //appSettings.putString("AP_PRODUCT_TITLE", s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -416,7 +436,7 @@ class ApTitleInputFragment : Fragment() {
                     BaseActivity.hideSoftKeyboard(requireActivity(), apTitleDefaultInputBox)
                     val intent = Intent("move-next")
                     LocalBroadcastManager.getInstance(requireActivity())
-                            .sendBroadcast(intent)
+                        .sendBroadcast(intent)
                 }
                 return false
             }
@@ -425,10 +445,10 @@ class ApTitleInputFragment : Fragment() {
 
         apTitleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
             ) {
                 appSettings.putInt("AP_TITLE_SPINNER_SELECTED_POSITION", position)
                 when (position) {
@@ -445,6 +465,7 @@ class ApTitleInputFragment : Fragment() {
                         apTitleViewWrapper.visibility = View.VISIBLE
                         apTitleDefaultInputBox.setText(apTitleDefaultValue)
                         apTitleView.setText(apTitleDefaultValue)
+                        apTitleView.setSelection(apTitleView.text.toString().length)
 
                     }
                     2 -> {
@@ -463,29 +484,29 @@ class ApTitleInputFragment : Fragment() {
                             appSettings.putString("AP_PRODUCT_TITLE", listValues[0])
                         }
                         val apTitleSpinnerAdapter = ArrayAdapter(
-                                requireActivity(),
-                                android.R.layout.simple_spinner_item,
-                                listValues
+                            requireActivity(),
+                            android.R.layout.simple_spinner_item,
+                            listValues
                         )
                         apTitleSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         apTitleListSpinner.adapter = apTitleSpinnerAdapter
 
                         apTitleListSpinner.onItemSelectedListener =
-                                object : AdapterView.OnItemSelectedListener {
-                                    override fun onItemSelected(
-                                            parent: AdapterView<*>?,
-                                            view: View?,
-                                            position: Int,
-                                            id: Long
-                                    ) {
-                                        appSettings.putString("AP_PRODUCT_TITLE", parent!!.selectedItem.toString())
-                                    }
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>?,
+                                    view: View?,
+                                    position: Int,
+                                    id: Long
+                                ) {
+                                    appSettings.putString("AP_PRODUCT_TITLE", parent!!.selectedItem.toString())
+                                }
 
-                                    override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                                    }
+                                override fun onNothingSelected(parent: AdapterView<*>?) {
 
                                 }
+
+                            }
 
                     }
                     3 -> {
@@ -542,7 +563,6 @@ class ApTitleInputFragment : Fragment() {
             }
 
         }
-
     }
 
     private fun openListWithFieldsDialog(fieldType: String) {
