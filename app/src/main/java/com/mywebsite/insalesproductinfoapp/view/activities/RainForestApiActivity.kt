@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
+import android.text.Editable
 import android.text.Spannable
 import android.text.TextPaint
+import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.util.Log
@@ -22,6 +24,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +48,7 @@ import com.mywebsite.insalesproductinfoapp.interfaces.TranslationCallback
 import com.mywebsite.insalesproductinfoapp.model.RainForestApiObject
 import com.mywebsite.insalesproductinfoapp.utils.*
 import com.mywebsite.insalesproductinfoapp.view.fragments.FullImageFragment
+import com.mywebsite.insalesproductinfoapp.viewmodel.RainForestViewModel
 import com.skydoves.balloon.ArrowOrientation
 import com.skydoves.balloon.Balloon
 import com.skydoves.balloon.BalloonAnimation
@@ -93,6 +97,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     var userCurrentCreditsValue: Float = 0F
     private lateinit var auth: FirebaseAuth
     private lateinit var firebaseDatabase: DatabaseReference
+    private lateinit var viewModel:RainForestViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,6 +111,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
     private fun initViews() {
         context = this
+        viewModel = ViewModelProvider(this)[RainForestViewModel::class.java]
         auth = Firebase.auth
         firebaseDatabase = FirebaseDatabase.getInstance().reference
         appSettings = AppSettings(context)
@@ -132,6 +138,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         translatorPrice = appSettings.getString("TRANSLATOR_CHARACTERS_PRICE")!!.toFloat()
         unitCharacterPrice = translatorPrice / characters
         userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+
 
         searchBox.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
@@ -338,6 +345,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         searchBox.clearFocus()
                         hideSoftKeyboard(context, searchBox)
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+                        currentPage = 1
                         startSearch(barcodeId)
                     }
                 }
@@ -362,6 +370,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 searchBox.clearFocus()
                 hideSoftKeyboard(context, searchBox)
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+                currentPage = 1
                 startSearch(spokenText)
             }
         }
@@ -407,6 +416,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     hideSoftKeyboard(context, searchBox)
                     searchBox.clearFocus()
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+                    currentPage = 1
                     startSearch(query)
                 } else {
                     showAlert(context, getString(R.string.empty_text_error))
@@ -517,9 +527,15 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
     private fun getProducts(query: String) {
         startLoading(context)
+        if (!(query == searchQuery)){
+            if (rainForestList.isNotEmpty()){
+                rainForestList.clear()
+            }
+        }
+
         searchQuery = query
         val url =
-            "https://api.rainforestapi.com/request?api_key=2ADA91B95479431FAFCDEDFA36717046&type=search&amazon_domain=amazon.com&search_term=$query&page=$currentPage"
+            "https://api.rainforestapi.com/request?api_key=2ADA91B95479431FAFCDEDFA36717046&type=search&amazon_domain=amazon.com&search_term=$searchQuery&page=$currentPage"
         val stringRequest = StringRequest(
             Request.Method.GET,
             url,
@@ -557,7 +573,6 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
                         if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
                             try {
-
                                 translateText(
                                     context,
                                     tempRainForestList,
@@ -663,6 +678,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 override fun onTextTranslation(translatedText: String) {
                     tempRainForestList[i].title = translatedText
                     if (index == tempList.size - 1) {
+                        index = 0
                         listener.onSuccess("success")
                     } else {
                         index += 1

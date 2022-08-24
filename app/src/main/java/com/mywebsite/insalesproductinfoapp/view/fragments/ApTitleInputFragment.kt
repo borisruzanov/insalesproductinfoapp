@@ -420,7 +420,7 @@ class ApTitleInputFragment : Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                //apTitleView.setText(s.toString())
+                apTitleView.setText(s.toString())
                 appSettings.putString("AP_TITLE_DEFAULT_VALUE", s.toString())
                 //appSettings.putString("AP_PRODUCT_TITLE", s.toString())
             }

@@ -396,7 +396,7 @@ class ApDescriptionInputFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 apDescriptionView.setText(s.toString())
                 appSettings.putString("AP_DESCRIPTION_DEFAULT_VALUE", s.toString())
-                appSettings.putString("AP_PRODUCT_DESCRIPTION",s.toString())
+//                appSettings.putString("AP_PRODUCT_DESCRIPTION",s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {

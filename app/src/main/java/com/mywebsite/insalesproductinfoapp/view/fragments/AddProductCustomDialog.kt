@@ -932,7 +932,7 @@ class AddProductCustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                //apTitleView.setText(s.toString())
+                apTitleView.setText(s.toString())
                 appSettings.putString("AP_TITLE_DEFAULT_VALUE", s.toString())
                 //appSettings.putString("AP_PRODUCT_TITLE", s.toString())
             }
@@ -1202,7 +1202,7 @@ class AddProductCustomDialog(
             }
 
             override fun afterTextChanged(s: Editable?) {
-                //apDescriptionView.setText(s.toString())
+                apDescriptionView.setText(s.toString())
                 appSettings.putString("AP_DESCRIPTION_DEFAULT_VALUE", s.toString())
                 //appSettings.putString("AP_PRODUCT_DESCRIPTION", s.toString())
             }
