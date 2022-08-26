@@ -70,7 +70,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private lateinit var rainForestRecyclerView: RecyclerView
     private lateinit var gridLayoutManager: GridLayoutManager
     private lateinit var loadMoreBtn: MaterialButton
-    private lateinit var currentCreditsView:MaterialTextView
+    private lateinit var currentCreditsView: MaterialTextView
     private lateinit var adapter: RainForestApiAdapter
     private var rainForestList = mutableListOf<RainForestApiObject>()
     private var tempRainForestList = mutableListOf<RainForestApiObject>()
@@ -97,12 +97,13 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     var userCurrentCreditsValue: Float = 0F
     private lateinit var auth: FirebaseAuth
     private lateinit var firebaseDatabase: DatabaseReference
-    private lateinit var viewModel:RainForestViewModel
-    private var baseTranslatePricePerChar:Double = 0.0
-    private var totalTranslatePrice:Double = 0.0
-    private var overallPrice:Double = 0.0
-    private var rainForestCallPrice:Double = 0.0
-    private var percentageValue:Int = 0
+    private lateinit var viewModel: RainForestViewModel
+    private var baseTranslatePricePerChar: Double = 0.0
+    private var totalTranslatePrice: Double = 0.0
+    private var overallPrice: Double = 0.0
+    private var rainForestCallPrice: Double = 0.0
+    private var percentageValue: Int = 0
+    private var translatorStatus: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,45 +155,50 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         hideSoftKeyboard(context, searchBox)
                         searchBox.clearFocus()
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+                        if (translatorStatus == 1) {
+                            val totalCreditPrice = unitCharacterPrice * query.length
+                            val total = totalCreditPrice + pListPrice
+                            howMuchChargeCredits = total
+                            CoroutineScope(Dispatchers.IO).launch {
+                                GcpTranslator.translateFromRusToEng(
+                                    context,
+                                    query,
+                                    object : TranslationCallback {
+                                        override fun onTextTranslation(translatedText: String) {
+                                            CoroutineScope(Dispatchers.Main).launch {
+                                                if (translatedText.isNotEmpty()) {
+                                                    //showAlert(context,translatedText)
+                                                    getProducts(translatedText)
+                                                } else {
+                                                    dismiss()
+                                                    showAlert(
+                                                        context,
+                                                        getString(R.string.something_wrong_with_translator_error)
+                                                    )
+                                                }
+                                            }
 
-                        CoroutineScope(Dispatchers.IO).launch {
+                                        }
+
+                                    })
+                            }
+                        } else {
+                            getProducts(query)
+                        }
+//                        CoroutineScope(Dispatchers.IO).launch {
 //                        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
 //                        val translate = TranslateOptions.getDefaultInstance().service
 //                        val detection: Detection = translate.detect(query)
-                            val detectedLanguage = "en"//detection.language
-                            if (detectedLanguage == "en") {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    getProducts(query)
-                                }
-                            } else {
-                                val totalCreditPrice = unitCharacterPrice * query.length
-                                val total = totalCreditPrice + pListPrice
-                                howMuchChargeCredits = total
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    GcpTranslator.translateFromRusToEng(
-                                        context,
-                                        query,
-                                        object : TranslationCallback {
-                                            override fun onTextTranslation(translatedText: String) {
-                                                CoroutineScope(Dispatchers.Main).launch {
-                                                    if (translatedText.isNotEmpty()) {
-                                                        //showAlert(context,translatedText)
-                                                        getProducts(translatedText)
-                                                    } else {
-                                                        dismiss()
-                                                        showAlert(
-                                                            context,
-                                                            getString(R.string.something_wrong_with_translator_error)
-                                                        )
-                                                    }
-                                                }
+//                            val detectedLanguage = "en"//detection.language
+//                            if (detectedLanguage == "en") {
+//                                CoroutineScope(Dispatchers.Main).launch {
+//                                    getProducts(query)
+//                                }
+//                            } else {
 
-                                            }
 
-                                        })
-                                }
-                            }
-                        }
+//                            }
+//                        }
 
                     } else {
                         showAlert(context, getString(R.string.empty_text_error))
@@ -295,20 +301,23 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         toolbar.setTitleTextColor(ContextCompat.getColor(context, R.color.black))
     }
 
-    private fun calculatePrice(){
-        firebaseDatabase.child(Constants.firebasePrices).child("translator").addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                baseTranslatePricePerChar = snapshot.child("baseTranslatePricePerChar").getValue(Double::class.java) as Double
-                rainForestCallPrice = snapshot.child("rainForestCallPrice").getValue(Double::class.java) as Double
-                percentageValue = snapshot.child("percentage").getValue(Int::class.java) as Int
-                Log.d("TEST199PRICES","$baseTranslatePricePerChar:$rainForestCallPrice:$percentageValue")
-            }
+    private fun calculatePrice() {
+        firebaseDatabase.child(Constants.firebasePrices).child("translator")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    baseTranslatePricePerChar = snapshot.child("baseTranslatePricePerChar")
+                        .getValue(Double::class.java) as Double
+                    rainForestCallPrice =
+                        snapshot.child("rainForestCallPrice").getValue(Double::class.java) as Double
+                    percentageValue = snapshot.child("percentage").getValue(Int::class.java) as Int
+                    translatorStatus = snapshot.child("status").getValue(Int::class.java) as Int
+                }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("TEST199PRICES", error.message)
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("TEST199PRICES", error.message)
+                }
 
-        })
+            })
     }
 
     private fun getUserCredit() {
@@ -367,10 +376,11 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         hideSoftKeyboard(context, searchBox)
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                         currentPage = 1
-                        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                        userCurrentCredits =
+                            appSettings.getString(Constants.userCreditsValue) as String
+                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= 1.0) {
                             startSearch(barcodeId)
-                        }else{
+                        } else {
                             MaterialAlertDialogBuilder(context)
                                 .setMessage(getString(R.string.low_credites_error_message))
                                 .setCancelable(false)
@@ -408,9 +418,9 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                 currentPage = 1
 
-                if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= 1.0) {
                     startSearch(spokenText)
-                }else{
+                } else {
                     MaterialAlertDialogBuilder(context)
                         .setMessage(getString(R.string.low_credites_error_message))
                         .setCancelable(false)
@@ -468,9 +478,9 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     searchBox.clearFocus()
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                     currentPage = 1
-                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= 1.0) {
                         startSearch(query)
-                    }else{
+                    } else {
                         MaterialAlertDialogBuilder(context)
                             .setMessage(getString(R.string.low_credites_error_message))
                             .setCancelable(false)
@@ -551,50 +561,54 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
     private fun startSearch(query: String) {
 //        startLoading(context)
-        CoroutineScope(Dispatchers.IO).launch {
+//        CoroutineScope(Dispatchers.IO).launch {
 //                        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
 //                        val translate = TranslateOptions.getDefaultInstance().service
 //                        val detection: Detection = translate.detect(query)
-            val detectedLanguage = "en"//detection.language
-            if (detectedLanguage == "en") {
-                CoroutineScope(Dispatchers.Main).launch {
-                    getProducts(query)
-                }
-            } else {
-                val totalCreditPrice = unitCharacterPrice * query.length
-                val total = totalCreditPrice + pListPrice
-                howMuchChargeCredits = total
-                CoroutineScope(Dispatchers.IO).launch {
-                    GcpTranslator.translateFromRusToEng(
-                        context,
-                        query,
-                        object : TranslationCallback {
-                            override fun onTextTranslation(translatedText: String) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    if (translatedText.isNotEmpty()) {
-                                        //showAlert(context,translatedText)
-                                        getProducts(translatedText)
-                                    } else {
-                                        dismiss()
-                                        showAlert(
-                                            context,
-                                            getString(R.string.something_wrong_with_translator_error)
-                                        )
-                                    }
+//            val detectedLanguage = "en"//detection.language
+//            if (detectedLanguage == "en") {
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    getProducts(query)
+//                }
+//            } else {
+        if (translatorStatus == 1) {
+            val totalCreditPrice = unitCharacterPrice * query.length
+            val total = totalCreditPrice + pListPrice
+            howMuchChargeCredits = total
+            CoroutineScope(Dispatchers.IO).launch {
+                GcpTranslator.translateFromRusToEng(
+                    context,
+                    query,
+                    object : TranslationCallback {
+                        override fun onTextTranslation(translatedText: String) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                if (translatedText.isNotEmpty()) {
+                                    //showAlert(context,translatedText)
+                                    getProducts(translatedText)
+                                } else {
+                                    dismiss()
+                                    showAlert(
+                                        context,
+                                        getString(R.string.something_wrong_with_translator_error)
+                                    )
                                 }
-
                             }
 
-                        })
-                }
+                        }
+
+                    })
             }
+        } else {
+            getProducts(query)
         }
+//            }
+//        }
     }
 
     private fun getProducts(query: String) {
         startLoading(context)
-        if (!(query == searchQuery)){
-            if (rainForestList.isNotEmpty()){
+        if (!(query == searchQuery)) {
+            if (rainForestList.isNotEmpty()) {
                 rainForestList.clear()
             }
         }
@@ -630,52 +644,72 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                             totalCharacters += item.getString("title").length
                         }
 
-                        totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
-                        overallPrice = totalTranslatePrice + rainForestCallPrice
-                        howMuchChargeCredits = (overallPrice + (overallPrice * (percentageValue/100))).toFloat()
+                        if (translatorStatus == 1) {
+                            totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
+                            overallPrice = totalTranslatePrice + rainForestCallPrice
+                            howMuchChargeCredits =
+                                (overallPrice + (overallPrice * (percentageValue / 100))).toFloat()
 
-                        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+                            userCurrentCredits =
+                                appSettings.getString(Constants.userCreditsValue) as String
 
-                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
-                            try {
-                                translateText(
-                                    context,
-                                    tempRainForestList,
-                                    object : ResponseListener {
-                                        override fun onSuccess(result: String) {
-                                            if (result.contains("success")) {
-                                                rainForestList.addAll(
-                                                    rainForestList.size,
-                                                    tempRainForestList
-                                                )
-                                                adapter.notifyItemChanged(
-                                                    previousListIndex,
-                                                    rainForestList.size
-                                                )
-                                                tempRainForestList.clear()
-                                                dismiss()
-                                                chargeCreditsPrice()
+                            if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
+                                try {
+                                    translateText(
+                                        context,
+                                        tempRainForestList,
+                                        object : ResponseListener {
+                                            override fun onSuccess(result: String) {
+                                                if (result.contains("success")) {
+                                                    rainForestList.addAll(
+                                                        rainForestList.size,
+                                                        tempRainForestList
+                                                    )
+                                                    adapter.notifyItemChanged(
+                                                        previousListIndex,
+                                                        rainForestList.size
+                                                    )
+                                                    tempRainForestList.clear()
+                                                    dismiss()
+                                                    chargeCreditsPrice()
+                                                }
                                             }
-                                        }
 
-                                    })
+                                        })
 
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                dismiss()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    dismiss()
+                                }
+                            } else {
+                                MaterialAlertDialogBuilder(context)
+                                    .setMessage(getString(R.string.low_credites_error_message))
+                                    .setCancelable(false)
+                                    .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                                        dialog.dismiss()
+                                    }
+                                    .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                                        dialog.dismiss()
+                                        startActivity(
+                                            Intent(
+                                                context,
+                                                UserScreenActivity::class.java
+                                            )
+                                        )
+                                    }
+                                    .create().show()
                             }
                         } else {
-                            MaterialAlertDialogBuilder(context)
-                                .setMessage(getString(R.string.low_credites_error_message))
-                                .setCancelable(false)
-                                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
-                                    dialog.dismiss()
-                                }
-                                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
-                                    dialog.dismiss()
-                                    startActivity(Intent(context, UserScreenActivity::class.java))
-                                }
-                                .create().show()
+                            rainForestList.addAll(
+                                rainForestList.size,
+                                tempRainForestList
+                            )
+                            adapter.notifyItemChanged(
+                                previousListIndex,
+                                rainForestList.size
+                            )
+                            tempRainForestList.clear()
+                            dismiss()
                         }
 
                     } else {
@@ -807,50 +841,52 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     val totalCharacters = title.length + description.length
 //                    val totalCreditPrice = unitCharacterPrice * totalCharacters
 //                    howMuchChargeCredits = totalCreditPrice
-                    totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
-                    overallPrice = totalTranslatePrice + rainForestCallPrice
-                    howMuchChargeCredits = (overallPrice + (overallPrice * (percentageValue/100))).toFloat()
+                    if (translatorStatus == 1) {
+                        totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
+                        overallPrice = totalTranslatePrice + rainForestCallPrice
+                        howMuchChargeCredits =
+                            (overallPrice + (overallPrice * (percentageValue / 100))).toFloat()
 
-                    userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
-                        GcpTranslator.translateFromEngToRus(
-                            context,
-                            title,
-                            object : TranslationCallback {
-                                override fun onTextTranslation(translatedText: String) {
-                                    if (translatedText.isNotEmpty()) {
-                                        title = translatedText
-                                    }
-                                    if (description.isNotEmpty()) {
-                                        GcpTranslator.translateFromEngToRus(
-                                            context,
-                                            description,
-                                            object : TranslationCallback {
-                                                override fun onTextTranslation(translatedText: String) {
-                                                    if (translatedText.isNotEmpty()) {
-                                                        description = translatedText
+                        userCurrentCredits =
+                            appSettings.getString(Constants.userCreditsValue) as String
+                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
+                            GcpTranslator.translateFromEngToRus(
+                                context,
+                                title,
+                                object : TranslationCallback {
+                                    override fun onTextTranslation(translatedText: String) {
+                                        if (translatedText.isNotEmpty()) {
+                                            title = translatedText
+                                        }
+                                        if (description.isNotEmpty()) {
+                                            GcpTranslator.translateFromEngToRus(
+                                                context,
+                                                description,
+                                                object : TranslationCallback {
+                                                    override fun onTextTranslation(translatedText: String) {
+                                                        if (translatedText.isNotEmpty()) {
+                                                            description = translatedText
+                                                        }
+                                                        dismiss()
+                                                        CustomDialog(
+                                                            title,
+                                                            description,
+                                                            imageList
+                                                        ).show(supportFragmentManager, "dialog")
                                                     }
-                                                    dismiss()
-                                                    CustomDialog(
-                                                        title,
-                                                        description,
-                                                        imageList
-                                                    ).show(supportFragmentManager, "dialog")
-                                                }
 
-                                            })
+                                                })
+                                        } else {
+                                            dismiss()
+                                            CustomDialog(
+                                                title,
+                                                description,
+                                                imageList
+                                            ).show(supportFragmentManager, "dialog")
+                                        }
                                     }
-                                    else{
-                                        dismiss()
-                                        CustomDialog(
-                                            title,
-                                            description,
-                                            imageList
-                                        ).show(supportFragmentManager, "dialog")
-                                    }
-                                }
 
-                            })
+                                })
 
 //                        initSelectebleWord(titleTextView.text.toString(), titleTextView)
 //                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
@@ -874,9 +910,15 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 //                            .addOnFailureListener {
 //
 //                            }
-                        chargeCreditsPrice()
-                    }
-                    else {
+                            chargeCreditsPrice()
+                        } else {
+                            CustomDialog(
+                                title,
+                                description,
+                                imageList
+                            ).show(supportFragmentManager, "dialog")
+                        }
+                    } else {
                         dismiss()
                         MaterialAlertDialogBuilder(context)
                             .setMessage(getString(R.string.low_credites_error_message))
@@ -1222,33 +1264,33 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 //                    object : TranslationCallback {
 //                        override fun onTextTranslation(translatedText: String) {
 //                            if (translatedText.isNotEmpty()) {
-                                titleTextView.text = title
+            titleTextView.text = title
 
-                                val textList = title.split(" ")
+            val textList = title.split(" ")
 
-                                titleTextViewList.clear()
-                                for (i in 0 until textList.size) {
-                                    val params = FlowLayout.LayoutParams(
-                                        FlowLayout.LayoutParams.WRAP_CONTENT,
-                                        FlowLayout.LayoutParams.WRAP_CONTENT
-                                    )
-                                    params.setMargins(5, 5, 5, 5)
-                                    val textView = MaterialTextView(requireActivity())
-                                    textView.layoutParams = params
-                                    textView.text = textList[i]
-                                    textView.tag = "title"
-                                    textView.id = i
-                                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                                    textView.setTextColor(
-                                        ContextCompat.getColor(
-                                            requireActivity(),
-                                            R.color.black
-                                        )
-                                    )
-                                    titleTextViewList.add(textView)
-                                    textView.setOnClickListener(this@CustomDialog)
-                                    dynamicTitleTextViewWrapper.addView(textView)
-                                }
+            titleTextViewList.clear()
+            for (i in 0 until textList.size) {
+                val params = FlowLayout.LayoutParams(
+                    FlowLayout.LayoutParams.WRAP_CONTENT,
+                    FlowLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(5, 5, 5, 5)
+                val textView = MaterialTextView(requireActivity())
+                textView.layoutParams = params
+                textView.text = textList[i]
+                textView.tag = "title"
+                textView.id = i
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                textView.setTextColor(
+                    ContextCompat.getColor(
+                        requireActivity(),
+                        R.color.black
+                    )
+                )
+                titleTextViewList.add(textView)
+                textView.setOnClickListener(this@CustomDialog)
+                dynamicTitleTextViewWrapper.addView(textView)
+            }
 //
 //
 //                            } else {
@@ -1262,48 +1304,19 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 ////                        titleTextView.setOnTouchListener(LinkMovementMethodOverride())
 //
 //
-                if (description.isNotEmpty()) {
+            if (description.isNotEmpty()) {
 //                    GcpTranslator.translateFromEngToRus(
 //                        requireActivity(),
 //                        description,
 //                        object : TranslationCallback {
 //                            override fun onTextTranslation(translatedText: String) {
 //                                if (translatedText.isNotEmpty()) {
-                                    descriptionTextView.text = description
+                descriptionTextView.text = description
 
-                                    val textList1 = description.split(" ")
+                val textList1 = description.split(" ")
 
-                                    descriptionTextViewList.clear()
-                                    for (i in 0 until textList1.size) {
-                                        val params = FlowLayout.LayoutParams(
-                                            FlowLayout.LayoutParams.WRAP_CONTENT,
-                                            FlowLayout.LayoutParams.WRAP_CONTENT
-                                        )
-                                        params.setMargins(5, 5, 5, 5)
-                                        val textView = MaterialTextView(requireActivity())
-                                        textView.layoutParams = params
-                                        textView.text = textList1[i]
-                                        textView.tag = "title"
-                                        textView.id = i
-                                        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
-                                        textView.setTextColor(
-                                            ContextCompat.getColor(
-                                                requireActivity(),
-                                                R.color.black
-                                            )
-                                        )
-                                        descriptionTextViewList.add(textView)
-                                        textView.setOnClickListener(this@CustomDialog)
-                                        dynamicDescriptionTextViewWrapper.addView(textView)
-                                    }
-
-//                                } else {
-//                                    descriptionTextView.text = ""
-//                                }
-//                            }
-//
-//                        })
-                } else {
+                descriptionTextViewList.clear()
+                for (i in 0 until textList1.size) {
                     val params = FlowLayout.LayoutParams(
                         FlowLayout.LayoutParams.WRAP_CONTENT,
                         FlowLayout.LayoutParams.WRAP_CONTENT
@@ -1311,11 +1324,40 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     params.setMargins(5, 5, 5, 5)
                     val textView = MaterialTextView(requireActivity())
                     textView.layoutParams = params
-                    textView.text = getString(R.string.nothing_show_text)
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-                    textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.red))
+                    textView.text = textList1[i]
+                    textView.tag = "title"
+                    textView.id = i
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+                    textView.setTextColor(
+                        ContextCompat.getColor(
+                            requireActivity(),
+                            R.color.black
+                        )
+                    )
+                    descriptionTextViewList.add(textView)
+                    textView.setOnClickListener(this@CustomDialog)
                     dynamicDescriptionTextViewWrapper.addView(textView)
                 }
+
+//                                } else {
+//                                    descriptionTextView.text = ""
+//                                }
+//                            }
+//
+//                        })
+            } else {
+                val params = FlowLayout.LayoutParams(
+                    FlowLayout.LayoutParams.WRAP_CONTENT,
+                    FlowLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(5, 5, 5, 5)
+                val textView = MaterialTextView(requireActivity())
+                textView.layoutParams = params
+                textView.text = getString(R.string.nothing_show_text)
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                textView.setTextColor(ContextCompat.getColor(requireActivity(), R.color.red))
+                dynamicDescriptionTextViewWrapper.addView(textView)
+            }
 ////                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
 ////                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
 //                val firebaseDatabase = FirebaseDatabase.getInstance().reference
