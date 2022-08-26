@@ -98,6 +98,11 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     private lateinit var auth: FirebaseAuth
     private lateinit var firebaseDatabase: DatabaseReference
     private lateinit var viewModel:RainForestViewModel
+    private var baseTranslatePricePerChar:Double = 0.0
+    private var totalTranslatePrice:Double = 0.0
+    private var overallPrice:Double = 0.0
+    private var rainForestCallPrice:Double = 0.0
+    private var percentageValue:Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,6 +112,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         initViews()
         setUpToolbar()
         getUserCredit()
+        calculatePrice()
     }
 
     private fun initViews() {
@@ -289,6 +295,21 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
         toolbar.setTitleTextColor(ContextCompat.getColor(context, R.color.black))
     }
 
+    private fun calculatePrice(){
+        firebaseDatabase.child(Constants.firebasePrices).child("translator").addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                baseTranslatePricePerChar = snapshot.child("baseTranslatePricePerChar").getValue(Double::class.java) as Double
+                rainForestCallPrice = snapshot.child("rainForestCallPrice").getValue(Double::class.java) as Double
+                percentageValue = snapshot.child("percentage").getValue(Int::class.java) as Int
+                Log.d("TEST199PRICES","$baseTranslatePricePerChar:$rainForestCallPrice:$percentageValue")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("TEST199PRICES", error.message)
+            }
+
+        })
+    }
 
     private fun getUserCredit() {
         if (auth.currentUser != null) {
@@ -346,7 +367,22 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                         hideSoftKeyboard(context, searchBox)
                         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                         currentPage = 1
-                        startSearch(barcodeId)
+                        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
+                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                            startSearch(barcodeId)
+                        }else{
+                            MaterialAlertDialogBuilder(context)
+                                .setMessage(getString(R.string.low_credites_error_message))
+                                .setCancelable(false)
+                                .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                                    dialog.dismiss()
+                                }
+                                .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                                    dialog.dismiss()
+                                    startActivity(Intent(context, UserScreenActivity::class.java))
+                                }
+                                .create().show()
+                        }
                     }
                 }
 
@@ -371,7 +407,22 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                 hideSoftKeyboard(context, searchBox)
                 window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                 currentPage = 1
-                startSearch(spokenText)
+
+                if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                    startSearch(spokenText)
+                }else{
+                    MaterialAlertDialogBuilder(context)
+                        .setMessage(getString(R.string.low_credites_error_message))
+                        .setCancelable(false)
+                        .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                            dialog.dismiss()
+                            startActivity(Intent(context, UserScreenActivity::class.java))
+                        }
+                        .create().show()
+                }
             }
         }
 
@@ -417,7 +468,22 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                     searchBox.clearFocus()
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
                     currentPage = 1
-                    startSearch(query)
+                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >=1.0) {
+                        startSearch(query)
+                    }else{
+                        MaterialAlertDialogBuilder(context)
+                            .setMessage(getString(R.string.low_credites_error_message))
+                            .setCancelable(false)
+                            .setNegativeButton(getString(R.string.no_text)) { dialog, which ->
+                                dialog.dismiss()
+                            }
+                            .setPositiveButton(getString(R.string.buy_credits)) { dialog, which ->
+                                dialog.dismiss()
+                                startActivity(Intent(context, UserScreenActivity::class.java))
+                            }
+                            .create().show()
+                    }
+
                 } else {
                     showAlert(context, getString(R.string.empty_text_error))
                 }
@@ -564,14 +630,13 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                             totalCharacters += item.getString("title").length
                         }
 
-                        val totalCreditPrice = unitCharacterPrice * totalCharacters
-                        howMuchChargeCredits = totalCreditPrice
-                        Log.d("TEST199LISTSIZE", "${tempRainForestList.size}:$previousListIndex")
+                        totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
+                        overallPrice = totalTranslatePrice + rainForestCallPrice
+                        howMuchChargeCredits = (overallPrice + (overallPrice * (percentageValue/100))).toFloat()
 
-                        userCurrentCredits =
-                            appSettings.getString(Constants.userCreditsValue) as String
+                        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 
-                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+                        if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
                             try {
                                 translateText(
                                     context,
@@ -740,10 +805,14 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
 
                     val totalCharacters = title.length + description.length
-                    val totalCreditPrice = unitCharacterPrice * totalCharacters
-                    howMuchChargeCredits = totalCreditPrice
+//                    val totalCreditPrice = unitCharacterPrice * totalCharacters
+//                    howMuchChargeCredits = totalCreditPrice
+                    totalTranslatePrice = baseTranslatePricePerChar * totalCharacters
+                    overallPrice = totalTranslatePrice + rainForestCallPrice
+                    howMuchChargeCredits = (overallPrice + (overallPrice * (percentageValue/100))).toFloat()
+
                     userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
-                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= totalCreditPrice) {
+                    if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= howMuchChargeCredits) {
                         GcpTranslator.translateFromEngToRus(
                             context,
                             title,
@@ -788,23 +857,24 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
 
 //                        initSelectebleWord(descriptionTextView.text.toString(), descriptionTextView)
 //                        descriptionTextView.setOnTouchListener(LinkMovementMethodOverride())
-                        val firebaseDatabase = FirebaseDatabase.getInstance().reference
-                        val hashMap = HashMap<String, Any>()
-                        val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
-                        userCurrentCredits = remaining.toString()
-                        hashMap["credits"] = userCurrentCredits
-                        firebaseDatabase.child(Constants.firebaseUserCredits)
-                            .child(Constants.firebaseUserId)
-                            .updateChildren(hashMap)
-                            .addOnSuccessListener {
-                                howMuchChargeCredits = 0F
-                                getUserCredits(
-                                    context
-                                )
-                            }
-                            .addOnFailureListener {
-
-                            }
+//                        val firebaseDatabase = FirebaseDatabase.getInstance().reference
+//                        val hashMap = HashMap<String, Any>()
+//                        val remaining = userCurrentCredits.toFloat() - howMuchChargeCredits
+//                        userCurrentCredits = remaining.toString()
+//                        hashMap["credits"] = userCurrentCredits
+//                        firebaseDatabase.child(Constants.firebaseUserCredits)
+//                            .child(Constants.firebaseUserId)
+//                            .updateChildren(hashMap)
+//                            .addOnSuccessListener {
+//                                howMuchChargeCredits = 0F
+//                                getUserCredits(
+//                                    context
+//                                )
+//                            }
+//                            .addOnFailureListener {
+//
+//                            }
+                        chargeCreditsPrice()
                     }
                     else {
                         dismiss()
