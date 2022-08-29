@@ -13,6 +13,7 @@ import com.google.android.material.button.MaterialButton
 import com.mywebsite.insalesproductinfoapp.R
 import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductAddImageDesignBinding
 import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductImagesItemRowDesignBinding
+import com.squareup.picasso.Picasso
 
 class ProductImagesAdapter(private val context: Context, private val productImagesList: ArrayList<ProductImages>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -33,11 +34,12 @@ class ProductImagesAdapter(private val context: Context, private val productImag
 
         fun bindData(item:ProductImages,context: Context,position: Int){
 
-            Glide.with(context)
-                .load(item.imageUrl)
-                .thumbnail(Glide.with(context).load(R.drawable.loader))
-                .fitCenter()
-                .into(binding.insalesProductImageView)
+//            Glide.with(context)
+//                .load(item.imageUrl)
+//                .thumbnail(Glide.with(context).load(R.drawable.loader))
+//                .fitCenter()
+//                .into(binding.insalesProductImageView)
+                Picasso.get().load(item.imageUrl).placeholder(R.drawable.loader).fit().centerInside().into(binding.insalesProductImageView)
 
             binding.insalesProductImageView.setOnClickListener {
                 mListener.onItemClick(position)

@@ -19,6 +19,7 @@ import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductsItemRowDes
 import com.mywebsite.insalesproductinfoapp.databinding.InsalesProductsItemRowMinimalDesignBinding
 import com.mywebsite.insalesproductinfoapp.model.Product
 import com.mywebsite.insalesproductinfoapp.utils.WrapContentLinearLayoutManager
+import com.squareup.picasso.Picasso
 import net.expandable.ExpandableTextView
 
 class InSalesProductsAdapter(
@@ -76,8 +77,9 @@ class InSalesProductsAdapter(
 
         fun bindData(item: Product, context: Context, position: Int) {
             if (item.productImages!!.size > 0) {
-                Glide.with(context).load(item.productImages!![0].imageUrl)
-                    .into(binding.insalesPItemImageView)
+//                Glide.with(context).load(item.productImages!![0].imageUrl)
+//                    .into(binding.insalesPItemImageView)
+                Picasso.get().load(item.productImages!![0].imageUrl).fit().centerInside().into(binding.insalesPItemImageView)
             }
 
             if (item.sku.isEmpty()) {
@@ -278,6 +280,7 @@ class InSalesProductsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bindData(item: Product, context: Context, position: Int) {
+
             if (item.sku.isEmpty()) {
                 binding.skuBarcodeTextview.text = "Sku/Barcode: None"
             } else {

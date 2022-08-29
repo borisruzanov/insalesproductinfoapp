@@ -775,7 +775,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
             text,
             object : TranslationCallback {
                 override fun onTextTranslation(translatedText: String) {
-                    tempRainForestList[i].title = translatedText
+                    tempRainForestList[index].title = translatedText
                     if (index == tempList.size - 1) {
                         index = 0
                         listener.onSuccess("success")
