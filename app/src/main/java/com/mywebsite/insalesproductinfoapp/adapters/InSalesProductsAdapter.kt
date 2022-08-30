@@ -77,9 +77,9 @@ class InSalesProductsAdapter(
 
         fun bindData(item: Product, context: Context, position: Int) {
             if (item.productImages!!.size > 0) {
-//                Glide.with(context).load(item.productImages!![0].imageUrl)
-//                    .into(binding.insalesPItemImageView)
-                Picasso.get().load(item.productImages!![0].imageUrl).fit().centerInside().into(binding.insalesPItemImageView)
+                Glide.with(context).load(item.productImages!![0].imageUrl)
+                    .into(binding.insalesPItemImageView)
+//                Picasso.get().load(item.productImages!![0].imageUrl).fit().centerInside().into(binding.insalesPItemImageView)
             }
 
             if (item.sku.isEmpty()) {
