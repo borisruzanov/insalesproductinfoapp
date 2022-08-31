@@ -93,15 +93,15 @@ class ApTitleInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-//        if (position == 1){
-//            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
-//            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
-//        }
-//        else{
-//            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
-//            apTitleView.setSelection(apTitleView.text.toString().length)
-//        }
+        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+        if (position == 1){
+            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
+            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
+        }
+        else{
+            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+            apTitleView.setSelection(apTitleView.text.toString().length)
+        }
 //
 //        if (position == 0 || position == 1){
 ////           Handler(Looper.myLooper()!!).postDelayed(Runnable {
@@ -135,12 +135,23 @@ class ApTitleInputFragment : Fragment() {
 
     private fun renderView(){
         val apTitleSpinnerSelectedPosition = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-                if (apTitleSpinnerSelectedPosition == 0 || apTitleSpinnerSelectedPosition == 1){
-//           Handler(Looper.myLooper()!!).postDelayed(Runnable {
-                    apTitleView.setSelection(apTitleView.text.toString().length)
-               BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)
-//           }, 1000)
+        if (apTitleSpinnerSelectedPosition == 1){
+            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
+            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
         }
+        else{
+            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+            apTitleView.setSelection(apTitleView.text.toString().length)
+        }
+//                if (apTitleSpinnerSelectedPosition == 0 || apTitleSpinnerSelectedPosition == 1){
+////           Handler(Looper.myLooper()!!).postDelayed(Runnable {
+//                    apTitleView.setSelection(apTitleView.text.toString().length)
+               BaseActivity.showSoftKeyboard(requireActivity(), apTitleView)
+////           }, 1000)
+//        }
+//        else{
+//
+//        }
         val apTitleDefaultValue = appSettings.getString("AP_TITLE_DEFAULT_VALUE")
         val apTitleListId = appSettings.getInt("AP_TITLE_LIST_ID")
         val apTitleActiveListName = appSettings.getString("AP_TITLE_LIST_NAME")
