@@ -287,14 +287,14 @@ class ApDescriptionInputFragment : Fragment() {
 //                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
 ////            },1000)
 //        }
-        if (apDescriptionSpinnerSelectedPosition == 1) {
-            apDescriptionDefaultInputBox.setText(appSettings.getString("AP_DESCRIPTION_DEFAULT_VALUE"))
-            apDescriptionDefaultInputBox.setSelection(apDescriptionDefaultInputBox.text.toString().length)
-
-        } else {
+//        if (apDescriptionSpinnerSelectedPosition == 1) {
+//            apDescriptionDefaultInputBox.setText(appSettings.getString("AP_DESCRIPTION_DEFAULT_VALUE"))
+//            apDescriptionDefaultInputBox.setSelection(apDescriptionDefaultInputBox.text.toString().length)
+//
+//        } else {
             apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
             apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-        }
+//        }
         BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
 
         val apDescriptionDefaultValue = appSettings.getString("AP_DESCRIPTION_DEFAULT_VALUE")
@@ -313,19 +313,28 @@ class ApDescriptionInputFragment : Fragment() {
         }
         when (apDescriptionSpinnerSelectedPosition) {
             1 -> {
-                apDescriptionVoiceRecView.visibility = View.GONE
-                apDescriptionCameraRecView.visibility = View.GONE
-                apDescriptionImageRecView.visibility = View.GONE
+//                apDescriptionVoiceRecView.visibility = View.GONE
+//                apDescriptionCameraRecView.visibility = View.GONE
+//                apDescriptionImageRecView.visibility = View.GONE
+//                apDescriptionListBtn.visibility = View.GONE
+//                apDescriptionActiveListNameView.visibility = View.GONE
+//                apDescriptionListSpinner.visibility = View.GONE
+//                apDescriptionDefaultValueMessage.visibility = View.VISIBLE
+//                apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+//                apDescriptionViewWrapper.visibility = View.VISIBLE
+//                apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
+//                apDescriptionView.setText(apDescriptionDefaultValue)
+//                apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+//                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
                 apDescriptionListBtn.visibility = View.GONE
                 apDescriptionActiveListNameView.visibility = View.GONE
                 apDescriptionListSpinner.visibility = View.GONE
-                apDescriptionDefaultValueMessage.visibility = View.VISIBLE
-                apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionDefaultValueMessage.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
                 apDescriptionViewWrapper.visibility = View.VISIBLE
-                apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
-                apDescriptionView.setText(apDescriptionDefaultValue)
-                apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-//                BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
+                apDescriptionVoiceRecView.visibility = View.VISIBLE
             }
             2 -> {
                 apDescriptionVoiceRecView.visibility = View.GONE
@@ -463,19 +472,29 @@ class ApDescriptionInputFragment : Fragment() {
                 appSettings.putInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION", position)
                 when (position) {
                     1 -> {
-                        apDescriptionVoiceRecView.visibility = View.GONE
-                        apDescriptionCameraRecView.visibility = View.GONE
-                        apDescriptionImageRecView.visibility = View.GONE
+//                        apDescriptionVoiceRecView.visibility = View.GONE
+//                        apDescriptionCameraRecView.visibility = View.GONE
+//                        apDescriptionImageRecView.visibility = View.GONE
+//                        apDescriptionListBtn.visibility = View.GONE
+//                        apDescriptionActiveListNameView.visibility = View.GONE
+//                        apDescriptionListSpinner.visibility = View.GONE
+//                        apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+//                        apDescriptionDefaultValueMessage.visibility = View.VISIBLE
+//                        apDescriptionViewWrapper.visibility = View.VISIBLE
+//                        apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
+//                        apDescriptionView.setText(apDescriptionDefaultValue)
+//                        apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+//                        BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
+
                         apDescriptionListBtn.visibility = View.GONE
                         apDescriptionActiveListNameView.visibility = View.GONE
                         apDescriptionListSpinner.visibility = View.GONE
-                        apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
-                        apDescriptionDefaultValueMessage.visibility = View.VISIBLE
+                        apDescriptionDefaultInputWrapper.visibility = View.GONE
+                        apDescriptionDefaultValueMessage.visibility = View.GONE
+                        apDescriptionCameraRecView.visibility = View.GONE
+                        apDescriptionImageRecView.visibility = View.GONE
                         apDescriptionViewWrapper.visibility = View.VISIBLE
-                        apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
-                        apDescriptionView.setText(apDescriptionDefaultValue)
-                        apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-//                        BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionDefaultInputBox)
+                        apDescriptionVoiceRecView.visibility = View.VISIBLE
                     }
                     2 -> {
                         apDescriptionVoiceRecView.visibility = View.GONE
@@ -765,11 +784,10 @@ class ApDescriptionInputFragment : Fragment() {
                 stringBuilder.append(currentPItemTitle)
                 spokenText = spokenText.capitalized()
                 stringBuilder.append("$spokenText. ")
+                appSettings.putString("AP_PRODUCT_DESCRIPTION", stringBuilder.toString())
                 apDescriptionView.setText(stringBuilder.toString())
                 apDescriptionView.setSelection(apDescriptionView.text.toString().length)
                 apDescriptionView.requestFocus()
-
-                appSettings.putString("AP_PRODUCT_DESCRIPTION", apDescriptionView.text.toString())
                 //BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
 
             }

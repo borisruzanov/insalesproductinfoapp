@@ -603,8 +603,8 @@
 
     <string-array name="add_product_options">
         <item>Default</item>
-        <item>Non Changeable</item>
-        <item>List of Values</item>
+<!--        <item>Non Changeable</item>-->
+<!--        <item>List of Values</item>-->
         <item>Voice Recognition</item>
         <!--        <item>Camera Recognition</item>-->
         <!--        <item>Image Recognition</item>-->
@@ -614,5 +614,6 @@
         <item>Default</item>
         <item>Non Changeable</item>
         <item>List of Values</item>
+        <item>Voice Recognition</item>
     </string-array>
 </resources>

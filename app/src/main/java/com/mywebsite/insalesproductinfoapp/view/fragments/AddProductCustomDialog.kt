@@ -91,8 +91,10 @@ class AddProductCustomDialog(
     private lateinit var apAddDescriptionView: MaterialTextView
     private lateinit var apPriceDefaultInputWrapper: TextInputLayout
     private lateinit var apPriceViewWrapper: TextInputLayout
+    private lateinit var apPriceVoiceRecView: LinearLayout
     private lateinit var apQuantityDefaultInputWrapper: TextInputLayout
     private lateinit var apQuantityViewWrapper: TextInputLayout
+    private lateinit var apQuantityVoiceRecView: LinearLayout
     private lateinit var apTestDataView: MaterialTextView
     private lateinit var tableGenerator: TableGenerator
     private lateinit var internetImageRecyclerView: RecyclerView
@@ -275,6 +277,8 @@ class AddProductCustomDialog(
         apDescriptionDefaultInputWrapper =
             view.findViewById<TextInputLayout>(R.id.ap_description_non_changeable_default_text_input_wrapper)
         apQuantityViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_quantity_wrapper)
+        apQuantityVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_quantity_voice_layout)
+        apPriceVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_price_voice_layout)
         apQuantityDefaultInputWrapper =
             view.findViewById<TextInputLayout>(R.id.ap_quantity_non_changeable_default_text_input_wrapper)
         apPriceViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_price_wrapper)
@@ -822,16 +826,25 @@ class AddProductCustomDialog(
         when (apTitleSpinnerSelectedPosition)
         {
             1 -> {
-                apTitleVoiceRecView.visibility = View.GONE
-                apTitleCameraRecView.visibility = View.GONE
-                apTitleImageRecView.visibility = View.GONE
+//                apTitleVoiceRecView.visibility = View.GONE
+//                apTitleCameraRecView.visibility = View.GONE
+//                apTitleImageRecView.visibility = View.GONE
+//                apTitleListBtn.visibility = View.GONE
+//                apTitleActiveListNameView.visibility = View.GONE
+//                apTitleListSpinner.visibility = View.GONE
+//                apTitleDefaultInputWrapper.visibility = View.VISIBLE
+//                apTitleViewWrapper.visibility = View.VISIBLE
+//                apTitleDefaultInputBox.setText(apTitleDefaultValue)
+//                apTitleView.setText(apTitleDefaultValue)
+
                 apTitleListBtn.visibility = View.GONE
                 apTitleActiveListNameView.visibility = View.GONE
                 apTitleListSpinner.visibility = View.GONE
-                apTitleDefaultInputWrapper.visibility = View.VISIBLE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
                 apTitleViewWrapper.visibility = View.VISIBLE
-                apTitleDefaultInputBox.setText(apTitleDefaultValue)
-                apTitleView.setText(apTitleDefaultValue)
+                apTitleVoiceRecView.visibility = View.VISIBLE
             }
             2 -> {
                 apTitleVoiceRecView.visibility = View.GONE
@@ -949,21 +962,32 @@ class AddProductCustomDialog(
                 appSettings.putInt("AP_TITLE_SPINNER_SELECTED_POSITION", position)
 
                 if (position == 1) {
-                    apTitleVoiceRecView.visibility = View.GONE
-                    apTitleCameraRecView.visibility = View.GONE
-                    apTitleImageRecView.visibility = View.GONE
+//                    apTitleVoiceRecView.visibility = View.GONE
+//                    apTitleCameraRecView.visibility = View.GONE
+//                    apTitleImageRecView.visibility = View.GONE
+//                    apTitleListBtn.visibility = View.GONE
+//                    apTitleActiveListNameView.visibility = View.GONE
+//                    apTitleListSpinner.visibility = View.GONE
+//                    apTitleDefaultInputWrapper.visibility = View.VISIBLE
+//                    apTitleViewWrapper.visibility = View.VISIBLE
+//                    if (apTitleDefaultValue!!.isNotEmpty()) {
+//                        apTitleDefaultInputBox.setText(apTitleDefaultValue)
+//                        apTitleView.setText(apTitleDefaultValue)
+//                    } else {
+//                        apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+//                        apTitleView.setSelection(apTitleView.text.toString().length)
+//                    }
+
                     apTitleListBtn.visibility = View.GONE
                     apTitleActiveListNameView.visibility = View.GONE
                     apTitleListSpinner.visibility = View.GONE
-                    apTitleDefaultInputWrapper.visibility = View.VISIBLE
+                    apTitleDefaultInputWrapper.visibility = View.GONE
+                    apTitleCameraRecView.visibility = View.GONE
+                    apTitleImageRecView.visibility = View.GONE
                     apTitleViewWrapper.visibility = View.VISIBLE
-                    if (apTitleDefaultValue!!.isNotEmpty()) {
-                        apTitleDefaultInputBox.setText(apTitleDefaultValue)
-                        apTitleView.setText(apTitleDefaultValue)
-                    } else {
-                        apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
-                        apTitleView.setSelection(apTitleView.text.toString().length)
-                    }
+                    apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+                    apTitleView.setSelection(apTitleView.text.toString().length)
+                    apTitleVoiceRecView.visibility = View.VISIBLE
                 } else if (position == 2) {
                     apTitleVoiceRecView.visibility = View.GONE
                     apTitleCameraRecView.visibility = View.GONE
@@ -1094,16 +1118,25 @@ class AddProductCustomDialog(
         }
         when (apDescriptionSpinnerSelectedPosition) {
             1 -> {
-                apDescriptionVoiceRecView.visibility = View.GONE
-                apDescriptionCameraRecView.visibility = View.GONE
-                apDescriptionImageRecView.visibility = View.GONE
+//                apDescriptionVoiceRecView.visibility = View.GONE
+//                apDescriptionCameraRecView.visibility = View.GONE
+//                apDescriptionImageRecView.visibility = View.GONE
+//                apDescriptionListBtn.visibility = View.GONE
+//                apDescriptionActiveListNameView.visibility = View.GONE
+//                apDescriptionListSpinner.visibility = View.GONE
+//                apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+//                apDescriptionViewWrapper.visibility = View.VISIBLE
+//                apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
+//                apDescriptionView.setText(apDescriptionDefaultValue)
+
                 apDescriptionListBtn.visibility = View.GONE
                 apDescriptionActiveListNameView.visibility = View.GONE
                 apDescriptionListSpinner.visibility = View.GONE
-                apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+                apDescriptionDefaultInputWrapper.visibility = View.GONE
+                apDescriptionCameraRecView.visibility = View.GONE
+                apDescriptionImageRecView.visibility = View.GONE
                 apDescriptionViewWrapper.visibility = View.VISIBLE
-                apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
-                apDescriptionView.setText(apDescriptionDefaultValue)
+                apDescriptionVoiceRecView.visibility = View.VISIBLE
             }
             2 -> {
                 apDescriptionVoiceRecView.visibility = View.GONE
@@ -1219,21 +1252,32 @@ class AddProductCustomDialog(
                 ) {
                     appSettings.putInt("AP_DESCRIPTION_SPINNER_SELECTED_POSITION", position)
                     if (position == 1) {
-                        apDescriptionVoiceRecView.visibility = View.GONE
-                        apDescriptionCameraRecView.visibility = View.GONE
-                        apDescriptionImageRecView.visibility = View.GONE
+//                        apDescriptionVoiceRecView.visibility = View.GONE
+//                        apDescriptionCameraRecView.visibility = View.GONE
+//                        apDescriptionImageRecView.visibility = View.GONE
+//                        apDescriptionListBtn.visibility = View.GONE
+//                        apDescriptionActiveListNameView.visibility = View.GONE
+//                        apDescriptionListSpinner.visibility = View.GONE
+//                        apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+//                        apDescriptionViewWrapper.visibility = View.VISIBLE
+//                        if (apDescriptionDefaultValue!!.isNotEmpty()) {
+//                            apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
+//                            apDescriptionView.setText(apDescriptionDefaultValue)
+//                        } else {
+//                            apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
+//                            apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+//                        }
+
                         apDescriptionListBtn.visibility = View.GONE
                         apDescriptionActiveListNameView.visibility = View.GONE
                         apDescriptionListSpinner.visibility = View.GONE
-                        apDescriptionDefaultInputWrapper.visibility = View.VISIBLE
+                        apDescriptionDefaultInputWrapper.visibility = View.GONE
+                        apDescriptionCameraRecView.visibility = View.GONE
+                        apDescriptionImageRecView.visibility = View.GONE
                         apDescriptionViewWrapper.visibility = View.VISIBLE
-                        if (apDescriptionDefaultValue!!.isNotEmpty()) {
-                            apDescriptionDefaultInputBox.setText(apDescriptionDefaultValue)
-                            apDescriptionView.setText(apDescriptionDefaultValue)
-                        } else {
-                            apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
-                            apDescriptionView.setSelection(apDescriptionView.text.toString().length)
-                        }
+                        apDescriptionView.setText(appSettings.getString("AP_PRODUCT_DESCRIPTION"))
+                        apDescriptionView.setSelection(apDescriptionView.text.toString().length)
+                        apDescriptionVoiceRecView.visibility = View.VISIBLE
                     } else if (position == 2) {
                         apDescriptionVoiceRecView.visibility = View.GONE
                         apDescriptionCameraRecView.visibility = View.GONE
@@ -1362,12 +1406,64 @@ class AddProductCustomDialog(
         apQuantityListBtn.setOnClickListener {
             openListWithFieldsDialog("ap_quantity")
         }
+
+
+        apQuantityVoiceRecView.setOnClickListener {
+            Constants.CIVType = "ap_quantity"
+            voiceLanguageCode = appSettings.getString("VOICE_LANGUAGE_CODE") as String
+            val voiceLayout = LayoutInflater.from(requireActivity()).inflate(R.layout.voice_language_setting_layout, null)
+            val voiceLanguageSpinner = voiceLayout.findViewById<AppCompatSpinner>(R.id.voice_language_spinner)
+            val voiceLanguageSaveBtn = voiceLayout.findViewById<MaterialButton>(R.id.voice_language_save_btn)
+
+            if (voiceLanguageCode == "en" || voiceLanguageCode.isEmpty()) {
+                voiceLanguageSpinner.setSelection(0, false)
+            } else {
+                voiceLanguageSpinner.setSelection(1, false)
+            }
+
+            voiceLanguageSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
+                        appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
+
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    }
+
+                }
+            val builder = MaterialAlertDialogBuilder(requireActivity())
+            builder.setView(voiceLayout)
+            val alert = builder.create();
+            alert.show()
+            voiceLanguageSaveBtn.setOnClickListener {
+                alert.dismiss()
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode)
+
+                }
+                voiceResultLauncher.launch(intent)
+            }
+        }
+
         if (apQuantitySpinnerSelectedPosition == 1) {
             apQuantityListSpinner.visibility = View.GONE
             apQuantityListBtn.visibility = View.GONE
             apQuantityActiveListNameView.visibility = View.GONE
             apQuantityDefaultInputWrapper.visibility = View.VISIBLE
             apQuantityViewWrapper.visibility = View.VISIBLE
+            apQuantityVoiceRecView.visibility = View.GONE
             if (apQuantityDefaultValue!!.isNotEmpty()) {
                 apQuantityDefaultInputBox.setText(apQuantityDefaultValue)
                 apQuantityView.setText(apQuantityDefaultValue)
@@ -1375,12 +1471,15 @@ class AddProductCustomDialog(
                 apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                 apQuantityView.setSelection(apQuantityView.text.toString().length)
             }
-        } else if (apQuantitySpinnerSelectedPosition == 2) {
+        }
+        else if (apQuantitySpinnerSelectedPosition == 2)
+        {
             apQuantityDefaultInputWrapper.visibility = View.GONE
             apQuantityListBtn.visibility = View.VISIBLE
             apQuantityActiveListNameView.visibility = View.VISIBLE
             apQuantityViewWrapper.visibility = View.GONE
             apQuantityListSpinner.visibility = View.VISIBLE
+            apQuantityVoiceRecView.visibility = View.GONE
 //            val listOptions: String = tableGenerator.getListValues(apQuantityListId)
 //            val listValues = listOptions.split(",")
 //            val apQuantitySpinnerAdapter = ArrayAdapter(
@@ -1417,12 +1516,22 @@ class AddProductCustomDialog(
                     }
 
                 }
-        } else {
+        }
+        else if (apQuantitySpinnerSelectedPosition == 3){
+            apQuantityViewWrapper.visibility = View.VISIBLE
+            apQuantityListBtn.visibility = View.GONE
+            apQuantityActiveListNameView.visibility = View.GONE
+            apQuantityListSpinner.visibility = View.GONE
+            apQuantityDefaultInputWrapper.visibility = View.GONE
+            apQuantityVoiceRecView.visibility = View.VISIBLE
+        }
+        else {
             apQuantityViewWrapper.visibility = View.VISIBLE
             apQuantityListBtn.visibility = View.GONE
             apQuantityActiveListNameView.visibility = View.GONE
             apQuantityDefaultInputWrapper.visibility = View.GONE
             apQuantityListSpinner.visibility = View.GONE
+            apQuantityVoiceRecView.visibility = View.GONE
         }
 
         apQuantityDefaultInputBox.addTextChangedListener(object : TextWatcher {
@@ -1466,6 +1575,7 @@ class AddProductCustomDialog(
                     apQuantityActiveListNameView.visibility = View.GONE
                     apQuantityDefaultInputWrapper.visibility = View.VISIBLE
                     apQuantityViewWrapper.visibility = View.VISIBLE
+                    apQuantityVoiceRecView.visibility = View.GONE
                     apQuantityDefaultValue = appSettings.getString("AP_QUANTITY_DEFAULT_VALUE")
                     if (apQuantityDefaultValue!!.isNotEmpty()) {
                         apQuantityDefaultInputBox.setText(apQuantityDefaultValue)
@@ -1474,7 +1584,9 @@ class AddProductCustomDialog(
                         apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                         apQuantityView.setSelection(apQuantityView.text.toString().length)
                     }
-                } else if (position == 2) {
+                }
+                else if (position == 2)
+                {
                     apQuantityDefaultInputWrapper.visibility = View.GONE
                     apQuantityListBtn.visibility = View.VISIBLE
                     apQuantityActiveListNameView.visibility = View.VISIBLE
@@ -1482,6 +1594,7 @@ class AddProductCustomDialog(
                     apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                     apQuantityView.setSelection(apQuantityView.text.toString().length)
                     apQuantityListSpinner.visibility = View.VISIBLE
+                    apQuantityVoiceRecView.visibility = View.GONE
 //                    val listOptions: String = tableGenerator.getListValues(apQuantityListId)
 //                    val listValues = listOptions.split(",")
 //                    val apQuantitySpinnerAdapter = ArrayAdapter(
@@ -1518,7 +1631,16 @@ class AddProductCustomDialog(
                             }
 
                         }
-                } else {
+                }
+                else if (position == 3){
+                    apQuantityViewWrapper.visibility = View.VISIBLE
+                    apQuantityListBtn.visibility = View.GONE
+                    apQuantityActiveListNameView.visibility = View.GONE
+                    apQuantityListSpinner.visibility = View.GONE
+                    apQuantityDefaultInputWrapper.visibility = View.GONE
+                    apQuantityVoiceRecView.visibility = View.VISIBLE
+                }
+                else {
                     apQuantityViewWrapper.visibility = View.VISIBLE
                     apQuantityView.setText(appSettings.getString("AP_PRODUCT_QUANTITY"))
                     apQuantityView.setSelection(apQuantityView.text.toString().length)
@@ -1526,6 +1648,7 @@ class AddProductCustomDialog(
                     apQuantityActiveListNameView.visibility = View.GONE
                     apQuantityDefaultInputWrapper.visibility = View.GONE
                     apQuantityListSpinner.visibility = View.GONE
+                    apQuantityVoiceRecView.visibility = View.GONE
                 }
             }
 
@@ -1574,12 +1697,63 @@ class AddProductCustomDialog(
         apPriceListBtn.setOnClickListener {
             openListWithFieldsDialog("ap_price")
         }
+
+        apPriceVoiceRecView.setOnClickListener {
+            Constants.CIVType = "ap_price"
+            voiceLanguageCode = appSettings.getString("VOICE_LANGUAGE_CODE") as String
+            val voiceLayout = LayoutInflater.from(requireActivity()).inflate(R.layout.voice_language_setting_layout, null)
+            val voiceLanguageSpinner = voiceLayout.findViewById<AppCompatSpinner>(R.id.voice_language_spinner)
+            val voiceLanguageSaveBtn = voiceLayout.findViewById<MaterialButton>(R.id.voice_language_save_btn)
+
+            if (voiceLanguageCode == "en" || voiceLanguageCode.isEmpty()) {
+                voiceLanguageSpinner.setSelection(0, false)
+            } else {
+                voiceLanguageSpinner.setSelection(1, false)
+            }
+
+            voiceLanguageSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
+                        appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
+
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    }
+
+                }
+            val builder = MaterialAlertDialogBuilder(requireActivity())
+            builder.setView(voiceLayout)
+            val alert = builder.create();
+            alert.show()
+            voiceLanguageSaveBtn.setOnClickListener {
+                alert.dismiss()
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode)
+
+                }
+                voiceResultLauncher.launch(intent)
+            }
+        }
+
         if (apPriceSpinnerSelectedPosition == 1) {
             apPriceListSpinner.visibility = View.GONE
             apPriceListBtn.visibility = View.GONE
             apPriceActiveListNameView.visibility = View.GONE
             apPriceDefaultInputWrapper.visibility = View.VISIBLE
             apPriceViewWrapper.visibility = View.VISIBLE
+            apPriceVoiceRecView.visibility = View.GONE
             if (apPriceDefaultValue!!.isNotEmpty()) {
                 apPriceDefaultInputBox.setText(apPriceDefaultValue)
                 apPriceView.setText(apPriceDefaultValue)
@@ -1587,12 +1761,15 @@ class AddProductCustomDialog(
                 apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                 apPriceView.setSelection(apPriceView.text.toString().length)
             }
-        } else if (apPriceSpinnerSelectedPosition == 2) {
+        }
+        else if (apPriceSpinnerSelectedPosition == 2)
+        {
             apPriceDefaultInputWrapper.visibility = View.GONE
             apPriceListBtn.visibility = View.VISIBLE
             apPriceActiveListNameView.visibility = View.VISIBLE
             apPriceViewWrapper.visibility = View.GONE
             apPriceListSpinner.visibility = View.VISIBLE
+            apPriceVoiceRecView.visibility = View.GONE
 //            val listOptions: String = tableGenerator.getListValues(apPriceListId)
 //            val listValues = listOptions.split(",")
 //            val apPriceSpinnerAdapter = ArrayAdapter(
@@ -1629,12 +1806,22 @@ class AddProductCustomDialog(
                     }
 
                 }
-        } else {
+        }
+        else if (apPriceSpinnerSelectedPosition == 3){
+            apPriceViewWrapper.visibility = View.VISIBLE
+            apPriceListBtn.visibility = View.GONE
+            apPriceActiveListNameView.visibility = View.GONE
+            apPriceListSpinner.visibility = View.GONE
+            apPriceDefaultInputWrapper.visibility = View.GONE
+            apPriceVoiceRecView.visibility = View.VISIBLE
+        }
+        else {
             apPriceViewWrapper.visibility = View.VISIBLE
             apPriceListBtn.visibility = View.GONE
             apPriceActiveListNameView.visibility = View.GONE
             apPriceDefaultInputWrapper.visibility = View.GONE
             apPriceListSpinner.visibility = View.GONE
+            apPriceVoiceRecView.visibility = View.GONE
         }
 
         apPriceDefaultInputBox.addTextChangedListener(object : TextWatcher {
@@ -1673,6 +1860,7 @@ class AddProductCustomDialog(
                     apPriceDefaultInputWrapper.visibility = View.VISIBLE
                     apPriceActiveListNameView.visibility = View.GONE
                     apPriceViewWrapper.visibility = View.VISIBLE
+                    apPriceVoiceRecView.visibility = View.GONE
                     apPriceDefaultValue = appSettings.getString("AP_PRICE_DEFAULT_VALUE")
                     if (apPriceDefaultValue!!.isNotEmpty()) {
                         apPriceDefaultInputBox.setText(apPriceDefaultValue)
@@ -1681,7 +1869,8 @@ class AddProductCustomDialog(
                         apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                         apPriceView.setSelection(apPriceView.text.toString().length)
                     }
-                } else if (position == 2) {
+                }
+                else if (position == 2) {
                     apPriceDefaultInputWrapper.visibility = View.GONE
                     apPriceListBtn.visibility = View.VISIBLE
                     apPriceActiveListNameView.visibility = View.VISIBLE
@@ -1689,6 +1878,7 @@ class AddProductCustomDialog(
                     apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                     apPriceView.setSelection(apPriceView.text.toString().length)
                     apPriceListSpinner.visibility = View.VISIBLE
+                    apPriceVoiceRecView.visibility = View.GONE
 //                    val listOptions: String = tableGenerator.getListValues(apPriceListId)
 //                    val listValues = listOptions.split(",")
 //                    val apPriceSpinnerAdapter = ArrayAdapter(
@@ -1725,7 +1915,16 @@ class AddProductCustomDialog(
                             }
 
                         }
-                } else {
+                }
+                else if (position == 3){
+                    apPriceViewWrapper.visibility = View.VISIBLE
+                    apPriceListBtn.visibility = View.GONE
+                    apPriceActiveListNameView.visibility = View.GONE
+                    apPriceListSpinner.visibility = View.GONE
+                    apPriceDefaultInputWrapper.visibility = View.GONE
+                    apPriceVoiceRecView.visibility = View.VISIBLE
+                }
+                else {
                     apPriceViewWrapper.visibility = View.VISIBLE
                     apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
                     apPriceView.setSelection(apPriceView.text.toString().length)
@@ -1733,6 +1932,7 @@ class AddProductCustomDialog(
                     apPriceActiveListNameView.visibility = View.GONE
                     apPriceDefaultInputWrapper.visibility = View.GONE
                     apPriceListSpinner.visibility = View.GONE
+                    apPriceVoiceRecView.visibility = View.GONE
                 }
             }
 
@@ -2306,7 +2506,7 @@ class AddProductCustomDialog(
                     apTitleView.requestFocus()
                     //BaseActivity.showSoftKeyboard(requireActivity(),apTitleView)
 
-                } else {
+                } else if (Constants.CIVType == "ap_description"){
                     val currentPItemTitle = apDescriptionView.text.toString().trim()
                     val stringBuilder = java.lang.StringBuilder()
                     stringBuilder.append(currentPItemTitle)
@@ -2317,6 +2517,10 @@ class AddProductCustomDialog(
                     apDescriptionView.requestFocus()
                     //BaseActivity.showSoftKeyboard(requireActivity(),apDescriptionView)
 
+                } else if (Constants.CIVType == "ap_quantity"){
+                    apQuantityView.setText(spokenText)
+                } else if (Constants.CIVType == "ap_price"){
+                    apPriceView.setText(spokenText)
                 }
             }
         }

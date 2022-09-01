@@ -93,15 +93,15 @@ class ApTitleInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-        if (position == 1){
-            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
-            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
-        }
-        else{
-            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
-            apTitleView.setSelection(apTitleView.text.toString().length)
-        }
+//        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
+//        if (position == 1){
+//            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
+//            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
+//        }
+//        else{
+//            apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
+//            apTitleView.setSelection(apTitleView.text.toString().length)
+//        }
 //
 //        if (position == 0 || position == 1){
 ////           Handler(Looper.myLooper()!!).postDelayed(Runnable {
@@ -114,7 +114,7 @@ class ApTitleInputFragment : Fragment() {
     private fun initViews(view: View) {
 
         apTitleView = view.findViewById(R.id.ap_title)
-        apTitleViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_title_wrapper)
+        apTitleViewWrapper = view.findViewById(R.id.ap_title_wrapper)
 //        getTitleBtn  = view.findViewById(R.id.get_title_text_view)
         apTitleSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_title_options_spinner)
         apTitleListBtn = view.findViewById<MaterialButton>(R.id.ap_title_list_with_fields_btn)
@@ -135,14 +135,14 @@ class ApTitleInputFragment : Fragment() {
 
     private fun renderView(){
         val apTitleSpinnerSelectedPosition = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
-        if (apTitleSpinnerSelectedPosition == 1){
-            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
-            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
-        }
-        else{
+//        if (apTitleSpinnerSelectedPosition == 1){
+//            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
+//            apTitleDefaultInputBox.setSelection(apTitleDefaultInputBox.text.toString().length)
+//        }
+//        else{
             apTitleView.setText(appSettings.getString("AP_PRODUCT_TITLE"))
             apTitleView.setSelection(apTitleView.text.toString().length)
-        }
+//        }
 //                if (apTitleSpinnerSelectedPosition == 0 || apTitleSpinnerSelectedPosition == 1){
 ////           Handler(Looper.myLooper()!!).postDelayed(Runnable {
 //                    apTitleView.setSelection(apTitleView.text.toString().length)
@@ -316,18 +316,28 @@ class ApTitleInputFragment : Fragment() {
         when (apTitleSpinnerSelectedPosition) {
             1 -> {
 //                BaseActivity.showSoftKeyboard(requireActivity(),apTitleDefaultInputBox)
-                apTitleVoiceRecView.visibility = View.GONE
-                apTitleCameraRecView.visibility = View.GONE
-                apTitleImageRecView.visibility = View.GONE
+//                apTitleVoiceRecView.visibility = View.GONE
+//                apTitleCameraRecView.visibility = View.GONE
+//                apTitleImageRecView.visibility = View.GONE
+//                apTitleListBtn.visibility = View.GONE
+//                apTitleActiveListNameView.visibility = View.GONE
+//                apTitleListSpinner.visibility = View.GONE
+//                apTitleDefaultInputWrapper.visibility = View.VISIBLE
+//                apTitleDefaultValueMessage.visibility = View.VISIBLE
+//                apTitleViewWrapper.visibility = View.VISIBLE
+//                apTitleDefaultInputBox.setText(apTitleDefaultValue)
+//                apTitleView.setText(apTitleDefaultValue)
+//                apTitleView.setSelection(apTitleView.text.toString().length)
+
                 apTitleListBtn.visibility = View.GONE
                 apTitleActiveListNameView.visibility = View.GONE
                 apTitleListSpinner.visibility = View.GONE
-                apTitleDefaultInputWrapper.visibility = View.VISIBLE
-                apTitleDefaultValueMessage.visibility = View.VISIBLE
+                apTitleDefaultInputWrapper.visibility = View.GONE
+                apTitleDefaultValueMessage.visibility = View.GONE
+                apTitleCameraRecView.visibility = View.GONE
+                apTitleImageRecView.visibility = View.GONE
                 apTitleViewWrapper.visibility = View.VISIBLE
-                apTitleDefaultInputBox.setText(apTitleDefaultValue)
-                apTitleView.setText(apTitleDefaultValue)
-                apTitleView.setSelection(apTitleView.text.toString().length)
+                apTitleVoiceRecView.visibility = View.VISIBLE
 
             }
             2 -> {
@@ -465,18 +475,28 @@ class ApTitleInputFragment : Fragment() {
                 when (position) {
                     1 -> {
 //                        BaseActivity.showSoftKeyboard(requireActivity(),apTitleDefaultInputBox)
-                        apTitleVoiceRecView.visibility = View.GONE
-                        apTitleCameraRecView.visibility = View.GONE
-                        apTitleImageRecView.visibility = View.GONE
+//                        apTitleVoiceRecView.visibility = View.GONE
+//                        apTitleCameraRecView.visibility = View.GONE
+//                        apTitleImageRecView.visibility = View.GONE
+//                        apTitleListBtn.visibility = View.GONE
+//                        apTitleActiveListNameView.visibility = View.GONE
+//                        apTitleListSpinner.visibility = View.GONE
+//                        apTitleDefaultInputWrapper.visibility = View.VISIBLE
+//                        apTitleDefaultValueMessage.visibility = View.VISIBLE
+//                        apTitleViewWrapper.visibility = View.VISIBLE
+//                        apTitleDefaultInputBox.setText(apTitleDefaultValue)
+//                        apTitleView.setText(apTitleDefaultValue)
+//                        apTitleView.setSelection(apTitleView.text.toString().length)
+
                         apTitleListBtn.visibility = View.GONE
                         apTitleActiveListNameView.visibility = View.GONE
                         apTitleListSpinner.visibility = View.GONE
-                        apTitleDefaultInputWrapper.visibility = View.VISIBLE
-                        apTitleDefaultValueMessage.visibility = View.VISIBLE
+                        apTitleDefaultInputWrapper.visibility = View.GONE
+                        apTitleDefaultValueMessage.visibility = View.GONE
+                        apTitleCameraRecView.visibility = View.GONE
+                        apTitleImageRecView.visibility = View.GONE
                         apTitleViewWrapper.visibility = View.VISIBLE
-                        apTitleDefaultInputBox.setText(apTitleDefaultValue)
-                        apTitleView.setText(apTitleDefaultValue)
-                        apTitleView.setSelection(apTitleView.text.toString().length)
+                        apTitleVoiceRecView.visibility = View.VISIBLE
 
                     }
                     2 -> {
@@ -741,10 +761,10 @@ class ApTitleInputFragment : Fragment() {
                     stringBuilder.append(currentPItemTitle)
                     spokenText = spokenText.capitalized()
                     stringBuilder.append("$spokenText. ")
+                    appSettings.putString("AP_PRODUCT_TITLE", stringBuilder.toString())
                     apTitleView.setText(stringBuilder.toString())
                     apTitleView.setSelection(apTitleView.text.toString().length)
                     apTitleView.requestFocus()
-                    appSettings.putString("AP_PRODUCT_TITLE", apTitleView.text.toString())
                     //BaseActivity.showSoftKeyboard(requireActivity(),apTitleView)
 
                 }

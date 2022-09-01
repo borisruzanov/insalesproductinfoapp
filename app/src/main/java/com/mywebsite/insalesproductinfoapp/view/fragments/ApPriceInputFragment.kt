@@ -1,8 +1,10 @@
 package com.mywebsite.insalesproductinfoapp.view.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -13,7 +15,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -32,10 +36,14 @@ import com.mywebsite.insalesproductinfoapp.utils.Constants
 import com.mywebsite.insalesproductinfoapp.utils.TableGenerator
 import com.mywebsite.insalesproductinfoapp.view.activities.BaseActivity
 import com.mywebsite.insalesproductinfoapp.view.activities.FieldListsActivity
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ApPriceInputFragment : Fragment() {
-
+    private lateinit var apPriceDefaultInputBox: TextInputEditText
+    private lateinit var apPriceSpinner: AppCompatSpinner
+    private lateinit var apPriceVoiceRecView: LinearLayout
     private lateinit var apPriceDefaultValueMessage: MaterialTextView
     private lateinit var apPriceDefaultInputWrapper: TextInputLayout
     private lateinit var apPriceListBtn: MaterialButton
@@ -47,6 +55,7 @@ class ApPriceInputFragment : Fragment() {
     private var listId: Int? = null
     private lateinit var adapter: FieldListsAdapter
     private lateinit var apPriceListSpinner:AppCompatSpinner
+    private var voiceLanguageCode = "en"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,14 +79,52 @@ class ApPriceInputFragment : Fragment() {
 
         apPriceView = view.findViewById(R.id.ap_price)
         apPriceViewWrapper = view.findViewById<TextInputLayout>(R.id.ap_price_wrapper)
-        val apPriceSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_options_spinner)
+        apPriceSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_options_spinner)
         apPriceListBtn = view.findViewById<MaterialButton>(R.id.ap_price_list_with_fields_btn)
-        val apPriceDefaultInputBox = view.findViewById<TextInputEditText>(R.id.ap_price_non_changeable_default_text_input)
+        apPriceVoiceRecView = view.findViewById<LinearLayout>(R.id.ap_price_voice_layout)
+        apPriceDefaultInputBox = view.findViewById<TextInputEditText>(R.id.ap_price_non_changeable_default_text_input)
         apPriceDefaultInputWrapper = view.findViewById<TextInputLayout>(R.id.ap_price_non_changeable_default_text_input_wrapper)
         apPriceDefaultValueMessage =
             view.findViewById<MaterialTextView>(R.id.ap_price_default_value_message)
         apPriceListSpinner = view.findViewById<AppCompatSpinner>(R.id.ap_price_list_spinner)
         apPriceActiveListNameView = view.findViewById<MaterialTextView>(R.id.ap_price_active_list_name)
+
+    }
+
+    private var voiceResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+            // THIS LINE OF CODE WILL CHECK THE IMAGE HAS BEEN SELECTED OR NOT
+            if (result.resultCode == Activity.RESULT_OK) {
+                val spokenText: String =
+                    result.data!!.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                        .let { results ->
+                            results!!.get(0)
+                        }
+                appSettings.putString("AP_PRODUCT_PRICE", spokenText)
+                apPriceView.setText(spokenText)
+                apPriceView.setSelection(apPriceView.text.toString().length)
+                //BaseActivity.showSoftKeyboard(requireActivity(),apTitleView)
+
+            }
+        }
+
+    override fun onResume() {
+        super.onResume()
+
+        renderView()
+    }
+
+    private fun renderView(){
+        val position = appSettings.getInt("AP_PRICE_SPINNER_SELECTED_POSITION")
+        if (position == 0 || position == 1 || position == 3){
+//            Handler(Looper.myLooper()!!).postDelayed(Runnable {
+            apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
+            apPriceView.setSelection(apPriceView.text.toString().length)
+            BaseActivity.showSoftKeyboard(requireActivity(),apPriceView)
+//            },1000)
+        }
+
         val apPriceSpinnerSelectedPosition = appSettings.getInt("AP_PRICE_SPINNER_SELECTED_POSITION")
         var apPriceDefaultValue = appSettings.getString("AP_PRICE_DEFAULT_VALUE")
         val apPriceListId = appSettings.getInt("AP_PRICE_LIST_ID")
@@ -92,6 +139,55 @@ class ApPriceInputFragment : Fragment() {
         apPriceListBtn.setOnClickListener {
             openListWithFieldsDialog("ap_price")
         }
+
+        apPriceVoiceRecView.setOnClickListener {
+            voiceLanguageCode = appSettings.getString("VOICE_LANGUAGE_CODE") as String
+            val voiceLayout = LayoutInflater.from(requireActivity()).inflate(R.layout.voice_language_setting_layout, null)
+            val voiceLanguageSpinner = voiceLayout.findViewById<AppCompatSpinner>(R.id.voice_language_spinner)
+            val voiceLanguageSaveBtn = voiceLayout.findViewById<MaterialButton>(R.id.voice_language_save_btn)
+
+            if (voiceLanguageCode == "en" || voiceLanguageCode.isEmpty()) {
+                voiceLanguageSpinner.setSelection(0, false)
+            } else {
+                voiceLanguageSpinner.setSelection(1, false)
+            }
+
+            voiceLanguageSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        voiceLanguageCode = if (parent!!.selectedItem.toString().toLowerCase(Locale.ENGLISH).contains("english")){"en"}else{"ru"}
+                        appSettings.putString("VOICE_LANGUAGE_CODE", voiceLanguageCode)
+
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                    }
+
+                }
+            val builder = MaterialAlertDialogBuilder(requireActivity())
+            builder.setView(voiceLayout)
+            val alert = builder.create();
+            alert.show()
+            voiceLanguageSaveBtn.setOnClickListener {
+                alert.dismiss()
+                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                    putExtra(
+                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                    )
+                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLanguageCode)
+
+                }
+                voiceResultLauncher.launch(intent)
+            }
+        }
+
         when (apPriceSpinnerSelectedPosition) {
             1 -> {
                 apPriceListSpinner.visibility = View.GONE
@@ -100,7 +196,7 @@ class ApPriceInputFragment : Fragment() {
                 apPriceDefaultInputWrapper.visibility = View.VISIBLE
                 apPriceDefaultValueMessage.visibility = View.VISIBLE
                 apPriceViewWrapper.visibility = View.VISIBLE
-
+                apPriceVoiceRecView.visibility = View.GONE
                 if (apPriceDefaultValue!!.isNotEmpty()) {
                     apPriceDefaultInputBox.setText(apPriceDefaultValue)
                     apPriceView.setText(apPriceDefaultValue)
@@ -118,6 +214,7 @@ class ApPriceInputFragment : Fragment() {
                 apPriceActiveListNameView.visibility = View.VISIBLE
                 apPriceViewWrapper.visibility = View.GONE
                 apPriceListSpinner.visibility = View.VISIBLE
+                apPriceVoiceRecView.visibility = View.GONE
                 val listOptions: String = tableGenerator.getListValues(apPriceListId)
                 val listValues = listOptions.split(",")
                 if (listValues.isNotEmpty()){
@@ -147,13 +244,23 @@ class ApPriceInputFragment : Fragment() {
 
                 }
             }
+            3->{
+                apPriceViewWrapper.visibility = View.VISIBLE
+                apPriceListBtn.visibility = View.GONE
+                apPriceActiveListNameView.visibility = View.GONE
+                apPriceListSpinner.visibility = View.GONE
+                apPriceDefaultInputWrapper.visibility = View.GONE
+                apPriceDefaultValueMessage.visibility = View.GONE
+                apPriceVoiceRecView.visibility = View.VISIBLE
+            }
             else -> {
                 apPriceViewWrapper.visibility = View.VISIBLE
                 apPriceListBtn.visibility = View.GONE
                 apPriceActiveListNameView.visibility = View.GONE
                 apPriceDefaultInputWrapper.visibility = View.GONE
-                apPriceDefaultValueMessage.visibility = View.VISIBLE
+                apPriceDefaultValueMessage.visibility = View.GONE
                 apPriceListSpinner.visibility = View.GONE
+                apPriceVoiceRecView.visibility = View.GONE
 //                BaseActivity.showSoftKeyboard(requireActivity(),apPriceView)
             }
         }
@@ -209,6 +316,7 @@ class ApPriceInputFragment : Fragment() {
                         apPriceDefaultInputWrapper.visibility = View.VISIBLE
                         apPriceDefaultValueMessage.visibility = View.VISIBLE
                         apPriceViewWrapper.visibility = View.VISIBLE
+                        apPriceVoiceRecView.visibility = View.GONE
                         apPriceDefaultValue = appSettings.getString("AP_PRICE_DEFAULT_VALUE")
                         if (apPriceDefaultValue!!.isNotEmpty()) {
                             apPriceDefaultInputBox.setText(apPriceDefaultValue)
@@ -226,6 +334,7 @@ class ApPriceInputFragment : Fragment() {
                         apPriceActiveListNameView.visibility = View.VISIBLE
                         apPriceViewWrapper.visibility = View.GONE
                         apPriceListSpinner.visibility = View.VISIBLE
+                        apPriceVoiceRecView.visibility = View.GONE
                         val listOptions: String = tableGenerator.getListValues(apPriceListId)
                         val listValues = listOptions.split(",")
                         if (listValues.isNotEmpty()){
@@ -255,6 +364,15 @@ class ApPriceInputFragment : Fragment() {
 
                         }
                     }
+                    3->{
+                        apPriceViewWrapper.visibility = View.VISIBLE
+                        apPriceListBtn.visibility = View.GONE
+                        apPriceActiveListNameView.visibility = View.GONE
+                        apPriceListSpinner.visibility = View.GONE
+                        apPriceDefaultInputWrapper.visibility = View.GONE
+                        apPriceDefaultValueMessage.visibility = View.GONE
+                        apPriceVoiceRecView.visibility = View.VISIBLE
+                    }
                     else -> {
                         apPriceViewWrapper.visibility = View.VISIBLE
                         apPriceListBtn.visibility = View.GONE
@@ -262,6 +380,7 @@ class ApPriceInputFragment : Fragment() {
                         apPriceDefaultValueMessage.visibility = View.GONE
                         apPriceDefaultInputWrapper.visibility = View.GONE
                         apPriceListSpinner.visibility = View.GONE
+                        apPriceVoiceRecView.visibility = View.GONE
 //                        BaseActivity.showSoftKeyboard(requireActivity(),apPriceView)
                     }
                 }
@@ -291,7 +410,7 @@ class ApPriceInputFragment : Fragment() {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
                 if (actionId == EditorInfo.IME_ACTION_NEXT){
                     //BaseActivity.hideSoftKeyboard(requireActivity(),apPriceView)
-                        Constants.hideKeyboar(requireActivity())
+                    Constants.hideKeyboar(requireActivity())
                     val intent = Intent("move-next")
                     LocalBroadcastManager.getInstance(requireActivity())
                         .sendBroadcast(intent)
@@ -300,18 +419,6 @@ class ApPriceInputFragment : Fragment() {
             }
 
         })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        apPriceView.setText(appSettings.getString("AP_PRODUCT_PRICE"))
-        val position = appSettings.getInt("AP_PRICE_SPINNER_SELECTED_POSITION")
-        if (position == 0 || position == 1){
-//            Handler(Looper.myLooper()!!).postDelayed(Runnable {
-                BaseActivity.showSoftKeyboard(requireActivity(),apPriceView)
-                apPriceView.setSelection(apPriceView.text.toString().length)
-//            },1000)
-        }
     }
 
     private fun openListWithFieldsDialog(fieldType: String) {
