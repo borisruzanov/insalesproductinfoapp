@@ -93,6 +93,7 @@ class ApTitleInputFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
 //        val position = appSettings.getInt("AP_TITLE_SPINNER_SELECTED_POSITION")
 //        if (position == 1){
 //            apTitleDefaultInputBox.setText(appSettings.getString("AP_TITLE_DEFAULT_VALUE"))
