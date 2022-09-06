@@ -17,7 +17,9 @@ object GcpTranslator {
     fun translateFromEngToRus(context: Context, text: String, listener: TranslationCallback){
 //        listener.onTextTranslation(text)
 //        return
-        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
+        val appSettings = AppSettings(context)
+        val apiKey = appSettings.getString("G_API_KEY")
+        System.setProperty("GOOGLE_API_KEY",apiKey)
         CoroutineScope(Dispatchers.IO).launch {
 
             val translate = TranslateOptions.getDefaultInstance().service
@@ -57,7 +59,9 @@ object GcpTranslator {
     fun translateFromRusToEng(context: Context, text: String, listener: TranslationCallback){
 //        listener.onTextTranslation(text)
 //        return
-        System.setProperty("GOOGLE_API_KEY",context.resources.getString(R.string.translation_api_key))
+        val appSettings = AppSettings(context)
+        val apiKey = appSettings.getString("G_API_KEY")
+        System.setProperty("GOOGLE_API_KEY",apiKey)
         val translate = TranslateOptions.getDefaultInstance().service
         val detection: Detection = translate.detect(text)
         val detectedLanguage = detection.language

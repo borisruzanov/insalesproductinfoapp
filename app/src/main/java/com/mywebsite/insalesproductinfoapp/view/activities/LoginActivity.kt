@@ -207,7 +207,7 @@ class LoginActivity : BaseActivity() {
                                 var isFound = false
 
                                 for (item: DataSnapshot in snapshot.children) {
-                                    if (item.child("deviceId").getValue(String::class.java) == deviceId &&
+                                    if (item.child("deviceId").getValue(String::class.java) == deviceId ||
                                         item.child("email").getValue(String::class.java) == email) {
                                         isFound = true
                                         break

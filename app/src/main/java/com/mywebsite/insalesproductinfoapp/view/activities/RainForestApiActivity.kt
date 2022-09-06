@@ -339,7 +339,7 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
                             }
                         }
                         val roundedCreditValues =
-                            userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.UP)
+                            userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.FLOOR)
                                 .toDouble()
                         currentCreditsView.text = "$roundedCreditValues"
                         appSettings.putString(Constants.userCreditsValue, "$roundedCreditValues")

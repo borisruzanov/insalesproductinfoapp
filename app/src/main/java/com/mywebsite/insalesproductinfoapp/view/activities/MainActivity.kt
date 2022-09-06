@@ -305,6 +305,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
         getSearchImageDetail()
         checkAndStartTrialPeriod()
         getPrices()
+        getApiKey()
         val intentsFilter = IntentFilter()
         intentsFilter.addAction("update-products")
         intentsFilter.addAction("update-images")
@@ -2211,6 +2212,26 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
             }
 
         }
+    }
+
+    private fun getApiKey() {
+        firebaseDatabase.child(Constants.firebaseKeys).addListenerForSingleValueEvent(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val apiKey: String =
+                    snapshot.child("api_key").getValue(
+                        String::class.java
+                    ) as String
+
+
+                appSettings.putString("G_API_KEY", apiKey)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
     }
 
     private fun getPrices() {
