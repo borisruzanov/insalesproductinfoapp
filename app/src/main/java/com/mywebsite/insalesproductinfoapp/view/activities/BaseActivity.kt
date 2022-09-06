@@ -40,6 +40,7 @@ import com.mywebsite.insalesproductinfoapp.utils.Constants.Companion.EMAIL_ADDRE
 import com.mywebsite.insalesproductinfoapp.utils.DialogPrefs
 import com.mywebsite.insalesproductinfoapp.utils.VolleySingleton
 import org.json.JSONObject
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
@@ -606,11 +607,15 @@ abstract class BaseActivity :  AppCompatActivity() {
                                     0F
                                 }
                             }
+                            val roundedCreditValues =
+                                userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.FLOOR)
+                                    .toDouble()
                             appSettings.putString(
                                 Constants.userCreditsValue,
-                                "$userCurrentCreditsValue"
+                                "$roundedCreditValues"
                             )
-                            Log.d("TEST199", "$userCurrentCreditsValue")
+
+                            //Log.d("TEST199", "$roundedCreditValues")
                         }
 
                         override fun onCancelled(error: DatabaseError) {

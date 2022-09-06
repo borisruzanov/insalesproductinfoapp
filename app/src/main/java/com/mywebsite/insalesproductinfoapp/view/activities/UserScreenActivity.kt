@@ -670,16 +670,15 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
                                         }
 
                                         if (isFound) {
-                                            val df =
-                                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                            val df = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                            userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
                                             if (df.parse(tempObject!!.expired)!!.time > System.currentTimeMillis()) {
                                                 couponCodeCredits = tempObject!!.credits
                                                 isCouponCodeApplied = true
 
                                                 val hashMap = HashMap<String, String>()
                                                 userCurrentCreditsValue += couponCodeCredits
-                                                hashMap["credits"] =
-                                                    userCurrentCreditsValue.toString()
+                                                hashMap["credits"] = (userCurrentCreditsValue + userCurrentCredits.toFloat()).toString()
 
                                                 firebaseDatabase.child(Constants.firebaseUserCredits)
                                                     .child(Constants.firebaseUserId)
@@ -738,7 +737,8 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
         tempObject.isUsed = 1
         tempObject.user_id = Constants.firebaseUserId
         firebaseDatabase.child(Constants.firebaseUsedCoupons)
-            .child(code.toLowerCase(Locale.ENGLISH))
+            .child(code.lowercase())
+            .push()
             .setValue(tempObject)
     }
 
@@ -749,6 +749,7 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
 
         startLoading(context)
         firebaseDatabase.child(Constants.firebaseUsedCoupons)
+            .child(code.lowercase())
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {

@@ -233,7 +233,7 @@ class LoginActivity : BaseActivity() {
 
                                                 val roundedCreditValues =
                                                     userCurrentCreditsValue.toBigDecimal()
-                                                        .setScale(2, RoundingMode.UP)
+                                                        .setScale(2, RoundingMode.FLOOR)
                                                         .toDouble()
                                                 val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
                                                 val hashMap = HashMap<String, Any>()
@@ -261,7 +261,6 @@ class LoginActivity : BaseActivity() {
                                     moveNext()
                                 }
                             } else {
-
                                 firebaseDatabase.child(Constants.firebaseUserCredits)
                                     .child(id).addListenerForSingleValueEvent(object : ValueEventListener {
                                         override fun onDataChange(snapshot: DataSnapshot) {
@@ -279,7 +278,7 @@ class LoginActivity : BaseActivity() {
 
                                             val roundedCreditValues =
                                                 userCurrentCreditsValue.toBigDecimal()
-                                                    .setScale(2, RoundingMode.UP)
+                                                    .setScale(2, RoundingMode.FLOOR)
                                                     .toDouble()
                                             val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
                                             val hashMap = HashMap<String, Any>()

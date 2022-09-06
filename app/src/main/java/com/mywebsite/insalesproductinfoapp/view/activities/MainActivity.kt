@@ -505,7 +505,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
         searchedImagesList: java.util.ArrayList<String>,
         internetImageAdapter: InternetImageAdapter
     ) {
-        var creditChargePrice: Float = 0F
+        var creditChargePrice: Double = 0.0
+        var chargeCredits: Double = 0.0
         if (searchBoxView.text.toString().trim().isNotEmpty()) {
 
             val firebaseDatabase = FirebaseDatabase.getInstance().reference
@@ -514,13 +515,12 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                     ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val creditPrice = snapshot.child("credits")
-                            .getValue(Int::class.java) as Int
+                            .getValue(Double::class.java) as Double
                         val images = snapshot.child("images")
                             .getValue(Int::class.java) as Int
-                        creditChargePrice = creditPrice.toFloat() / images
+                        creditChargePrice = creditPrice / images
 
-                        userCurrentCredits =
-                            appSettings.getString(Constants.userCreditsValue) as String
+                        userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
 
                         if (userCurrentCredits.isNotEmpty() && (userCurrentCredits != "0" || userCurrentCredits != "0.0") && userCurrentCredits.toFloat() >= creditChargePrice) {
                             hideSoftKeyboard(
@@ -558,7 +558,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                                                     )
                                                 }
                                             }
-
+                                            chargeCredits = creditChargePrice * searchedImagesList.size
                                             internetImageAdapter.notifyItemRangeChanged(
                                                 0,
                                                 searchedImagesList.size
@@ -568,11 +568,10 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                                         }
                                         //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
                                         val hashMap = HashMap<String, Any>()
-                                        val remaining =
-                                            userCurrentCredits.toFloat() - creditChargePrice
-                                        Log.d("TEST199", "$remaining")
-                                        hashMap["credits"] =
-                                            remaining.toString()
+                                        val remaining = userCurrentCredits.toFloat() - chargeCredits
+                                        //Log.d("TEST199", "$remaining")
+                                        hashMap["credits"] = remaining.toString()
+                                        chargeCredits = 0.0
                                         firebaseDatabase.child(Constants.firebaseUserCredits)
                                             .child(Constants.firebaseUserId)
                                             .updateChildren(hashMap)
@@ -1067,7 +1066,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                             }
                         }
                         val roundedCreditValues =
-                            userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.UP)
+                            userCurrentCreditsValue.toBigDecimal().setScale(2, RoundingMode.FLOOR)
                                 .toDouble()
                         binding.homeCurrentCreditsView.text = "$roundedCreditValues"
                         appSettings.putString(Constants.userCreditsValue, "$roundedCreditValues")
@@ -1668,7 +1667,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                 }
                 productsList.removeAt(position)
                 productsList.add(position, tempProduct)
-                productAdapter.notifyDataSetChanged()
+                productAdapter.notifyItemChanged(position)
                 Constants.startImageUploadService(
                     pItem.id,
                     multiImagesList.joinToString(","),

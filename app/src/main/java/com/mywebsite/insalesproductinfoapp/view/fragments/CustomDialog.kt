@@ -1621,7 +1621,8 @@ class CustomDialog(
         searchedImagesList: ArrayList<String>,
         internetImageAdapter: InternetImageAdapter
     ) {
-        var creditChargePrice: Float = 0F
+        var creditChargePrice: Double = 0.0
+        var chargeCredits: Double = 0.0
         if (searchBoxView.text.toString().trim().isNotEmpty()) {
 
 
@@ -1631,10 +1632,10 @@ class CustomDialog(
                     ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val creditPrice = snapshot.child("credits")
-                            .getValue(Int::class.java) as Int
+                            .getValue(Double::class.java) as Double
                         val images = snapshot.child("images")
                             .getValue(Int::class.java) as Int
-                        creditChargePrice = creditPrice.toFloat() / images
+                        creditChargePrice = creditPrice / images
 
                         userCurrentCredits =
                             appSettings.getString(Constants.userCreditsValue) as String
@@ -1675,7 +1676,7 @@ class CustomDialog(
                                                     )
                                                 }
                                             }
-
+                                            chargeCredits = creditChargePrice * searchedImagesList.size
                                             internetImageAdapter.notifyItemRangeChanged(
                                                 0,
                                                 searchedImagesList.size
@@ -1685,7 +1686,7 @@ class CustomDialog(
                                         //userCurrentCredits = appSettings.getString(Constants.userCreditsValue) as String
                                         val hashMap = HashMap<String, Any>()
                                         val remaining =
-                                            userCurrentCredits.toFloat() - creditChargePrice
+                                            userCurrentCredits.toFloat() - chargeCredits
                                         Log.d("TEST199", "$remaining")
                                         hashMap["credits"] =
                                             remaining.toString()
