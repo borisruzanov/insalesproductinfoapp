@@ -42,8 +42,8 @@ class LoginActivity : BaseActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
     private lateinit var appSettings:AppSettings
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
-    private lateinit var auth: FirebaseAuth
+//    private lateinit var mGoogleSignInClient: GoogleSignInClient
+//    private lateinit var auth: FirebaseAuth
     private var user: User? = null
     private lateinit var firebaseDatabase: DatabaseReference
     var userCurrentCreditsValue: Float = 0F
@@ -78,23 +78,23 @@ class LoginActivity : BaseActivity() {
     private fun initViews(){
        appSettings  = AppSettings(context)
         firebaseDatabase = FirebaseDatabase.getInstance().reference
-        auth = Firebase.auth
+//        auth = Firebase.auth
 
-        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
+//        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//            .requestIdToken(getString(R.string.default_web_client_id))
+//            .requestEmail()
 //            .requestScopes(Scope(DriveScopes.DRIVE_FILE))
 //            .requestScopes(Scope(SheetsScopes.SPREADSHEETS))
 //            .requestScopes(Scope(DriveScopes.DRIVE_APPDATA))
-            .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
+//            .build()
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
 
-        val acct: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(context)
-
-        if (acct != null) {
-            binding.googleLoginWrapperLayout.visibility = View.GONE
-            binding.insalesLoginWrapperLayout.visibility = View.VISIBLE
-        }
+//        val acct: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(context)
+//
+//        if (acct != null) {
+//            binding.googleLoginWrapperLayout.visibility = View.GONE
+//            binding.insalesLoginWrapperLayout.visibility = View.VISIBLE
+//        }
 
         binding.insalesLoginBtn.setOnClickListener {
             if (validation()) {
@@ -106,89 +106,229 @@ class LoginActivity : BaseActivity() {
 
         }
 
-        binding.googleLoginBtn.setOnClickListener {
-            startLogin()
-        }
+//        binding.googleLoginBtn.setOnClickListener {
+//            startLogin()
+//        }
 
     }
 
-    private fun startLogin() {
-        val signInIntent = mGoogleSignInClient.signInIntent
-        googleLauncher.launch(signInIntent)
-    }
+//    private fun startLogin() {
+//        val signInIntent = mGoogleSignInClient.signInIntent
+//        googleLauncher.launch(signInIntent)
+//    }
+//
+//    // THIS GOOGLE LAUNCHER WILL HANDLE RESULT
+//    private var googleLauncher =
+//        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+//
+//            if (result.resultCode == Activity.RESULT_OK) {
+//
+//                GoogleSignIn.getSignedInAccountFromIntent(result.data)
+//                    .addOnSuccessListener { googleSignInAccount ->
+//                        firebaseAuthWithGoogle(googleSignInAccount!!.idToken!!)
+//                        saveUserUpdatedDetail(googleSignInAccount, "new")
+//                    }.addOnFailureListener { p0 ->
+//                        showAlert(
+//                            context,
+//                            p0.localizedMessage!!
+//                        )
+//                    }
+//            }
+//        }
+//
+//    private fun saveUserUpdatedDetail(acct: GoogleSignInAccount?, isLastSignUser: String) {
+//        try {
+//
+//            // IF PART WILL RUN IF USER LOGGED AND ACCOUNT DETAIL NOT EMPTY
+//            if (acct != null && acct.displayName.isNullOrEmpty()) {
+//                startLogin()
+//            } else if (acct != null) {
+//                val personName = acct.displayName
+//                val personGivenName = acct.givenName
+//                val personFamilyName = acct.familyName
+//                val personEmail = acct.email
+//                val personId = acct.id
+//                val personPhoto: Uri? = acct.photoUrl
+//                val user = User(
+//                    personName!!,
+//                    personGivenName!!,
+//                    personFamilyName!!,
+//                    personEmail!!,
+//                    personId!!,
+//                    personPhoto!!.toString()
+//                )
+//                appSettings.putUser(Constants.user, user)
+//                Constants.userData = user
+//                this.user = user
+//                if (isLastSignUser == "new") {
+//                    appSettings.putBoolean(Constants.isLogin, true)
+//                }
+//            }
+//        } catch (e: Exception) {
+//
+//        }
+//
+//    }
+//
+//    private fun firebaseAuthWithGoogle(idToken: String) {
+//        val credential = GoogleAuthProvider.getCredential(idToken, null)
+//        auth.signInWithCredential(credential)
+//            .addOnCompleteListener(this) { task ->
+//                if (task.isSuccessful) {
+//                    add50CreditsFree()
+//                }
+//            }
+//    }
 
-    // THIS GOOGLE LAUNCHER WILL HANDLE RESULT
-    private var googleLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-            if (result.resultCode == Activity.RESULT_OK) {
-
-                GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                    .addOnSuccessListener { googleSignInAccount ->
-                        firebaseAuthWithGoogle(googleSignInAccount!!.idToken!!)
-                        saveUserUpdatedDetail(googleSignInAccount, "new")
-                    }.addOnFailureListener { p0 ->
-                        showAlert(
-                            context,
-                            p0.localizedMessage!!
-                        )
-                    }
-            }
-        }
-
-    private fun saveUserUpdatedDetail(acct: GoogleSignInAccount?, isLastSignUser: String) {
-        try {
-
-            // IF PART WILL RUN IF USER LOGGED AND ACCOUNT DETAIL NOT EMPTY
-            if (acct != null && acct.displayName.isNullOrEmpty()) {
-                startLogin()
-            } else if (acct != null) {
-                val personName = acct.displayName
-                val personGivenName = acct.givenName
-                val personFamilyName = acct.familyName
-                val personEmail = acct.email
-                val personId = acct.id
-                val personPhoto: Uri? = acct.photoUrl
-                val user = User(
-                    personName!!,
-                    personGivenName!!,
-                    personFamilyName!!,
-                    personEmail!!,
-                    personId!!,
-                    personPhoto!!.toString()
-                )
-                appSettings.putUser(Constants.user, user)
-                Constants.userData = user
-                this.user = user
-                if (isLastSignUser == "new") {
-                    appSettings.putBoolean(Constants.isLogin, true)
-                }
-            }
-        } catch (e: Exception) {
-
-        }
-
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    add50CreditsFree()
-                }
-            }
-    }
+//    @SuppressLint("HardwareIds")
+//    private fun add50CreditsFree() {
+//        startLoading(context)
+//        val user = Firebase.auth.currentUser
+//        var freeCreditsValue = ""
+//        if (user != null) {
+//            val id = user.uid as String
+//            Constants.firebaseUserId = id
+//            val email = user.email.toString()
+//            val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+//
+//            val usedIdReference = firebaseDatabase.child("USERS_DEVICES_EMAILS")
+//            val params = HashMap<String, Any>()
+//            params["email"] = email
+//            params["deviceId"] = deviceId
+//
+//            firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    freeCreditsValue = snapshot.child("value").getValue(String::class.java) as String
+//
+//                    usedIdReference.addListenerForSingleValueEvent(object : ValueEventListener {
+//                        override fun onDataChange(snapshot: DataSnapshot) {
+//                            if (snapshot.hasChildren()) {
+//                                var isFound = false
+//
+//                                for (item: DataSnapshot in snapshot.children) {
+//                                    if (item.child("deviceId").getValue(String::class.java) == deviceId &&
+//                                        item.child("email").getValue(String::class.java) == email) {
+//                                        isFound = true
+//                                        break
+//                                    }
+//                                }
+//
+//                                if (!isFound) {
+//                                    firebaseDatabase.child(Constants.firebaseUserCredits)
+//                                        .child(id).addListenerForSingleValueEvent(object :
+//                                            ValueEventListener {
+//                                            override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                                                if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
+//                                                    val previousCredits =
+//                                                        snapshot.child("credits").getValue(String::class.java)
+//                                                    userCurrentCreditsValue =
+//                                                        if (previousCredits!!.isNotEmpty()) {
+//                                                            previousCredits.toFloat()
+//                                                        } else {
+//                                                            0F
+//                                                        }
+//                                                }
+//
+//                                                val roundedCreditValues =
+//                                                    userCurrentCreditsValue.toBigDecimal()
+//                                                        .setScale(2, RoundingMode.FLOOR)
+//                                                        .toDouble()
+//                                                val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
+//                                                val hashMap = HashMap<String, Any>()
+//
+//                                                hashMap["credits"] = totalCredits.toString()
+//                                                firebaseDatabase.child(Constants.firebaseUserCredits)
+//                                                    .child(id)
+//                                                    .updateChildren(hashMap)
+//                                                    .addOnSuccessListener {
+//                                                        usedIdReference.push().setValue(params)
+//                                                        moveNext()
+//                                                    }
+//                                                    .addOnFailureListener {
+//                                                        moveNext()
+//                                                    }
+//                                            }
+//
+//                                            override fun onCancelled(error: DatabaseError) {
+//                                                moveNext()
+//                                            }
+//
+//                                        })
+//                                }
+//                                else {
+//                                    moveNext()
+//                                }
+//                            } else {
+//                                firebaseDatabase.child(Constants.firebaseUserCredits)
+//                                    .child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+//                                        override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                                            if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
+//                                                val previousCredits =
+//                                                    snapshot.child("credits").getValue(String::class.java)
+//                                                userCurrentCreditsValue =
+//                                                    if (previousCredits!!.isNotEmpty()) {
+//                                                        previousCredits.toFloat()
+//                                                    } else {
+//                                                        0F
+//                                                    }
+//                                            }
+//
+//                                            val roundedCreditValues =
+//                                                userCurrentCreditsValue.toBigDecimal()
+//                                                    .setScale(2, RoundingMode.FLOOR)
+//                                                    .toDouble()
+//                                            val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
+//                                            val hashMap = HashMap<String, Any>()
+//
+//                                            hashMap["credits"] = totalCredits.toString()
+//                                            firebaseDatabase.child(Constants.firebaseUserCredits)
+//                                                .child(id)
+//                                                .updateChildren(hashMap)
+//                                                .addOnSuccessListener {
+//                                                    usedIdReference.push().setValue(params)
+//                                                    moveNext()
+//                                                }
+//                                                .addOnFailureListener {
+////                                            moveNext()
+//                                                }
+//                                        }
+//
+//                                        override fun onCancelled(error: DatabaseError) {
+//                                            moveNext()
+//                                        }
+//
+//                                    })
+//                            }
+//                        }
+//
+//                        override fun onCancelled(error: DatabaseError) {
+////                    moveNext()
+//                        }
+//
+//                    })
+//
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//
+//                }
+//
+//            })
+//        }
+//        else{
+//            moveNext()
+//        }
+//    }
 
     @SuppressLint("HardwareIds")
     private fun add50CreditsFree() {
         startLoading(context)
-        val user = Firebase.auth.currentUser
         var freeCreditsValue = ""
-        if (user != null) {
-            val id = user.uid as String
-            Constants.firebaseUserId = id
-            val email = user.email.toString()
+        if (Constants.firebaseUserId.isNotEmpty()) {
+
+            val email = Constants.firebaseUserId
             val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
             val usedIdReference = firebaseDatabase.child("USERS_DEVICES_EMAILS")
@@ -199,7 +339,6 @@ class LoginActivity : BaseActivity() {
             firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     freeCreditsValue = snapshot.child("value").getValue(String::class.java) as String
-                    Log.d("TEST199FREECREDITS",freeCreditsValue)
 
                     usedIdReference.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
@@ -216,7 +355,7 @@ class LoginActivity : BaseActivity() {
 
                                 if (!isFound) {
                                     firebaseDatabase.child(Constants.firebaseUserCredits)
-                                        .child(id).addListenerForSingleValueEvent(object :
+                                        .child(email).addListenerForSingleValueEvent(object :
                                             ValueEventListener {
                                             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -240,7 +379,7 @@ class LoginActivity : BaseActivity() {
 
                                                 hashMap["credits"] = totalCredits.toString()
                                                 firebaseDatabase.child(Constants.firebaseUserCredits)
-                                                    .child(id)
+                                                    .child(email)
                                                     .updateChildren(hashMap)
                                                     .addOnSuccessListener {
                                                         usedIdReference.push().setValue(params)
@@ -262,7 +401,7 @@ class LoginActivity : BaseActivity() {
                                 }
                             } else {
                                 firebaseDatabase.child(Constants.firebaseUserCredits)
-                                    .child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+                                    .child(email).addListenerForSingleValueEvent(object : ValueEventListener {
                                         override fun onDataChange(snapshot: DataSnapshot) {
 
                                             if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
@@ -285,7 +424,7 @@ class LoginActivity : BaseActivity() {
 
                                             hashMap["credits"] = totalCredits.toString()
                                             firebaseDatabase.child(Constants.firebaseUserCredits)
-                                                .child(id)
+                                                .child(email)
                                                 .updateChildren(hashMap)
                                                 .addOnSuccessListener {
                                                     usedIdReference.push().setValue(params)
@@ -322,16 +461,15 @@ class LoginActivity : BaseActivity() {
             moveNext()
         }
     }
-
     private fun moveNext(){
         dismiss()
-        binding.googleLoginWrapperLayout.visibility = View.GONE
-        binding.insalesLoginWrapperLayout.visibility = View.VISIBLE
+//        binding.googleLoginWrapperLayout.visibility = View.GONE
+//        binding.insalesLoginWrapperLayout.visibility = View.VISIBLE
 //        Handler(Looper.myLooper()!!).postDelayed({
 //            dismiss()
-//            startActivity(Intent(context,MainActivity::class.java)).apply {
-//                finish()
-//            }
+            startActivity(Intent(context,MainActivity::class.java)).apply {
+                finish()
+            }
 //        },2000)
 
     }
@@ -368,9 +506,12 @@ class LoginActivity : BaseActivity() {
                     appSettings.putString("INSALES_SHOP_NAME", shopName)
                     appSettings.putString("INSALES_EMAIL", email)
                     appSettings.putString("INSALES_PASSWORD", password)
-                    startActivity(Intent(context,MainActivity::class.java)).apply {
-                        finish()
-                    }
+                    Constants.firebaseUserId = email.replace(".", "-").replace("#", "-").replace("$", "-").replace("[", "-")
+                        .replace("]", "-")
+                    add50CreditsFree()
+//                    startActivity(Intent(context,MainActivity::class.java)).apply {
+//                        finish()
+//                    }
                 } else {
                     showAlert(context, response.get("message").asString)
                 }

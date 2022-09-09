@@ -49,7 +49,7 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
     private lateinit var context: Context
     private lateinit var firebaseDatabase: DatabaseReference
     private lateinit var appSettings: AppSettings
-    private lateinit var auth: FirebaseAuth
+//    private lateinit var auth: FirebaseAuth
     var userCurrentCreditsValue: Float = 0F
     private var userCurrentCredits = ""
     private var couponCodeCredits = 0
@@ -76,7 +76,7 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
 
     private fun initViews() {
         context = this
-        auth = FirebaseAuth.getInstance()
+//        auth = FirebaseAuth.getInstance()
         firebaseDatabase = FirebaseDatabase.getInstance().reference
         appSettings = AppSettings(context)
         binding.getCreditsBtn.setOnClickListener(this)
@@ -131,10 +131,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
     }
 
     private fun getUserCredit() {
-        if (auth.currentUser != null) {
+        if (Constants.firebaseUserId.isNotEmpty()) {
 
-            val userId = auth.currentUser!!.uid
-            Constants.firebaseUserId = userId
+            val userId = Constants.firebaseUserId
+            //Constants.firebaseUserId = userId
             firebaseDatabase.child(Constants.firebaseUserCredits)
                 .child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -164,9 +164,9 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
     }
 
     private fun getUserSubscriptionDetails() {
-        if (auth.currentUser != null) {
+        if (Constants.firebaseUserId.isNotEmpty()) {
 
-            val userId = auth.currentUser!!.uid
+            val userId = Constants.firebaseUserId//auth.currentUser!!.uid
 
             startLoading(context)
             viewModel.callUserPackageDetail(context, userId)
@@ -593,10 +593,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
         oneCreditBtn.setOnClickListener {
             productId = "single_credit"
             productIdIndex = 0
-            if (auth.currentUser != null) {
+            if (Constants.firebaseUserId.isNotEmpty()) {
                 alert.dismiss()
                 creditsValue = 1F
-                userId = auth.currentUser!!.uid
+                userId = Constants.firebaseUserId//auth.currentUser!!.uid
                 purchase()
 
             } else {
@@ -607,10 +607,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
         sixCreditBtn.setOnClickListener {
             productId = "six_credits"
             productIdIndex = 1
-            if (auth.currentUser != null) {
+            if (Constants.firebaseUserId.isNotEmpty()) {
                 alert.dismiss()
                 creditsValue = 6F
-                userId = auth.currentUser!!.uid
+                userId = Constants.firebaseUserId//auth.currentUser!!.uid
                 purchase()
 
             } else {
@@ -621,10 +621,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
         tenCreditBtn.setOnClickListener {
             productId = "ten_credits"
             productIdIndex = 2
-            if (auth.currentUser != null) {
+            if (Constants.firebaseUserId.isNotEmpty()) {
                 alert.dismiss()
                 creditsValue = 10F
-                userId = auth.currentUser!!.uid
+                userId = Constants.firebaseUserId//auth.currentUser!!.uid
                 purchase()
 
             } else {
@@ -921,10 +921,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
                     )
                 }
             } else {
-                if (auth.currentUser != null) {
+                if (Constants.firebaseUserId.isNotEmpty()) {
 
-                    val userId = auth.currentUser!!.uid
-                    Constants.firebaseUserId = userId
+                    val userId = Constants.firebaseUserId//auth.currentUser!!.uid
+//                    Constants.firebaseUserId = userId
                     firebaseDatabase.child(Constants.firebaseUserCredits)
                         .child(userId).addListenerForSingleValueEvent(object :
                             ValueEventListener {
@@ -1015,10 +1015,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
                     )
                 }
             } else {
-                if (auth.currentUser != null) {
+                if (Constants.firebaseUserId.isNotEmpty()) {
 
-                    val userId = auth.currentUser!!.uid
-                    Constants.firebaseUserId = userId
+                    val userId = Constants.firebaseUserId//auth.currentUser!!.uid
+//                    Constants.firebaseUserId = userId
                     firebaseDatabase.child(Constants.firebaseUserCredits)
                         .child(userId).addListenerForSingleValueEvent(object :
                             ValueEventListener {
@@ -1083,10 +1083,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
                     )
                 }
             } else {
-                if (auth.currentUser != null) {
+                if (Constants.firebaseUserId.isNotEmpty()) {
 
-                    val userId = auth.currentUser!!.uid
-                    Constants.firebaseUserId = userId
+                    val userId = Constants.firebaseUserId//auth.currentUser!!.uid
+                    //Constants.firebaseUserId = userId
                     firebaseDatabase.child(Constants.firebaseUserCredits)
                         .child(userId).addListenerForSingleValueEvent(object :
                             ValueEventListener {
@@ -1145,10 +1145,10 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
                     )
                 }
             } else {
-                if (auth.currentUser != null) {
+                if (Constants.firebaseUserId.isNotEmpty()) {
 
-                    val userId = auth.currentUser!!.uid
-                    Constants.firebaseUserId = userId
+                    val userId = Constants.firebaseUserId//auth.currentUser!!.uid
+                    //Constants.firebaseUserId = userId
                     firebaseDatabase.child(Constants.firebaseUserCredits)
                         .child(userId).addListenerForSingleValueEvent(object :
                             ValueEventListener {
@@ -1315,8 +1315,8 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
 
         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
             val purchase: Purchase = purchases[0]
-            if (auth.currentUser != null) {
-                val userId = auth.currentUser!!.uid
+            if (Constants.firebaseUserId.isNotEmpty()) {
+                val userId = Constants.firebaseUserId//auth.currentUser!!.uid
                 purchaseDetail =
                     PurchaseDetail(
                         userId,
@@ -1533,8 +1533,8 @@ class UserScreenActivity : BaseActivity(), View.OnClickListener, PurchasesUpdate
         if (userCurrentCredits.isNotEmpty()) {
             if (userCurrentCredits.toFloat() >= feature.credit_price) {
 
-                if (auth.currentUser != null) {
-                    val userId = auth.currentUser!!.uid
+                if (Constants.firebaseUserId.isNotEmpty()) {
+                    val userId = Constants.firebaseUserId//auth.currentUser!!.uid
 
                     purchaseFeatures(context, feature, userId, object : APICallback {
                         override fun onSuccess(response: JSONObject) {

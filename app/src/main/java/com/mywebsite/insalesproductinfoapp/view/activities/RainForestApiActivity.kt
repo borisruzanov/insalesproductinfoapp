@@ -321,10 +321,10 @@ class RainForestApiActivity : BaseActivity(), RainForestApiAdapter.OnItemClickLi
     }
 
     private fun getUserCredit() {
-        if (auth.currentUser != null) {
+        if (Constants.firebaseUserId.isNotEmpty()) {
 
-            val userId = auth.currentUser!!.uid
-            Constants.firebaseUserId = userId
+            val userId = Constants.firebaseUserId
+            //Constants.firebaseUserId = userId
             firebaseDatabase.child(Constants.firebaseUserCredits)
                 .child(userId).addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {

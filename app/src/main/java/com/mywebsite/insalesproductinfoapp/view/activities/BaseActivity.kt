@@ -588,12 +588,12 @@ abstract class BaseActivity :  AppCompatActivity() {
         fun getUserCredits(context: Context) {
             val appSettings = AppSettings(context)
             var userCurrentCreditsValue: Float = 0F
-            val auth = FirebaseAuth.getInstance()
+            //val auth = FirebaseAuth.getInstance()
             val firebaseDatabase = FirebaseDatabase.getInstance().reference
-            if (auth.currentUser != null) {
+            if (Constants.firebaseUserId.isNotEmpty()) {
 
-                val userId = auth.currentUser!!.uid
-                Constants.firebaseUserId = userId
+                val userId = Constants.firebaseUserId
+                //Constants.firebaseUserId = userId
                 firebaseDatabase.child(Constants.firebaseUserCredits)
                     .child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {

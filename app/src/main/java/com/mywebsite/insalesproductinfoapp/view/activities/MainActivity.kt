@@ -92,7 +92,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     private var productsList = mutableListOf<Product>()
     //    private var originalProductsList = mutableListOf<Product>()
     private lateinit var viewModel: MainActivityViewModel
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
+//    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private var dialogStatus = 0
     private var currentPage = 1
     private var currentTotalProducts = 0
@@ -100,7 +100,7 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     private var password = ""
     private var shopName = ""
     var userCurrentCreditsValue: Float = 0F
-    private lateinit var auth: FirebaseAuth
+//    private lateinit var auth: FirebaseAuth
     private lateinit var firebaseDatabase: DatabaseReference
     private var productImagesChanges = false
     private var selectedImageBase64String: String = ""
@@ -144,18 +144,18 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     private fun initViews() {
         context = this
         appSettings = AppSettings(context)
-        auth = Firebase.auth
+//        auth = Firebase.auth
         firebaseDatabase = FirebaseDatabase.getInstance().reference
         viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         salesViewModel = ViewModelProvider(this)[SalesCustomersViewModel::class.java]
 
-        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
-
-        val acct: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(context)
+//        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//            .requestIdToken(getString(R.string.default_web_client_id))
+//            .requestEmail()
+//            .build()
+//        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions)
+//
+//        val acct: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(context)
 
         shopName = appSettings.getString("INSALES_SHOP_NAME") as String
         email = appSettings.getString("INSALES_EMAIL") as String
@@ -989,13 +989,13 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                         appSettings.remove("INSALES_EMAIL")
                         appSettings.remove("INSALES_PASSWORD")
                         Paper.book().destroy()
-                        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this) {
-                            mGoogleSignInClient.signOut().addOnCompleteListener(this) {
-                                FirebaseAuth.getInstance().signOut()
-
-                                appSettings.remove(Constants.isLogin)
-                                appSettings.remove(Constants.user)
-                                Constants.userData = null
+//                        mGoogleSignInClient.revokeAccess().addOnCompleteListener(this) {
+//                            mGoogleSignInClient.signOut().addOnCompleteListener(this) {
+//                                FirebaseAuth.getInstance().signOut()
+//
+//                                appSettings.remove(Constants.isLogin)
+//                                appSettings.remove(Constants.user)
+//                                Constants.userData = null
                                 Toast.makeText(
                                     context,
                                     getString(R.string.logout_success_text),
@@ -1006,8 +1006,8 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
                                 startActivity(Intent(context, LoginActivity::class.java)).apply {
                                     finish()
                                 }
-                            }
-                        }
+//                            }
+//                        }
                     }
                     .create().show()
             }
@@ -1048,10 +1048,10 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     }
 
     private fun getUserCredit() {
-        if (auth.currentUser != null) {
+        if (Constants.firebaseUserId.isNotEmpty()) {
 
-            val userId = auth.currentUser!!.uid
-            Constants.firebaseUserId = userId
+            val userId = Constants.firebaseUserId
+//            Constants.firebaseUserId = userId
             firebaseDatabase.child(Constants.firebaseUserCredits)
                 .child(userId).addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -2253,11 +2253,11 @@ class MainActivity : BaseActivity(), InSalesProductsAdapter.OnItemClickListener,
     }
 
     private fun checkAndStartTrialPeriod() {
-        if (auth.currentUser != null) {
-            val id = auth.uid as String
-            Constants.firebaseUserId = id
+        if (Constants.firebaseUserId.isNotEmpty()) {
+            val id = Constants.firebaseUserId//auth.uid as String
+            //Constants.firebaseUserId = id
 //            startLoading(context)
-            activeTrialFeatures(context, Constants.firebaseUserId, object : APICallback {
+            activeTrialFeatures(context, id, object : APICallback {
                 override fun onSuccess(response: JSONObject) {
 //                    dismiss()
 //                    getUserCurrentFeatures()

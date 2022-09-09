@@ -30,15 +30,22 @@ class LoginViewModel(context: Context) : ViewModel() {
         }
     }
 
-    private fun checkUserLoginStatus(){
+    private fun checkUserLoginStatus() {
         val insalesStatus = appSettings.getString("INSALES_STATUS")
-        val user = appSettings.getUser(Constants.user)
+        if (insalesStatus!!.isNotEmpty() && insalesStatus == "logged") {
+            val email = appSettings.getString("INSALES_EMAIL") as String
+            Constants.firebaseUserId =
+                email.replace(".", "-").replace("#", "-").replace("$", "-").replace("[", "-")
+                    .replace("]", "-")
+        }
+//        val user = appSettings.getUser(Constants.user)
         _isLoading.value = false
-        isLogged.value = user != null && insalesStatus!!.isNotEmpty() && insalesStatus == "logged"
+//        isLogged.value = user != null && insalesStatus!!.isNotEmpty() && insalesStatus == "logged"
+        isLogged.value = insalesStatus.isNotEmpty() && insalesStatus == "logged"
     }
 
-    fun callSalesAccount(context: Context,shopName:String,email:String,password:String){
-        accountResponse = ApiRepository.getInstance(context).salesAccount(shopName,email,password)
+    fun callSalesAccount(context: Context, shopName: String, email: String, password: String) {
+        accountResponse = ApiRepository.getInstance(context).salesAccount(shopName, email, password)
     }
 
     fun getSalesAccountResponse(): LiveData<JsonObject?> {
