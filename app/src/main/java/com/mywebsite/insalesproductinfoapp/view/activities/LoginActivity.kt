@@ -506,8 +506,8 @@ class LoginActivity : BaseActivity() {
                     appSettings.putString("INSALES_SHOP_NAME", shopName)
                     appSettings.putString("INSALES_EMAIL", email)
                     appSettings.putString("INSALES_PASSWORD", password)
-                    Constants.firebaseUserId = email.replace(".", "-").replace("#", "-").replace("$", "-").replace("[", "-")
-                        .replace("]", "-")
+                    Constants.firebaseUserId = email.replace(".", "_").replace("#", "_").replace("$", "_").replace("[", "_")
+                            .replace("]", "_")
                     add50CreditsFree()
 //                    startActivity(Intent(context,MainActivity::class.java)).apply {
 //                        finish()

@@ -35,8 +35,8 @@ class LoginViewModel(context: Context) : ViewModel() {
         if (insalesStatus!!.isNotEmpty() && insalesStatus == "logged") {
             val email = appSettings.getString("INSALES_EMAIL") as String
             Constants.firebaseUserId =
-                email.replace(".", "-").replace("#", "-").replace("$", "-").replace("[", "-")
-                    .replace("]", "-")
+                email.replace(".", "_").replace("#", "_").replace("$", "_").replace("[", "_")
+                    .replace("]", "_")
         }
 //        val user = appSettings.getUser(Constants.user)
         _isLoading.value = false
