@@ -323,7 +323,7 @@ class LoginActivity : BaseActivity() {
 //    }
 
     @SuppressLint("HardwareIds")
-    private fun add50CreditsFree() {
+    private fun add50CreditsFree(shopName: String) {
         startLoading(context)
         var freeCreditsValue = ""
         if (Constants.firebaseUserId.isNotEmpty()) {
@@ -333,8 +333,8 @@ class LoginActivity : BaseActivity() {
 
             val usedIdReference = firebaseDatabase.child("USERS_DEVICES_EMAILS")
             val params = HashMap<String, Any>()
-            params["email"] = email
-            params["deviceId"] = deviceId
+            params["shop_name"] = shopName
+            //params["deviceId"] = deviceId
 
             firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -346,8 +346,7 @@ class LoginActivity : BaseActivity() {
                                 var isFound = false
 
                                 for (item: DataSnapshot in snapshot.children) {
-                                    if (item.child("deviceId").getValue(String::class.java) == deviceId &&
-                                        item.child("email").getValue(String::class.java) == email) {
+                                    if (item.hasChild("shop_name") && item.child("shop_name").getValue(String::class.java) == shopName) {
                                         isFound = true
                                         break
                                     }
@@ -508,7 +507,7 @@ class LoginActivity : BaseActivity() {
                     appSettings.putString("INSALES_PASSWORD", password)
                     Constants.firebaseUserId = email.replace(".", "_").replace("#", "_").replace("$", "_").replace("[", "_")
                             .replace("]", "_")
-                    add50CreditsFree()
+                    add50CreditsFree(shopName)
 //                    startActivity(Intent(context,MainActivity::class.java)).apply {
 //                        finish()
 //                    }
