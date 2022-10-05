@@ -45,6 +45,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InsalesProductInfoApp"
         tools:targetApi="31">
+
         <activity
             android:name=".view.activities.LoginActivity"
             android:exported="true"
