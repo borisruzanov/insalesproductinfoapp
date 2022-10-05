@@ -333,8 +333,9 @@ class LoginActivity : BaseActivity() {
 
             val usedIdReference = firebaseDatabase.child("USERS_DEVICES_EMAILS")
             val params = HashMap<String, Any>()
-            params["shop_name"] = shopName
-            //params["deviceId"] = deviceId
+            params["email"] = email
+            params["deviceId"] = deviceId
+            params["shopName"] = shopName
 
             firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -346,7 +347,9 @@ class LoginActivity : BaseActivity() {
                                 var isFound = false
 
                                 for (item: DataSnapshot in snapshot.children) {
-                                    if (item.hasChild("shop_name") && item.child("shop_name").getValue(String::class.java) == shopName) {
+                                    if (item.child("email").getValue(String::class.java) == email ||
+                                        item.child("deviceId").getValue(String::class.java) == deviceId ||
+                                        item.child("shopName").getValue(String::class.java) == shopName) {
                                         isFound = true
                                         break
                                     }
