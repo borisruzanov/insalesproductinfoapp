@@ -57,101 +57,132 @@ class LoginViewModel(context: Context) : ViewModel() {
     }
 
     fun checkEmailExist(email: String,reference: DatabaseReference){
-        reference.addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChildren()) {
-                    var isFound = false
-                    for (item: DataSnapshot in snapshot.children) {
-                        if (item.hasChild("email")) {
-                            val value = item.child("email").getValue(String::class.java) as String
-                            if (value.isNotEmpty() && value == email) {
-                                isFound = true
-                                break
-                            }
-                            else{
-                                isFound = false
-                            }
-                        }
-                    }
-                    isEmailFound.postValue(isFound)
-                } else {
-                    isEmailFound.postValue(false)
-                }
-
+        reference.child(email).get().addOnSuccessListener {
+            if (it.value != null){
+                isEmailFound.postValue(true)
             }
-
-            override fun onCancelled(error: DatabaseError) {
+            else{
                 isEmailFound.postValue(false)
             }
 
-        })
+        }.addOnFailureListener{
+            isEmailFound.postValue(false)
+        }
+//        reference.child(email).addListenerForSingleValueEvent(object :
+//            ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                if (snapshot.hasChildren()) {
+//                    var isFound = false
+//                    for (item: DataSnapshot in snapshot.children) {
+//                        if (item.hasChild("email")) {
+//                            val value = item.child("email").getValue(String::class.java) as String
+//                            if (value.isNotEmpty() && value == email) {
+//                                isFound = true
+//                                break
+//                            }
+//                            else{
+//                                isFound = false
+//                            }
+//                        }
+//                    }
+//                    isEmailFound.postValue(isFound)
+//                } else {
+//                    isEmailFound.postValue(false)
+//                }
+//
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                isEmailFound.postValue(false)
+//            }
+//
+//        })
     }
 
     fun checkDeviceIdExist(deviceId: String,reference: DatabaseReference){
-
-        reference.addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChildren()) {
-                    var isFound = false
-                    for (item: DataSnapshot in snapshot.children) {
-                        if (item.hasChild("deviceId")) {
-                            val value = item.child("deviceId").getValue(String::class.java) as String
-                            if (value.isNotEmpty() && value == deviceId) {
-                                isFound = true
-                                break
-                            }
-                            else{
-                                isFound = false
-                            }
-                        }
-                    }
-                    isDeviceIdFound.postValue(isFound)
-                } else {
-                    isDeviceIdFound.postValue(false)
-                }
-
+        reference.child(deviceId).get().addOnSuccessListener {
+            if (it.value != null){
+                isDeviceIdFound.postValue(true)
             }
-
-            override fun onCancelled(error: DatabaseError) {
+            else{
                 isDeviceIdFound.postValue(false)
             }
 
-        })
+        }.addOnFailureListener{
+            isDeviceIdFound.postValue(false)
+        }
+//        reference.child(deviceId).addListenerForSingleValueEvent(object :
+//            ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                if (snapshot.hasChildren()) {
+//                    var isFound = false
+//                    for (item: DataSnapshot in snapshot.children) {
+//                        if (item.hasChild("deviceId")) {
+//                            val value = item.child("deviceId").getValue(String::class.java) as String
+//                            if (value.isNotEmpty() && value == deviceId) {
+//                                isFound = true
+//                                break
+//                            }
+//                            else{
+//                                isFound = false
+//                            }
+//                        }
+//                    }
+//                    isDeviceIdFound.postValue(isFound)
+//                } else {
+//                    isDeviceIdFound.postValue(false)
+//                }
+//
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                isDeviceIdFound.postValue(false)
+//            }
+//
+//        })
     }
 
     fun checkStoreIdExist(storeId: String,reference: DatabaseReference){
-
-        reference.addListenerForSingleValueEvent(object :
-            ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChildren()) {
-                    var isFound = false
-                    for (item: DataSnapshot in snapshot.children) {
-                        if (item.hasChild("storeId")) {
-                            val value = item.child("storeId").getValue(String::class.java) as String
-                            if (value.isNotEmpty() && value == storeId) {
-                                isFound = true
-                                break
-                            }
-                            else{
-                                isFound = false
-                            }
-                        }
-                    }
-                    isStoreIdFound.postValue(isFound)
-                } else {
-                    isStoreIdFound.postValue(false)
-                }
-
+        reference.child(storeId).get().addOnSuccessListener {
+            if (it.value != null){
+                isStoreIdFound.postValue(true)
             }
-
-            override fun onCancelled(error: DatabaseError) {
+            else{
                 isStoreIdFound.postValue(false)
             }
 
-        })
+        }.addOnFailureListener{
+            isStoreIdFound.postValue(false)
+        }
+//        reference.child(storeId).addListenerForSingleValueEvent(object :
+//            ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                if (snapshot.hasChildren()) {
+//                    var isFound = false
+//                    for (item: DataSnapshot in snapshot.children) {
+//                        if (item.hasChild("storeId")) {
+//                            val value = item.child("storeId").getValue(String::class.java) as String
+//                            if (value.isNotEmpty() && value == storeId) {
+//                                isFound = true
+//                                break
+//                            }
+//                            else{
+//                                isFound = false
+//                            }
+//                        }
+//                    }
+//                    isStoreIdFound.postValue(isFound)
+//                } else {
+//                    isStoreIdFound.postValue(false)
+//                }
+//
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//                isStoreIdFound.postValue(false)
+//            }
+//
+//        })
     }
 
 }

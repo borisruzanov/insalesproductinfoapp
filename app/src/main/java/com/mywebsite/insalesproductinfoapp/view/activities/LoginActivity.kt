@@ -34,7 +34,10 @@ import com.mywebsite.insalesproductinfoapp.utils.Constants
 import com.mywebsite.insalesproductinfoapp.viewmodel.LoginViewModel
 import com.mywebsite.insalesproductinfoapp.viewmodelfactory.LoginViewModelFactory
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.HashMap
 
 class LoginActivity : BaseActivity() {
 
@@ -335,13 +338,14 @@ class LoginActivity : BaseActivity() {
             val usedEmailReference = firebaseDatabase.child("USER_EMAILS")
             val usedDeviceIdsReference = firebaseDatabase.child("USER_DEVICE_IDS")
             val usedStoreReference = firebaseDatabase.child("USER_STORE_IDS")
-
-            val params = HashMap<String, Any>()
-            params["email"] = email
-            val params1 = HashMap<String, Any>()
-            params1["deviceId"] = deviceId
-            val params2 = HashMap<String, Any>()
-            params2["storeId"] = shopName
+            val sdf = SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.ENGLISH)
+            val date = sdf.format(System.currentTimeMillis())
+//            val params = HashMap<String, Any>()
+//            params[email] = date
+//            val params1 = HashMap<String, Any>()
+//            params1[deviceId] = date
+//            val params2 = HashMap<String, Any>()
+//            params2[shopName] = date
             var emailFound = false
             var deviceIdFound = false
             var storeIdFound = false
@@ -398,9 +402,9 @@ class LoginActivity : BaseActivity() {
                                                 .child(email)
                                                 .updateChildren(hashMap)
                                                 .addOnSuccessListener {
-                                                    usedEmailReference.push().setValue(params)
-                                                    usedDeviceIdsReference.push().setValue(params1)
-                                                    usedStoreReference.push().setValue(params2)
+                                                    usedEmailReference.child(email).setValue(date)
+                                                    usedDeviceIdsReference.child(deviceId).setValue(date)
+                                                    usedStoreReference.child(shopName).setValue(date)
                                                     moveNext()
                                                 }
                                                 .addOnFailureListener {
@@ -485,6 +489,9 @@ class LoginActivity : BaseActivity() {
                 } else {
                     showAlert(context, response.get("message").asString)
                 }
+            }
+            else{
+                showAlert(context, getString(R.string.something_wrong_error))
             }
         })
     }
