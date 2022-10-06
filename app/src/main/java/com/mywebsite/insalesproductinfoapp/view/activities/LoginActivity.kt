@@ -41,8 +41,9 @@ class LoginActivity : BaseActivity() {
     private lateinit var context: Context
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
-    private lateinit var appSettings:AppSettings
-//    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var appSettings: AppSettings
+
+    //    private lateinit var mGoogleSignInClient: GoogleSignInClient
 //    private lateinit var auth: FirebaseAuth
     private var user: User? = null
     private lateinit var firebaseDatabase: DatabaseReference
@@ -52,7 +53,7 @@ class LoginActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         context = this
         viewModel = ViewModelProvider(
-            this,LoginViewModelFactory(this)
+            this, LoginViewModelFactory(this)
         )[LoginViewModel::class.java]
         installSplashScreen().apply {
             setKeepOnScreenCondition {
@@ -71,12 +72,12 @@ class LoginActivity : BaseActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-         initViews()
+        initViews()
 
     }
 
-    private fun initViews(){
-       appSettings  = AppSettings(context)
+    private fun initViews() {
+        appSettings = AppSettings(context)
         firebaseDatabase = FirebaseDatabase.getInstance().reference
 //        auth = Firebase.auth
 
@@ -331,79 +332,47 @@ class LoginActivity : BaseActivity() {
             val email = Constants.firebaseUserId
             val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
-            val usedIdReference = firebaseDatabase.child("USERS_DEVICES_EMAILS")
+            val usedEmailReference = firebaseDatabase.child("USER_EMAILS")
+            val usedDeviceIdsReference = firebaseDatabase.child("USER_DEVICE_IDS")
+            val usedStoreReference = firebaseDatabase.child("USER_STORE_IDS")
+
             val params = HashMap<String, Any>()
             params["email"] = email
-            params["deviceId"] = deviceId
-            params["shopName"] = shopName
+            val params1 = HashMap<String, Any>()
+            params1["deviceId"] = deviceId
+            val params2 = HashMap<String, Any>()
+            params2["storeId"] = shopName
+            var emailFound = false
+            var deviceIdFound = false
+            var storeIdFound = false
 
-            firebaseDatabase.child(Constants.firebaseFreeCredits).addListenerForSingleValueEvent(object :ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    freeCreditsValue = snapshot.child("value").getValue(String::class.java) as String
+            viewModel.checkEmailExist(email,usedEmailReference)
+            viewModel.checkDeviceIdExist(deviceId,usedDeviceIdsReference)
+            viewModel.checkStoreIdExist(shopName,usedStoreReference)
 
-                    usedIdReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.hasChildren()) {
-                                var isFound = false
+            viewModel.isEmailFound.observe(this) { _value ->
+                emailFound = _value
+            }
 
-                                for (item: DataSnapshot in snapshot.children) {
-                                    if (item.child("email").getValue(String::class.java) == email ||
-                                        item.child("deviceId").getValue(String::class.java) == deviceId ||
-                                        item.child("shopName").getValue(String::class.java) == shopName) {
-                                        isFound = true
-                                        break
-                                    }
-                                }
+            viewModel.isDeviceIdFound.observe(this) { _value ->
+                deviceIdFound = _value
+            }
 
-                                if (!isFound) {
-                                    firebaseDatabase.child(Constants.firebaseUserCredits)
-                                        .child(email).addListenerForSingleValueEvent(object :
-                                            ValueEventListener {
-                                            override fun onDataChange(snapshot: DataSnapshot) {
+            viewModel.isStoreIdFound.observe(this) { _value ->
+                storeIdFound = _value
+            }
 
-                                                if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
-                                                    val previousCredits =
-                                                        snapshot.child("credits").getValue(String::class.java)
-                                                    userCurrentCreditsValue =
-                                                        if (previousCredits!!.isNotEmpty()) {
-                                                            previousCredits.toFloat()
-                                                        } else {
-                                                            0F
-                                                        }
-                                                }
+            firebaseDatabase.child(Constants.firebaseFreeCredits)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        freeCreditsValue =
+                            snapshot.child("value").getValue(String::class.java) as String
 
-                                                val roundedCreditValues =
-                                                    userCurrentCreditsValue.toBigDecimal()
-                                                        .setScale(2, RoundingMode.FLOOR)
-                                                        .toDouble()
-                                                val totalCredits = roundedCreditValues + freeCreditsValue.toInt()
-                                                val hashMap = HashMap<String, Any>()
-
-                                                hashMap["credits"] = totalCredits.toString()
-                                                firebaseDatabase.child(Constants.firebaseUserCredits)
-                                                    .child(email)
-                                                    .updateChildren(hashMap)
-                                                    .addOnSuccessListener {
-                                                        usedIdReference.push().setValue(params)
-                                                        moveNext()
-                                                    }
-                                                    .addOnFailureListener {
-                                                        moveNext()
-                                                    }
-                                            }
-
-                                            override fun onCancelled(error: DatabaseError) {
-                                                moveNext()
-                                            }
-
-                                        })
-                                }
-                                else {
-                                    moveNext()
-                                }
-                            } else {
+                        Handler(Looper.myLooper()!!).postDelayed({
+                            if (!emailFound && !deviceIdFound && !storeIdFound) {
                                 firebaseDatabase.child(Constants.firebaseUserCredits)
-                                    .child(email).addListenerForSingleValueEvent(object : ValueEventListener {
+                                    .child(email).addListenerForSingleValueEvent(object :
+                                        ValueEventListener {
                                         override fun onDataChange(snapshot: DataSnapshot) {
 
                                             if (snapshot.hasChildren() && snapshot.hasChild("credits")) {
@@ -429,11 +398,13 @@ class LoginActivity : BaseActivity() {
                                                 .child(email)
                                                 .updateChildren(hashMap)
                                                 .addOnSuccessListener {
-                                                    usedIdReference.push().setValue(params)
+                                                    usedEmailReference.push().setValue(params)
+                                                    usedDeviceIdsReference.push().setValue(params1)
+                                                    usedStoreReference.push().setValue(params2)
                                                     moveNext()
                                                 }
                                                 .addOnFailureListener {
-//                                            moveNext()
+                                                    moveNext()
                                                 }
                                         }
 
@@ -442,36 +413,31 @@ class LoginActivity : BaseActivity() {
                                         }
 
                                     })
+                            } else {
+                               moveNext()
                             }
-                        }
+                        }, 2000)
+                    }
 
-                        override fun onCancelled(error: DatabaseError) {
-//                    moveNext()
-                        }
+                    override fun onCancelled(error: DatabaseError) {
+                        moveNext()
+                    }
 
-                    })
-
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-
-                }
-
-            })
-        }
-        else{
+                })
+        } else {
             moveNext()
         }
     }
-    private fun moveNext(){
+
+    private fun moveNext() {
         dismiss()
 //        binding.googleLoginWrapperLayout.visibility = View.GONE
 //        binding.insalesLoginWrapperLayout.visibility = View.VISIBLE
 //        Handler(Looper.myLooper()!!).postDelayed({
 //            dismiss()
-            startActivity(Intent(context,MainActivity::class.java)).apply {
-                finish()
-            }
+        startActivity(Intent(context, MainActivity::class.java)).apply {
+            finish()
+        }
 //        },2000)
 
     }
@@ -508,7 +474,9 @@ class LoginActivity : BaseActivity() {
                     appSettings.putString("INSALES_SHOP_NAME", shopName)
                     appSettings.putString("INSALES_EMAIL", email)
                     appSettings.putString("INSALES_PASSWORD", password)
-                    Constants.firebaseUserId = email.replace(".", "_").replace("#", "_").replace("$", "_").replace("[", "_")
+                    Constants.firebaseUserId =
+                        email.replace(".", "_").replace("#", "_").replace("$", "_")
+                            .replace("[", "_")
                             .replace("]", "_")
                     add50CreditsFree(shopName)
 //                    startActivity(Intent(context,MainActivity::class.java)).apply {
