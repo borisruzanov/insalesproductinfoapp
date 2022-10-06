@@ -373,7 +373,7 @@ class LoginActivity : BaseActivity() {
                             snapshot.child("value").getValue(String::class.java) as String
 
                         Handler(Looper.myLooper()!!).postDelayed({
-                            if (!emailFound && !deviceIdFound && !storeIdFound) {
+                            if (!emailFound || !deviceIdFound || !storeIdFound) {
                                 firebaseDatabase.child(Constants.firebaseUserCredits)
                                     .child(email).addListenerForSingleValueEvent(object :
                                         ValueEventListener {
